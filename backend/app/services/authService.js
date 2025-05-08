@@ -4,6 +4,7 @@ const sendEmail = require('../utils/sendEmail');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const customError = require('../errors/CustomError');
+const format = require('../utils/formatValidation');
 
 const authService = {
     userLogin: async (email, password) => {
@@ -12,6 +13,12 @@ const authService = {
                 throw new customError('Email address is required. Please provide a valid email and try again.', 400);
             } else if (!password) {
                 throw new customError('Password is required. Please provide a valid password and try again.', 400);
+            } 
+
+            if (!format.isValidEmail(email)) {
+                throw new customError('Invalid email format. Please check and try again', 400);
+            } else if (!format.isValidPassword(password)) {
+                throw new customError('Password must contain at least one uppercase letter, one lowercase letter, one number, and be at least 8 characters long.',400);
             }
 
             const user = await userModel.getUserByEmail(email);
@@ -45,7 +52,11 @@ const authService = {
                 throw new customError('Password confirm is required. Please provide a valid password confirm and try again.', 400);
             }
 
-            if (password !== passwordConfirm) {
+            if (!format.isValidEmail(email)) {
+                throw new customError('Invalid email format. Please check and try again', 400);
+            } else if (!format.isValidPassword(password)) {
+                throw new customError('Password must contain at least one uppercase letter, one lowercase letter, one number, and be at least 8 characters long.',400);
+            } else if (password !== passwordConfirm) {
                 throw new customError('Passwords do not match. Please make sure both passwords are the same.', 400);
             }
 
@@ -71,7 +82,12 @@ const authService = {
     requestPasswordReset: async (email) => {
         try {
             if (!email) {
-                throw new customError('Email address is required. Please provide a valid email and try again.', 400);            }
+                throw new customError('Email address is required. Please provide a valid email and try again.', 400);
+            }
+
+            if (!format.isValidEmail(email)) {
+                throw new customError('Invalid email format. Please check and try again', 400);
+            }
 
             const user = await userModel.getUserByEmail(email);
             if (!user) {
@@ -105,8 +121,10 @@ const authService = {
             } else if (!passwordConfirm) {
                 throw new customError('Password confirm is required. Please provide a valid password confirm and try again.', 400);
             }
-
-            if (password !== passwordConfirm) {
+            
+            if (!format.isValidPassword(password)) {
+                throw new customError('Password must contain at least one uppercase letter, one lowercase letter, one number, and be at least 8 characters long.',400);
+            } else if (password !== passwordConfirm) {
                 throw new customError('Passwords do not match. Please make sure both passwords are the same.', 400);
             }
     

@@ -68,7 +68,7 @@ const userService = {
     deleteById: async (id) => {
         try {
             if (!id) {
-                throw new customError('User ID is required. Please provide a valid name and try again', 400);
+                throw new customError('User ID is required. Please provide a valid ID and try again', 400);
             }
 
             const findUser = await userModel.getUserById(id);

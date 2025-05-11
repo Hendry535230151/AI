@@ -1,26 +1,31 @@
 import './App.css';
 import React, { useEffect, useState } from 'react';
 
-
 function App() {
-  const [data, setData] = useState(null);
+  const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    fetch('/users')
+    fetch('http://localhost:3000/users')
       .then(res => res.json())
       .then(data => {
-        setData(data);
+        setUsers(data.data);
         console.log(data);
       })
       .catch(err => {
-        console.error('Error fetching data:', err);
+        console.error('Error fetching users:', err);
       });
   }, []);
 
   return (
-    <div>
-      <h1>Data dari Backend:</h1>
-      <pre>{JSON.stringify(data, null, 2)}</pre>
+    <div className="App">
+      <h1>Daftar Pengguna</h1>
+      <ul>
+        {users.map(user => (
+          <li key={user.id}>
+            <strong>{user.username}</strong> - {user.email}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

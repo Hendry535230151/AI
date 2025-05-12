@@ -1,7 +1,7 @@
 const db = require('../config/db');
 
 const categoryModel = {
-    getCategorie: () => {
+    getCategories: () => {
         return new Pormise((resolve, reject) => {
             const query = 'SELECT * FROM categories';
             db.query(query, (err, result) => {
@@ -65,7 +65,7 @@ const categoryModel = {
         });
     },
 
-    updateCategory: (id, categoryName) => {
+    updateCategoryName: (id, categoryName) => {
         return new Promise((resolve, reject) => {
             const query = 'UPDATE categories SET category_name = ? WHERE id = ?';
             db.query(query, [categoryName, id], (err, result) => {

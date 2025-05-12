@@ -4,6 +4,7 @@ const userRoute = require('./app/routes/userRoute');
 const authRoute = require('./app/routes/authRoute');
 const aiRoute = require('./app/routes/aiRoute');
 const directoriesRoute = require('./app/routes/directoryRoute');
+const categoryRoute = require('./app/routes/categoryRoute');
 const express = require('express');
 const cors = require('cors');
 const app = express();
@@ -23,7 +24,8 @@ app.use(cors(corsOptions));
 app.use('/users', userRoute);
 app.use('/auth', authRoute);
 app.use('/ai', aiRoute);
-app.use('/directories', directoriesRoute)
+app.use('/directories', directoriesRoute);
+app.use('/categories', categoryRoute);
 
 app.listen(process.env.PORT, () => {
     console.log(`Server run at http://localhost:${process.env.PORT}`);

@@ -2,7 +2,7 @@ const db = require('../config/db');
 
 const categoryModel = {
     getCategories: () => {
-        return new Pormise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             const query = 'SELECT * FROM categories';
             db.query(query, (err, result) => {
                 if (err) {
@@ -24,7 +24,7 @@ const categoryModel = {
                 if (err) {
                     return reject(err);
                 }
-                if (!result || result.length) {
+                if (!result || result.length === 0) {
                     resolve(false);
                 } else {
                     resolve(result);
@@ -35,8 +35,9 @@ const categoryModel = {
 
     getCategoryByName: (categoryName) => {
         return new Promise((resolve, reject) => {
-            const query = 'SELECT * FROM categories WHERE id LIKE ?';
-            db.query(query, [categoryName], (err, result) => {
+            const query = 'SELECT * FROM categories WHERE category_name LIKE ?';
+            db.query(query, [`%${categoryName}%`], (err, result) => {
+                console.log(result)
                 if (err) {
                     return reject(err);
                 }

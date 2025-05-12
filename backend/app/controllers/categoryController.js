@@ -22,8 +22,8 @@ const categoryController = {
 
     getCategoryByName: async (req, res) => {
         try {
-            const { name } = req.query;
-            const category = await categoryService.getCategoryByName(name);
+            const { categoryName } = req.query;
+            const category = await categoryService.getCategoryByName(categoryName);
             return res.status(200).json({ success: true, data: category });
         } catch (err) {
             return res.status(err.statusCode || 500).json({ success: false, message: err.message || 'Internal server error' });
@@ -32,8 +32,8 @@ const categoryController = {
 
     createCategory: async (req, res) => {
         try {
-            const { name } = req.body;
-            const category = await categoryService.createCategory(name);
+            const { categoryName } = req.body;
+            const category = await categoryService.createCategory(categoryName);
             return res.status(201).json({ success: true, data: category });
         } catch (err) {
             return res.status(err.statusCode || 500).json({ success: false, message: err.message || 'Internal server error' });
@@ -43,8 +43,8 @@ const categoryController = {
     updateCategory: async (req, res) => {
         try {
             const { id } = req.params;
-            const { name } = req.body;
-            const category = await categoryService.updateCategoryName(id, name);
+            const { categoryName } = req.body;
+            const category = await categoryService.updateCategoryName(id, categoryName);
             return res.status(200).json({ success: true, data: category });
         } catch (err) {
             return res.status(err.statusCode || 500).json({ success: false, message: err.message || 'Internal server error' });
@@ -55,7 +55,7 @@ const categoryController = {
         try {
             const { id } = req.params;
             const category = await categoryService.deleteCategory(id);
-            return res.status(200).json({ success: true, message: 'Category updatedep successfully.' });
+            return res.status(200).json({ success: true, message: 'Category deleted successfully.' });
         } catch (err) {
             return res.status(err.statusCode || 500).json({ success: false, message: err.message || 'Internal server error' });
         }

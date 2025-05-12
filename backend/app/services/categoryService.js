@@ -37,6 +37,7 @@ const categoryService = {
             }
 
             const findCategory = await categoryModel.getCategoryByName(categoryName);
+            console.log(findCategory)
             if (!findCategory) {
                 throw new CustomError('Error');
             }

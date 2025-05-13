@@ -45,10 +45,10 @@ const directoryController = {
 
     updateDirectoryName: async (req, res) => {
         const { id } = req.params;
-        const { directoriesName } = req.body;
+        const { userId, directoriesName } = req.body;
 
         try {
-            const updated = await directoryService.updateDirectoryName(id, directoriesName);
+            const updated = await directoryService.updateDirectoryName(id, userId, directoriesName);
             res.status(200).json({ success: true, message: 'Directory updated successfully', data: updated });
         } catch (err) {
             res.status(err.statusCode || 500).json({ success: false, message: err.message || 'Failed to update directory' });

@@ -37,7 +37,6 @@ const categoryService = {
             }
 
             const findCategory = await categoryModel.getCategoryByName(categoryName);
-            console.log(findCategory)
             if (!findCategory) {
                 throw new CustomError('Error');
             }
@@ -53,6 +52,10 @@ const categoryService = {
                 throw new CustomError('Error');
             }
 
+            const checkDuplicate = await categoryModel.checkDuplicate(categoryName);
+            if (checkDuplicate) {
+                throw new CustomError('Error');
+            }
             const createCategory = await categoryModel.createCategory(categoryName);
             if (!createCategory) {
                 throw new CustomError('Error');
@@ -71,6 +74,10 @@ const categoryService = {
                 throw new CustomError('Error');
             }
 
+            const checkDuplicate = await categoryModel.checkDuplicate(categoryName);
+            if (checkDuplicate) {
+                throw new CustomError('Error');
+            }
             const changeName = await categoryModel.updateCategoryName(id, categoryName)
             if (!changeName) {
                 throw new CustomError('Error');

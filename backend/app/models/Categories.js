@@ -50,6 +50,22 @@ const categoryModel = {
         });
     },
 
+    checkDuplicate: (categoryName) => {
+        return new Promise((resolve, reject) => {
+            const query =  'SELECT * FROM categories WHERE category_name = ?';
+            db.query(query, [categoryName], (err, result) => {
+                if (err) {
+                    reject(err);
+                }
+                if (!result || result.length === 0) {
+                    resolve(false);
+                } else {
+                    resolve(true);
+                }
+            })
+        });
+    },
+
     createCategory: (categoryName) => {
         return new Promise((resolve, reject) => {
             const query = 'INSERT INTO categories (category_name) VALUES (?)';

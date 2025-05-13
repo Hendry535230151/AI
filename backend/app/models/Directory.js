@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const { checkDuplicate } = require('./Categories');
 
 const directoryModel = {
     getDirectories: () => {
@@ -49,6 +50,22 @@ const directoryModel = {
         });
     },
 
+    checkDuplicateDirectory: (userId, directoryName) => {
+        return new Promise((resolve, reject) => {
+            const query = 'SELECT * FROM directories WHERE directory_name = ? AND user_id = ?';
+            db.query(query, [directoryName, userId], (err, result) => {
+                if (err) {
+                    return reject(err);
+                }
+                if (!result || result.length === 0) {
+                    resolve(false);
+                } else {
+                    resolve(result);
+                }
+            });
+        });
+    },
+
     createDirectory: (userId, directoryName, parentDirectory) => {
         return new Promise((resolve, reject) => {
             const query = 'INSERT INTO directories (user_id, directory_name, parent_directory) VALUES (?, ?, ?)';
@@ -65,10 +82,10 @@ const directoryModel = {
         });
     },
 
-    updateDirectoryName: (id, directoryName) => {
+    updateDirectoryName: (id, userId, directoryName) => {
         return new Promise((resolve, reject) => {
-            const query = 'UPDATE directories SET directory_name = ? WHERE id = ?';
-            db.query(query, [directoryName, id], (err, result) => {
+            const query = 'UPDATE directories SET directory_name = ? WHERE id = ? AND user_id = ?';
+            db.query(query, [directoryName, id, userId], (err, result) => {
                 if (err) {
                     return reject(err);
                 }

@@ -37,7 +37,6 @@ const categoryModel = {
         return new Promise((resolve, reject) => {
             const query = 'SELECT * FROM categories WHERE category_name LIKE ?';
             db.query(query, [`%${categoryName}%`], (err, result) => {
-                console.log(result)
                 if (err) {
                     return reject(err);
                 }

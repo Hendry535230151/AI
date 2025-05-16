@@ -1,13 +1,24 @@
 # AI
 This project is an AI-driven system designed to search, retrieve, and organize documentation and files based on user queries. Users can upload files, which the AI will categorize and store in a database, allowing for easy access and retrieval through a chat-based interface.
 
-## Used depedencies
-    npm install mysql2
+## AI % External API
+    npm install @google/generative-ai
+    npm install axios
+
+## Server & backend
     npm install express
-    npm install --save-dev nodemon
+    npm install mysql2
 
-## Security depedencies
+## Security dependencies
+    npm install nodemailer
+    npm install bcrypt
+    npm install jsonwebtoken
     npm install dotenv
+    npm install cors
 
-## Testing depedencies
-    npm install --save.dev jest
+## Frontend depedencies
+    npm install react-scripts --save
+
+## Development & Testing
+    npm install --save-dev jest
+    npm install --save-dev nodemon

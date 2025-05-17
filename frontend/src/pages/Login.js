@@ -19,6 +19,7 @@ function Login() {
         try {
             const response = await axios.post('http://localhost:3000/auth/login', loginForm);
             console.log('Login successful:', response.data);
+            navigate('/chat');
         } catch (err) {
             if (err.response) {
                 setError(`Error: ${err.response.data.message || 'Login failed'}`);

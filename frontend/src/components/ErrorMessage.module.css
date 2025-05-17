@@ -1,0 +1,42 @@
+.error_container {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333333;
+  color: #000;
+  padding: 1rem 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.error_title {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 8px;
+    color: #dbbd72;
+}
+
+.error_title i {
+    padding: 5px;
+    border: 1px solid #dbbd72;
+    border-radius: 5px;
+    color: #f5f5f5;
+    transition: 0.1s ease-in-out;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.error_title i:active {
+    background-color: #dbbd72;
+    color: #131313;
+}
+
+.error_description {
+    font-size: 14px;
+    line-height: 1.4;
+    color: #f5f5f5;
+}

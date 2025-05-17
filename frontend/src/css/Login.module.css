@@ -5,7 +5,7 @@
 }
 
 .card_container {
-    height: 600px;
+    height: 650px;
     width: 90%;
     max-width: 1000px;
     position: absolute;
@@ -122,6 +122,7 @@
 
 .button {
     background-color: #2a2a2a;
+    color: #f5f5f5;
 }
 
 .button:nth-child(1) {

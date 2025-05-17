@@ -5,7 +5,7 @@
 }
 
 .card_container {
-    height: 600px;
+    height: 650px;
     width: 90%;
     max-width: 1000px;
     position: absolute;
@@ -82,7 +82,7 @@
 }
 
 .submit_button {
-    margin: 30px 0 0 0;
+    margin: 15px 0 0 0;
     background-color: #dbbd72;
     width: 100%;
     height: 40px;
@@ -90,7 +90,7 @@
 }
 
 .or_line {
-    margin: 20px 0;
+    margin: 10px 0;
     display: flex;
     align-items: center;
     color: #dbbd72;
@@ -116,7 +116,7 @@
     position: absolute;
     bottom: 0;
     left: 0;
-    height: 100px;
+    height: 150px;
     width: 100%;
     background-color: #dbbd72;
     border-radius: 0 0 30px 30px;
@@ -137,6 +137,7 @@
 
 .button {
     background-color: #2a2a2a;
+    color: #f5f5f5;
 }
 
 .button:nth-child(1) {

@@ -1,5 +1,6 @@
 import styles from '../css/Login.module.css';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import ErrorMessage from '../components/ErrorMessage.js';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
@@ -60,7 +61,7 @@ function Login() {
 
                         <button className={styles.submit_button} type='submit'>Login</button>
 
-                        {error && <div className={styles.error}>{error}</div>}
+                        <ErrorMessage message={error} setMessage={setError} />
                         
                     </form>
 

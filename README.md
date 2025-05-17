@@ -18,6 +18,7 @@ This project is an AI-driven system designed to search, retrieve, and organize d
 
 ## Frontend depedencies
     npm install react-scripts --save
+    npm install react-router-dom
 
 ## Development & Testing
     npm install --save-dev jest

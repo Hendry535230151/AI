@@ -65,10 +65,10 @@ const fileModel = {
         });
     },
 
-    insertFile: (userId, directoryId, fileName, fileType, fileSize) => {
+    insertFile: (userId, directoryId, fileName, fileType, fileSize, fileBuffer, description) => {
         return new Promise((resolve, reject) => {
-            const query = 'INSERT INTO files (user_id, directory_id, file_name, file_type, file_size) VALUES (?, ?, ?, ?, ?)';
-            db.query(query, [userId, directoryId, fileName, fileType, fileSize], (err, result) => {
+            const query = 'INSERT INTO files (user_id, directory_id, file_name, file_type, file_size, file_buffer, description) VALUES (?, ?, ?, ?, ?, ?, ?)';
+            db.query(query, [userId, directoryId, fileName, fileType, fileSize, fileBuffer, description], (err, result) => {
                 if (err) {
                     return reject(err);
                 }

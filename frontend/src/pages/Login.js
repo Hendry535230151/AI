@@ -29,6 +29,10 @@ function Login() {
         try {
             const response = await axios.post('http://localhost:3000/auth/login', loginForm);
             console.log('Login successful:', response.data);
+
+            const token = response.data.token;
+            localStorage.setItem('token', token)
+
             navigate('/chat');
         } catch (err) {
             if (err.response) {

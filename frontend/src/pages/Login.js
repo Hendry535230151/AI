@@ -86,7 +86,7 @@ function Login() {
                     </div>
                 </div>
                 <div className={styles.card_image}>
-                    {/* <img className={styles.main_image} src='/Main_Image.png' alt='Main' /> */}
+                    <img className={styles.main_image} src='/Main_Image.png' alt='Main' />
                 </div>
             </div>
         </div>

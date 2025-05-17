@@ -1,8 +1,7 @@
 require('dotenv').config();
-const chatModel = require('../models/chatModel');
+const chatModel = require('../models/Chat');
 const CustomError = require('../errors/CustomError')
 const { GoogleGenerativeAI } = require("@google/generative-ai");
-const { getChats } = require('../models/Chat');
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const aiService = {
@@ -12,21 +11,23 @@ const aiService = {
         const result = await model.generateContent(message);
         const response = await result.response;
         const text = response.text();
+
         const userChat = await chatModel.insertChat('user', message); 
-         if(!userChat){
-            throw new CustomError()
-         }
+        if (!userChat){
+            throw new CustomError('Error A', 500)
+        }
         const aiChat = await chatModel.insertChat('ai', text)
-        if(!aiChat){
-            throw new CustomError()
-         }
+        if (!aiChat){
+            throw new CustomError('Error B', 500)
+        }
         return text;
     },
+
     getChats: async () => {
         try {
             const fetchAll = await chatModel.getChats();
             if (!fetchAll || fetchAll.length === 0) {
-                throw new customError('No chats found. Please ensure the database is correctly populated and try again.', 404);
+                throw new CustomError('No chats found. Please ensure the database is correctly populated and try again.', 404);
             }
 
             return fetchAll;

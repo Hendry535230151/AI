@@ -33,6 +33,7 @@ const chatModel = {
             });
         });
     },
+
     insertChat: (sender, text) => {
         return new Promise((resolve, reject) => {
             const query = 'INSERT INTO chats (sender, text) VALUES (?, ?)';
@@ -43,12 +44,11 @@ const chatModel = {
                 if (!result || result.length === 0) {
                     resolve(false);
                 } else {
-                    resolve(result[0]);
+                    resolve(true);
                 }
             });
         });
     },
-
 };
 
 module.exports = chatModel;

@@ -5,7 +5,6 @@ const chatModel = {
         return new Promise((resolve, reject) => {
             const query = 'SELECT * FROM chats';
             db.query(query, (err, result) => {
-                console.log(result)
                 if (err) {
                     return reject(err);
                 }

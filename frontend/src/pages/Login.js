@@ -1,5 +1,6 @@
 import styles from '../css/Login.module.css';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import ErrorMessage from '../components/ErrorMessage.js';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
@@ -8,6 +9,15 @@ function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+
+    useEffect(() => {
+        if (error) {
+            const timer = setTimeout(() => {
+                setError('');
+            }, 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [error]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -61,7 +71,7 @@ function Login() {
 
                         <button className={styles.submit_button} type='submit'>Login</button>
 
-                        {error && <div className={styles.error}>{error}</div>}
+                        <ErrorMessage message={error} setMessage={setError} />
                         
                     </form>
 
@@ -77,7 +87,7 @@ function Login() {
                     </div>
                 </div>
                 <div className={styles.card_image}>
-                    {/* <img className={styles.main_image} src='/Main_Image.png' alt='Main' /> */}
+                    <img className={styles.main_image} src='/Main_Image.png' alt='Main' />
                 </div>
             </div>
         </div>

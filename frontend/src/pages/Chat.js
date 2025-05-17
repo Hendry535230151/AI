@@ -1,4 +1,5 @@
 import styles from '../css/Chat.module.css';
+import fetchIdFromToken from '../utils/jwt-decoder';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -30,6 +31,7 @@ function Chat() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        const userId = fetchIdFromToken();
         const userMessage = droppedFile
             ? `📎 ${droppedFile.name} — ${message}`
             : message;
@@ -41,6 +43,8 @@ function Chat() {
                 const formData = new FormData();
                 formData.append('file', droppedFile);
                 formData.append('description', message);
+                formData.append('userId', userId);
+                formData.append('directoryId', 1);
 
                 const response = await axios.post('http://localhost:3000/files/create', formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }

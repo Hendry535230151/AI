@@ -13,11 +13,11 @@ function Chat() {
         const fetchHistory = async () => {
             try {
                 const res = await axios.get('http://localhost:3000/ai/history');
-                console.log('Fetched history:', res.data.history); 
-                setChatHistory(res.data.history.map(chat => ({
+                const chats = res.data.data.map(chat => ({
                     sender: chat.sender,
                     text: chat.text
-                })));
+                }));
+                setChatHistory(chats);
             } catch (err) {
                 setError('Failed to load chat history');
             }
@@ -56,9 +56,7 @@ function Chat() {
         <div className={styles.chatContainer}>
             <h1>Welcome to the Chat Page!</h1>
             <div className={styles.chatBox}>
-            {chatHistory.map((chat, index) => {
-                console.log('Rendering chat:', chat);
-                return (
+                {chatHistory.map((chat, index) => (
                     <div
                         key={index}
                         className={
@@ -69,8 +67,7 @@ function Chat() {
                     >
                         <strong>{chat.sender === 'user' ? 'You' : chat.sender === 'ai' ? 'AI' : 'Error'}:</strong> {chat.text}
                     </div>
-                );
-            })}
+                ))}
             </div>
 
             <form onSubmit={handleSubmit} className={styles.chatForm}>

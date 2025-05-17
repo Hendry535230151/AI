@@ -13,7 +13,7 @@
     left: 50%;
     transform: translate(-50%, -50%);
     display: grid;
-    grid-template-columns: 1fr 1.5fr;
+    grid-template-columns: 1.5fr 1fr;
     background-color: #2a2a2a;
     border-radius: 30px;
     box-shadow:
@@ -25,8 +25,9 @@
 .card_input {
     padding: 60px 50px;
     background-color: #242424;
-    border-radius: 30px 0 0 30px;
+    border-radius: 30px;
     position: relative;
+    box-shadow: 0 0 20px 0 hsla(0, 0%, 100%, 0.1);
 }
 
 .main_text {
@@ -34,38 +35,54 @@
     color: #dbbd72;
 }
 
+.input_group {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.column {
+  flex: 1;
+  /* min-width: 200px; */
+}
+
+.fullWidth {
+  flex: 1 1 100%;
+}
+
 .input_label {
     width: 100%;
     margin: 0 0 5px 0;
     display: block;
-    font-size: 16px;
+    font-size: 15px;
     font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
     color: #ffffff;
 }
 
 .input_field {
-    padding: 0 0 0 20px;
+    padding: 0 0 0 12px;
     margin: 0 0 10px 0;
     height: 40px;
     width: 100%;
+    min-width: 120px;
     background-color: #131313;
     border: 1px solid #dbbd72;
     border-radius: 10px;
+    color: #f5f5f5;
 }
 
 .input_field:last-of-type {
     margin: 0;
 }
 
-.forgot_password {
-    margin: 10px 0;
-    display: block;
-    color: #dbbd72;
-    text-decoration: none;
-    font-size: 12px;
-}
-
 .submit_button {
+    margin: 30px 0 0 0;
     background-color: #dbbd72;
     width: 100%;
     height: 40px;
@@ -99,10 +116,10 @@
     position: absolute;
     bottom: 0;
     left: 0;
-    height: 150px;
+    height: 100px;
     width: 100%;
     background-color: #dbbd72;
-    border-radius: 0 0 0 30px;
+    border-radius: 0 0 30px 30px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -111,9 +128,10 @@
 .button_container {
     width: 70%;
     height: 50px;
-    background-color: #131313;
+    background-color: #2a2a2a;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
+    border: 3px solid #2a2a2a;
     border-radius: 15px;
 }
 
@@ -135,8 +153,17 @@
     color: black;
 }
 
+.card_image {
+    display: grid;
+    place-items: center;
+    padding: 30px;
+    grid-template-rows: 1fr 80px;
+}
+
 .main_image {
     width: 100%;
     height: 100%;
     background-size: cover;
+    border-radius: 15px;
+    object-fit: cover;
 }

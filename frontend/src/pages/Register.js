@@ -1,5 +1,6 @@
 import styles from '../css/Register.module.css';
-import React, { useState } from 'react';
+import ErrorMessage from '../components/ErrorMessage.js';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
@@ -11,6 +12,15 @@ function Register() {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [error, setError] = useState('');
+
+    useEffect(() => {
+        if (error) {
+            const timer = setTimeout(() => {
+                setError('');
+            }, 3000);
+            return () => clearTimeout(timer);
+        }
+    }, [error]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -46,7 +56,6 @@ function Register() {
                     <h1 className={styles.main_text}>Hey, Join Us</h1>
                     <form onSubmit={handleSubmit}>
                         <div className={styles.input_group}>
-                            {/* Row 1 - First and Last Name */}
                             <div className={styles.row}>
                                 <div className={styles.column}>
                                     <label className={styles.input_label} htmlFor='firstName'>First name:</label>
@@ -72,7 +81,6 @@ function Register() {
                                 </div>
                             </div>
 
-                            {/* Row 2 - Email */}
                             <div className={styles.row}>
                                 <div className={styles.fullWidth}>
                                     <label className={styles.input_label} htmlFor='email'>Email:</label>
@@ -87,7 +95,6 @@ function Register() {
                                 </div>
                             </div>
 
-                            {/* Row 3 - Passwords */}
                             <div className={styles.row}>
                                 <div className={styles.column}>
                                     <label className={styles.input_label} htmlFor='password'>Password:</label>
@@ -116,7 +123,7 @@ function Register() {
 
                         <button className={styles.submit_button} type='submit'>Register</button>
 
-                        {error && <div className={styles.error}>{error}</div>}
+                        <ErrorMessage message={error} setMessage={setError} />
                     </form>
 
                     <div className={styles.or_line}>

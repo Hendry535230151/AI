@@ -22,14 +22,14 @@ const categorizeFile = (extension) => {
   return "others";
 };
 
-const handleQueryFile = async (message) => {
+const handleQueryFile = async (message, userId) => {
   const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
 
   try {
     const intentCheck = await model.generateContent(
       `Instruction: Classify the user's intent from the following message. 
       Possible intents: 
-      - list: if user wants to list all files, 
+      - list: if user wants to list all files, or get their files 
       - searchByName: if user is looking for a file by name or related to it, 
       - none: if the intent is unrelated to files.
 
@@ -41,7 +41,7 @@ const handleQueryFile = async (message) => {
     const reply = await model.generateContent(
       `Instruction: Based on the following message, respond with a short, polite sentence indicating that you are providing the requested file(s). 
       Keep the tone natural, friendly, and in the same language as the user's message.
-
+z
       Message: "${message}"`
     );
     const politeIntro = (await reply.response).text().trim();
@@ -59,7 +59,7 @@ const handleQueryFile = async (message) => {
 
     switch (intent) {
       case "list": {
-        let files = await fileModel.getFiles();
+        let files = await fileModel.getFileByUserId(userId);
         if (!files || files.length === 0) {
           const notFoundReplyGen = await model.generateContent(
             `Instruction: The user requested files of type "${files}", but none were found. 
@@ -102,7 +102,7 @@ const handleQueryFile = async (message) => {
         );
         const fileName = (await extract.response).text().trim();
 
-        let results = await fileModel.getFileByName(fileName);
+        let results = await fileModel.getFileByNameUserID(fileName, userId);
         if (!results || results.length === 0) {
           const notFoundReplyGen = await model.generateContent(
             `Instruction: The user requested files of type "${fileName}", but none were found. 

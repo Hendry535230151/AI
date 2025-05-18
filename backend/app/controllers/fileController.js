@@ -1,3 +1,4 @@
+const directoryService = require('../services/directoryService');
 const fileService = require('../services/fileService');
 
 const fileController = {
@@ -33,10 +34,16 @@ const fileController = {
     },
 
     createFile: async (req, res) => {
-        const { userId, directoryId, fileName, fileType, fileSize } = req.body;
+        const { userId, directoryId, description } = req.body;
+        const file = req.file;
+        console.log(directoryId);
+
+        if (!file) {
+            return res.status(400).json({ success: false, message: 'File is required, please provide valid file and try again' });
+        }
 
         try {
-            const newFile = await fileService.createFile(userId, directoryId, fileName, fileType, fileSize);
+            const newFile = await fileService.createFile(userId, directoryId, file.originalname, file.mimetype, file.size, file.buffer, description);
             res.status(201).json({ success: true, message: 'File created successfully', data: newFile });
         } catch (err) {
             res.status(err.statusCode || 400).json({ success: false, message: err.message || 'Failed to create file' });

@@ -52,8 +52,7 @@ const fileService = {
                 throw new CustomError('User ID is required. Please provide a valid user ID and try again.', 400);
             }
             if (!directoryId) {
-                directoryId = '1';
-                // throw new CustomError('Directory ID is required. Please provide a valid directory ID and try again.', 400);
+                throw new CustomError('Directory ID is required. Please provide a valid directory ID and try again.', 400);
             }
             if (!fileName) {
                 throw new CustomError('File name is required. Please provide a valid file name and try again.', 400);

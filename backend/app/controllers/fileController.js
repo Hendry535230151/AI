@@ -36,7 +36,6 @@ const fileController = {
     createFile: async (req, res) => {
         const { userId, directoryId, description } = req.body;
         const file = req.file;
-        console.log(directoryId);
 
         if (!file) {
             return res.status(400).json({ success: false, message: 'File is required, please provide valid file and try again' });

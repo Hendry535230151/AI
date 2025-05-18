@@ -5,5 +5,4 @@ const aiController = require('../controllers/aiController');
 router.post('/chat', aiController.aiChatting);
 router.get('/history', aiController.getHistory);
 
-
 module.exports = router;

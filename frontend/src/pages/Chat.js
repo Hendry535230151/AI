@@ -1,8 +1,8 @@
-import styles from "../css/Chat.module.css";
-import fetchIdFromToken from "../utils/jwt-decoder";
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import styles from '../css/Chat.module.css';
+import fetchIdFromToken from '../utils/jwt-decoder';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 function Chat() {
     const navigate = useNavigate();
@@ -14,8 +14,8 @@ function Chat() {
 
     const handleDrop = (e) => {
         e.preventDefault();
-        setIsDragging(false);
         e.stopPropagation();
+        setIsDragging(false);
 
         if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
             const file = e.dataTransfer.files[0];
@@ -29,9 +29,21 @@ function Chat() {
     };
 
     useEffect(() => {
+        let dragCounter = 0;
+        let dragLeaveTimeout;
+
         const fetchHistory = async () => {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                setError('User not authenticated. Please login.');
+                return;
+            }
             try {
-                const res = await axios.get('http://localhost:3000/ai/history');
+                const res = await axios.get('http://localhost:3000/ai/history', {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                });
                 const chats = res.data.data.map(chat => ({
                     sender: chat.sender,
                     text: chat.text
@@ -41,11 +53,6 @@ function Chat() {
                 setError('Failed to load chat history');
             }
         };
-
-        fetchHistory();
-
-        let dragCounter = 0;
-        let dragLeaveTimeout;
 
         const handleWindowDragOver = (e) => {
             e.preventDefault();
@@ -72,6 +79,8 @@ function Chat() {
             }
         };
 
+        fetchHistory();
+
         window.addEventListener('dragover', handleWindowDragOver);
         window.addEventListener('drop', handleWindowDrop);
         window.addEventListener('dragleave', handleWindowDragLeave);
@@ -87,10 +96,27 @@ function Chat() {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        const trimmedMessage = message.trim();
+        if (!trimmedMessage && !droppedFile) {
+            setError('Please enter a message or drop a file.');
+            return;
+        }
+
         const userId = fetchIdFromToken();
+        if (!userId) {
+            setError('User not authenticated. Please login.');
+            return;
+        }
+
+        const token = localStorage.getItem('token');
+        if (!token) {
+            setError('User not authenticated. Please login.');
+            return;
+        }
+
         const userMessage = droppedFile
-            ? `📎 ${droppedFile.name} — ${message}`
-            : message;
+            ? `📎 ${droppedFile.name} — ${trimmedMessage}`
+            : trimmedMessage;
 
         setChatHistory(prev => [...prev, { sender: 'user', text: userMessage }]);
 
@@ -98,47 +124,55 @@ function Chat() {
             if (droppedFile) {
                 const formData = new FormData();
                 formData.append('file', droppedFile);
-                formData.append('description', message);
+                formData.append('description', trimmedMessage);
                 formData.append('userId', userId);
                 formData.append('directoryId', 1);
 
                 const response = await axios.post('http://localhost:3000/files/create', formData, {
-                    headers: { 'Content-Type': 'multipart/form-data' }
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        Authorization: `Bearer ${token}`
+                    }
                 });
 
-                setChatHistory(prev => [...prev, {
-                    sender: 'ai',
-                    text: `✅ File uploaded: ${response.data.message || droppedFile.name}`
-                }]);
-                setDroppedFile(null);
-            } else {
-                const response = await axios.post('http://localhost:3000/ai/chat', {
-                    message,
-                    userId
-                });
+            setChatHistory(prev => [...prev, {
+                sender: 'ai',
+                text: `✅ File uploaded: ${response.data.message || droppedFile.name}`
+            }]);
+            setDroppedFile(null);
+        } else {
+            const response = await axios.post('http://localhost:3000/ai/chat', {
+                message: trimmedMessage,
+                userId
+            }, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
 
-                setChatHistory(prev => [...prev, {
-                    sender: 'ai',
-                    text: response.data.message || 'No reply'
-                }]);
-            }
-
-            setMessage('');
-            setError('');
-        } catch (err) {
-            let errMsg = '';
-            if (err.response) {
-                errMsg = `Error: ${err.response.data.message || 'Request failed'}`;
-            } else if (err.request) {
-                errMsg = 'No response from server.';
-            } else {
-                errMsg = `Error: ${err.message}`;
-            }
-
-            setError(errMsg);
-            setChatHistory(prev => [...prev, { sender: 'error', text: errMsg }]);
+            setChatHistory(prev => [...prev, {
+                sender: 'ai',
+                text: response.data.message || 'No reply'
+            }]);
         }
-    };
+
+        setMessage('');
+        setError('');
+    } catch (err) {
+        let errMsg = '';
+        if (err.response) {
+            errMsg = `Error: ${err.response.data.message || 'Request failed'}`;
+        } else if (err.request) {
+            errMsg = 'No response from server.';
+        } else {
+            errMsg = `Error: ${err.message}`;
+        }
+
+        setError(errMsg);
+        setChatHistory(prev => [...prev, { sender: 'error', text: errMsg }]);
+    }
+};
+
 
     return (
         <div className={styles.chat_container}>
@@ -151,14 +185,16 @@ function Chat() {
                     <div className={styles.chat_box}>
                         {chatHistory.map((chat, index) => (
                             <div
-                            key={index}
-                            className={
-                                chat.sender === 'user' ? styles.user_message :
-                                chat.sender === 'ai' ? styles.ai_message :
-                                styles.errorMessage
-                            }
+                                key={index}
+                                className={
+                                    chat.sender === 'user' ? styles.user_message :
+                                    chat.sender === 'ai' ? styles.ai_message :
+                                    styles.errorMessage
+                                }
                             >
-                                <strong>{chat.sender === 'user' ? 'You' : chat.sender === 'ai' ? 'AI' : 'Error'}:</strong> {chat.text}
+                                <strong>
+                                    {chat.sender === 'user' ? 'You' : chat.sender === 'ai' ? 'AI' : 'Error'}:
+                                </strong> {chat.text}
                             </div>
                         ))}
                     </div>
@@ -178,18 +214,19 @@ function Chat() {
                 <form onSubmit={handleSubmit} className={styles.chat_form}>
                     <div className={styles.input_wrapper}>
                         <input
-                            type="text"
+                            type='text'
                             value={message}
                             onChange={(e) => setMessage(e.target.value)}
                             placeholder={droppedFile ? 'Enter a description for the file...' : 'Type your message...'}
                             className={styles.chat_input}
                             required
-                            />
-                        <button type="submit" className={styles.chat_button}></button>
+                        />
+                        <button type='submit' className={styles.chat_button}></button>
                     </div>
                 </form>
             </div>
         </div>
     );
-    
+}
+
 export default Chat;

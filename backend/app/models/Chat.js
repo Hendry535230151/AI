@@ -33,10 +33,10 @@ const chatModel = {
         });
     },
 
-    insertChat: (sender, text) => {
+    insertChat: (userId, sender, text) => {
         return new Promise((resolve, reject) => {
-            const query = 'INSERT INTO chats (sender, text) VALUES (?, ?)';
-            db.query(query, [sender, text], (err, result) => {
+            const query = 'INSERT INTO chats (user_id, sender, text) VALUES (?, ?, ?)';
+            db.query(query, [userId, sender, text], (err, result) => {
                 if (err) {
                     return reject(err);
                 }

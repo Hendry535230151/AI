@@ -3,7 +3,6 @@ const aiService = require("../services/aiService");
 const aiController = {
     aiChatting: async (req, res) => {
         const { userId, message } = req.body;
-        console.log(userId, message);
         try {
             const response = await aiService.aiChatting(userId, message);
             res.status(200).json({ success: true, message: response });

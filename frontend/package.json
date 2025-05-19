@@ -13,6 +13,7 @@
     "react-dom": "^19.1.0",
     "react-dropzone": "^14.3.8",
     "react-router-dom": "^7.6.0",
+    "react-script": "^2.0.5",
     "react-scripts": "^5.0.1",
     "web-vitals": "^2.1.4"
   },

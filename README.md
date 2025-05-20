@@ -24,6 +24,7 @@ This project is an AI-driven system designed to search, retrieve, and organize d
 
     npm install react-scripts --save
     npm install react-router-dom
+    npm install react-markdown
 
 ## Development & Testing
 

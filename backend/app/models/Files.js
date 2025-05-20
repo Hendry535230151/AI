@@ -82,6 +82,27 @@ const fileModel = {
     });
   },
 
+  getFileByNameDescriptionUserID: (fileName, userId) => {
+    return new Promise((resolve, reject) => {
+      const query =
+        "SELECT * FROM files WHERE user_id = ? AND file_name LIKE ? OR description LIKE ?";
+      db.query(
+        query,
+        [userId, `%${fileName}%`, `%${fileName}%`],
+        (err, result) => {
+          if (err) {
+            return reject(err);
+          }
+          if (!result || result.length === 0) {
+            resolve(false);
+          } else {
+            resolve(result);
+          }
+        }
+      );
+    });
+  },
+
   checkDuplicateFile: (fileName) => {
     return new Promise((resolve, reject) => {
       const query = "SELECT * FROM files WHERE file_name = ?";

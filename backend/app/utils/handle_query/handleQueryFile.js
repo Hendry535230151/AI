@@ -1,6 +1,7 @@
 const fileModel = require("../../models/Files");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+const port = process.env.PORT;
 
 const fileCategories = {
   images: ["jpg", "jpeg", "png", "gif", "bmp", "webp"],
@@ -90,7 +91,15 @@ z
         }
 
         const fileList = files
-          .map((f) => `• ${f.file_name} (${f.file_type}, ${f.file_size} bytes)`)
+          //.map((f) => `• ${f.file_name} (${f.file_type}, ${f.file_size} bytes)`)
+          .map(
+            (f) =>
+              `• [${
+                f.file_name
+              }](http://localhost:${port}/download/${encodeURIComponent(
+                f.file_name
+              )})`
+          )
           .join("\n");
 
         return `${politeIntro}\n\n${fileList}`;
@@ -102,7 +111,10 @@ z
         );
         const fileName = (await extract.response).text().trim();
 
-        let results = await fileModel.getFileByNameUserID(fileName, userId);
+        let results = await fileModel.getFileByNameDescriptionUserID(
+          fileName,
+          userId
+        );
         if (!results || results.length === 0) {
           const notFoundReplyGen = await model.generateContent(
             `Instruction: The user requested files of type "${fileName}", but none were found. 
@@ -126,7 +138,14 @@ z
         }
 
         const fileList = results
-          .map((f) => `• ${f.file_name} (${f.file_type}, ${f.file_size} bytes)`)
+          .map(
+            (f) =>
+              `• [${
+                f.file_name
+              }](http://localhost:${port}/download/${encodeURIComponent(
+                f.file_name
+              )})`
+          )
           .join("\n");
 
         return `${politeIntro}\n\n${fileList}`;

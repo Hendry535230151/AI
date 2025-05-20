@@ -1,5 +1,5 @@
 require("dotenv").config();
-const chatModel = require("../models/Chat");
+const chatModel = require("../models/ChatModel");
 const CustomError = require("../errors/CustomError");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -38,9 +38,9 @@ const aiService = {
     return text;
   },
 
-  getChats: async () => {
+  getChatByUserId: async (userId) => {
     try {
-      const fetchAll = await chatModel.getChats();
+      const fetchAll = await chatModel.getChatByUserId(userId);
       if (!fetchAll || fetchAll.length === 0) {
         throw new CustomError(
           "No chats found. Please ensure the database is correctly populated and try again.",

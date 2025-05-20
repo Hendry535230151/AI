@@ -117,7 +117,6 @@ function Home() {
             </div>
             <div className={styles.auth_card}>
             <h3 className={styles.subs_text}>It's Time To Work</h3>
-            
                 <div className={styles.button_container}>
                     <button className={styles.auth_button}>
                     <span className={styles.icon}>📝</span>
@@ -129,8 +128,38 @@ function Home() {
                     Sign-in
                     </button>
                 </div>
-            </div>
-                
+            </div>  
+            <footer className={styles.custom_footer}>
+                <div className={styles.custom_footer_content}>
+                    <div className={styles.custom_footer_section}>
+                    <h4>Address</h4>
+                    <p>
+                        Fakultas Ilmu Komputer<br />
+                        Universitas XYZ<br />
+                        Jl. Pendidikan No. 123, Blok C<br />
+                        Kota ABC, Indonesia
+                    </p>
+                    </div>
+
+                    <div className={styles.custom_footer_section}>
+                    <h4>Contact Us</h4>
+                    <p>📞 08xxxxxxxxxx</p>
+                    <p>📧 Someone@example.com</p>
+                    </div>
+
+                    <div className={`${styles.custom_footer_section} ${styles.feedback}`}>
+                    <h4>We'd Love Your Feedback!</h4>
+                    <p>Let us know how we can improve</p>
+                    <div className={styles.custom_footer_input_group}>
+                        <input type="text" placeholder="Type something here ..." />
+                        <button>SEND ➤</button>
+                    </div>
+                    </div>
+                </div>
+                <div className={styles.custom_footer_bottom}>
+                    <p>© 2025 Website. All rights reserved.</p>
+                </div>
+            </footer>  
         </div>
         
     );

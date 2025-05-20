@@ -9,84 +9,93 @@ function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
-
-    useEffect(() => {
-        if (error) {
-            const timer = setTimeout(() => {
-                setError('');
-            }, 3000);
-            return () => clearTimeout(timer);
-        }
-    }, [error]);
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const loginForm = {
-            email,
-            password,
-        };
+        setIsLoading(true);
+
+        const loginForm = { email, password };
 
         try {
             const response = await axios.post('http://localhost:3000/auth/login', loginForm);
             console.log('Login successful:', response.data);
+
+            const token = response.data.token;
+            localStorage.setItem('token', token);
+
+            setTimeout(() => {
+                navigate('/chat');
+            }, 5000);
         } catch (err) {
-            if (err.response) {
-                setError(`Error: ${err.response.data.message || 'Login failed'}`);
-            } else if (err.request) {
-                setError('No response from server.');
-            } else {
-                setError(`Error: ${err.message}`);
-            }
+            setTimeout(() => {
+                setIsLoading(false);
+                if (err.response) {
+                    setError(err.response.data.message);
+                } else if (err.request) {
+                    setError('No response from server.');
+                } else {
+                    setError(err.message);
+                }
+            }, 3000);
         }
     };
 
-    return (    
-        <div className={styles.card_wrap}>
+    return (
+        <div className={styles.main_container}>
+            <header className={styles.header}>
+                <h1 className={styles.logo}>AInizer</h1>
+            </header>
             <div className={styles.card_container}>
-                <div className={styles.card_input}>
-                    <h1 className={styles.main_text}>Hello User</h1>
-                    <form onSubmit={handleSubmit}>
-                        <label className={styles.input_label} htmlFor='email'>Email:</label>
-                        <input 
-                            className={styles.input_field}
-                            id='email' 
-                            type='email' 
-                            placeholder='Input email here...' 
-                            value={email} 
-                            onChange={(e) => setEmail(e.target.value)} 
-                        />
+                <h1 className={styles.main_text}>Hello again</h1>
 
-                        <label className={styles.input_label} htmlFor='password'>Password:</label>
-                        <input 
-                            className={styles.input_field}
-                            id='password' 
-                            type='password' 
-                            placeholder='Input password here...' 
-                            value={password} 
-                            onChange={(e) => setPassword(e.target.value)} 
-                        />
-                        
-                        <a className={styles.forgot_password} href='_'>Forgot password</a>
+                <form onSubmit={handleSubmit} className={styles.input_form}>
+                    <label className={styles.input_label} htmlFor='email'>Email</label>
+                    <input 
+                        className={styles.input_field}
+                        id='email' 
+                        type='text' 
+                        placeholder='Input email here...' 
+                        value={email} 
+                        onChange={(e) => setEmail(e.target.value)} 
+                    />
 
-                        <button className={styles.submit_button} type='submit'>Login</button>
+                    <label className={styles.input_label} htmlFor='password'>Password</label>
+                    <input 
+                        className={styles.input_field}
+                        id='password' 
+                        type='password' 
+                        placeholder='Input password here...' 
+                        value={password} 
+                        onChange={(e) => setPassword(e.target.value)} 
+                    />   
+                    { error ? (
+                        <>
+                            <span className={styles.error_message}>
+                                <i className={`${styles.error_icon} fa-solid fa-circle-exclamation`}></i>
+                                {error}
+                            </span>
+                        </>
+                    ) : (
+                        <></>
+                    )}  
 
-                        <ErrorMessage message={error} setMessage={setError} />
-                        
-                    </form>
-
-                    <div className={styles.or_line}>
-                        <span className={styles.or_text}>OR</span>    
-                    </div>
-                    <span className={styles.content_text}>Bergabunglah bersama komunitas kami dan nikmati berbagai fitur eksklusif.</span>
-                    <div className={styles.button_card}>
-                        <div className={styles.button_container}>
-                            <button className={`${styles.button} ${styles.active}`}>Sign in</button>
-                            <button className={styles.button} onClick={() => navigate('/register')}>Sign up</button>
+                    { isLoading ? (
+                        <div className={styles.input_button}>
+                            <div className={styles.spinner}></div>
                         </div>
-                    </div>
-                </div>
-                <div className={styles.card_image}>
-                    {/* <img className={styles.main_image} src='/Main_Image.png' alt='Main' /> */}
+                    ) : (
+                        <button type='submit' className={styles.input_button} disabled={isLoading}>Login</button>
+                    )}
+                </form>
+
+                <span className={styles.sub_text}>
+                    Forgot your password? <a className={styles.forgot_password}>forgot password</a>
+                </span>
+
+                <div className={styles.button_group}>
+                    <button className={`${styles.button} ${styles.active}`}>Sign-in</button>
+                    <button className={styles.button} onClick={() => navigate('/register')} disabled={isLoading}>Sign-up</button>
                 </div>
             </div>
         </div>

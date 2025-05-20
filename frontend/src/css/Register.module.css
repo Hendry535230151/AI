@@ -1,170 +1,181 @@
-.card_wrap {
-    height: 100vh;
-    position: relative;
-    background-color: #1e1e1e;
-}
-
-.card_container {
-    height: 650px;
-    width: 90%;
-    max-width: 1000px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: grid;
-    grid-template-columns: 1.5fr 1fr;
-    background-color: #2a2a2a;
-    border-radius: 30px;
-    box-shadow:
-        0 0 5px 1px #f9f2e0,
-        0 0 15px 25px hsla(43, 59%, 80%, 0.2),
-        0 0 30px 50px hsla(43, 59%, 65%, 0.15);
-}
-
-.card_input {
-    padding: 60px 50px;
-    background-color: #242424;
-    border-radius: 30px;
-    position: relative;
-    box-shadow: 0 0 20px 0 hsla(0, 0%, 100%, 0.1);
-}
-
-.main_text {
-    margin: 0 0 20px 0;
-    color: #dbbd72;
-}
-
-.input_group {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.row {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.column {
-  flex: 1;
-  /* min-width: 200px; */
-}
-
-.fullWidth {
-  flex: 1 1 100%;
-}
-
-.input_label {
-    width: 100%;
-    margin: 0 0 5px 0;
-    display: block;
-    font-size: 15px;
-    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
-    color: #ffffff;
-}
-
-.input_field {
-    padding: 0 0 0 12px;
-    margin: 0 0 10px 0;
-    height: 40px;
-    width: 100%;
-    min-width: 120px;
+body {
     background-color: #131313;
-    border: 1px solid #dbbd72;
-    border-radius: 10px;
-    color: #f5f5f5;
 }
 
-.input_field:last-of-type {
-    margin: 0;
+.main_container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.submit_button {
-    margin: 15px 0 0 0;
-    background-color: #dbbd72;
+.header {
     width: 100%;
-    height: 40px;
-    border-radius: 10px;
-}
-
-.or_line {
-    margin: 10px 0;
+    height: 50px;
+    margin: 0 0 50px 0;
+    padding-left: 30px;
     display: flex;
     align-items: center;
-    color: #dbbd72;
-    font-size: 0.875rem;
-    gap: 0.5rem;
-    font-size: 12px;
 }
 
-.or_line::before,
-.or_line::after {
-    content: "";
-    flex: 1;
-    height: 1px;
-    background-color: #f5f5f5;
-}
-
-.content_text {
-    color: #aaaaaa;
-    font-size: 14px;
-}
-
-.button_card {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    height: 150px;
-    width: 100%;
-    background-color: #dbbd72;
-    border-radius: 0 0 30px 30px;
+.main_text_group {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 100%;
+    margin: 0 0 20px 0;
 }
 
-.button_container {
-    width: 70%;
-    height: 50px;
-    background-color: #2a2a2a;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    border: 3px solid #2a2a2a;
-    border-radius: 15px;
+.back_icon {
+    margin: 0 0 0 10px;
+    padding: 10px;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    border: 1px solid #EACA91;
+    border-radius: 50%;
+    transform: translateY(-50%);
+    color: #EACA91;
 }
 
-.button {
-    background-color: #2a2a2a;
+.back_icon:active {
+    background-color: #131313;
+    color: #f5f5f5;
+    border: 1px solid #f5f5f5;
+}
+
+.logo, .main_text {
+    font-family: "Birthstone", cursive;
+    color: #EACA91;
+    font-size: 1.7rem;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-weight: 400;
+}
+
+.main_text {
+    color: #f5f5f5;
+    text-shadow: 
+        0 0 5px rgba(245, 245, 245, 0.3),
+        0 0 10px rgba(245, 245, 245, 0.2),
+        0 0 15px rgba(245, 245, 245, 0.1);
+}
+
+.card_container {
+    width: 100%;
+    max-width: 350px;
+    height: 100%;
+    min-height: 510px;
+    padding: 50px 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border-radius: 30px;
+    background-color: #242424;
+    box-shadow: 0 0 20px rgba(234, 202, 145, 0.3), 
+                0 0 40px rgba(234, 202, 145, 0.2),
+                0 0 60px rgba(234, 202, 145, 0.1);
+}
+
+.input_form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.input_field {
+    height: 40px;
+    margin: 8px 0 16px 0;
+    padding-inline: 16px;
+    border-radius: 10px;
+    font-size: 14px;
+    background-color: #131313;
+    border: 1px solid #EACA91;
     color: #f5f5f5;
 }
 
-.button:nth-child(1) {
-    border-radius: 15px 0 0 15px;
+.input_field::placeholder {
+    font-size: 14px;
 }
 
-.button:nth-child(2) {
-    border-radius: 0 15px 15px 0;
+.input_field:last-of-type {
+    margin: 8px 0;
+}
+
+.input_label {
+    font-size: 14px;
+    padding: 0 0 0 16px;
+    color: #f5f5f5;
+}
+
+.input_button {
+    width: 100%;
+    height: 40px;
+    margin: 24px 0;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #EED9B1;
+}
+
+.sub_text {
+    color: #f5f5f5;
+}
+
+.forgot_password {
+    color: #EACA91;
+}
+
+.button_group {
+    height: 50px;
+    width: 100%;
+    padding: 5px;
+    margin: 24px 30px 0 30px;
+    background-color: #131313;
+    border-radius: 10px;
+    display: flex;
+}
+
+.button {
+    flex: 1;
+    border-radius: 6px;
+    background-color: transparent;
+    color: #7a7a7a;
 }
 
 .button.active {
     background-color: #f5f5f5;
-    border-radius: 15px;
-    color: black;
+    color: #131313;
 }
 
-.card_image {
-    display: grid;
-    place-items: center;
-    padding: 30px;
-    grid-template-rows: 1fr 80px;
+.back_icon {
+    display: flex;
 }
 
-.main_image {
-    width: 100%;
-    height: 100%;
-    background-size: cover;
-    border-radius: 15px;
-    object-fit: cover;
+.error_message {
+    font-size: 12px;
+    color: #b10909;   
+    display: flex;
+    align-items: center;
+}
+
+.error_icon {
+    margin: 0 10px 0 0;
+    font-size: 14px;
+}
+
+.spinner {
+    width: 24px;
+    height: 24px;
+    margin: 10px;
+    border: 4px solid rgba(0, 0, 0, 0.3);
+    border-top: 4px solid #131313;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
 }

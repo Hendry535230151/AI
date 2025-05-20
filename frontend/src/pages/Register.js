@@ -6,24 +6,19 @@ import { useNavigate } from 'react-router-dom';
 
 function Register() {
     const navigate = useNavigate();
+    const [step, setStep] = useState(1);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [passwordConfirm, setPasswordConfirm] = useState('');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [error, setError] = useState('');
-
-    useEffect(() => {
-        if (error) {
-            const timer = setTimeout(() => {
-                setError('');
-            }, 3000);
-            return () => clearTimeout(timer);
-        }
-    }, [error]);
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsLoading(true);
+
         const registerForm = {
             email,
             password,
@@ -34,108 +29,114 @@ function Register() {
 
         try {
             const response = await axios.post('http://localhost:3000/auth/register', registerForm);
-            console.log('Login successful:', response.data);
+            setTimeout(() => {
+                navigate('/chat');
+            }, 5000);
         } catch (err) {
-            if (err.response) {
-                setError(`Error: ${err.response.data.message || 'Register failed'}`);
-            } else if (err.request) {
-                setError('No response from server.');
-            } else {
-                setError(`Error: ${err.message}`);
-            }
+            setTimeout(() => {
+                setIsLoading(false);
+                if (err.response) {
+                    setError(err.response.data.message);
+                } else if (err.request) {
+                    setError('No response from server.');
+                } else {
+                    setError(err.message);
+                }
+            }, 3000);
         }
     };
 
     return (    
-        <div className={styles.card_wrap}>
+        <div className={styles.main_container}>
+            <header className={styles.header}>
+                <h1 className={styles.logo}>AInizer</h1>
+            </header>
             <div className={styles.card_container}>
-                <div className={styles.card_image}>
-                    {/* <img className={styles.main_image} src='/Main_Image.png' alt='Main' /> */}
+                <div className={styles.main_text_group}>
+                    {step === 2 && (
+                        <i className={`fa-solid fa-arrow-left ${styles.back_icon}`} onClick={() => setStep(1)} ></i>
+                    )}
+                    <h1 className={styles.main_text}>Ready to join?</h1>
                 </div>
-                <div className={styles.card_input}>
-                    <h1 className={styles.main_text}>Hey, Join Us</h1>
-                    <form onSubmit={handleSubmit}>
-                        <div className={styles.input_group}>
-                            <div className={styles.row}>
-                                <div className={styles.column}>
-                                    <label className={styles.input_label} htmlFor='firstName'>First name:</label>
-                                    <input 
-                                        className={styles.input_field}
-                                        id='firstName' 
-                                        type='text' 
-                                        placeholder='First name' 
-                                        value={firstName} 
-                                        onChange={(e) => setFirstName(e.target.value)} 
-                                    />
-                                </div>
-                                <div className={styles.column}>
-                                    <label className={styles.input_label} htmlFor='lastName'>Last name:</label>
-                                    <input 
-                                        className={styles.input_field}
-                                        id='lastName' 
-                                        type='text' 
-                                        placeholder='Last name' 
-                                        value={lastName} 
-                                        onChange={(e) => setLastName(e.target.value)} 
-                                    />
-                                </div>
-                            </div>
 
-                            <div className={styles.row}>
-                                <div className={styles.fullWidth}>
-                                    <label className={styles.input_label} htmlFor='email'>Email:</label>
-                                    <input 
-                                        className={styles.input_field}
-                                        id='email' 
-                                        type='email' 
-                                        placeholder='Email' 
-                                        value={email} 
-                                        onChange={(e) => setEmail(e.target.value)} 
-                                    />
-                                </div>
-                            </div>
-
-                            <div className={styles.row}>
-                                <div className={styles.column}>
-                                    <label className={styles.input_label} htmlFor='password'>Password:</label>
-                                    <input 
-                                        className={styles.input_field}
-                                        id='password' 
-                                        type='password' 
-                                        placeholder='Password' 
-                                        value={password} 
-                                        onChange={(e) => setPassword(e.target.value)} 
-                                    />
-                                </div>
-                                <div className={styles.column}>
-                                    <label className={styles.input_label} htmlFor='passwordConfirm'>Password confirm:</label>
-                                    <input 
-                                        className={styles.input_field}
-                                        id='passwordConfirm' 
-                                        type='password' 
-                                        placeholder='Password confirm' 
-                                        value={passwordConfirm} 
-                                        onChange={(e) => setPasswordConfirm(e.target.value)} 
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        <button className={styles.submit_button} type='submit'>Register</button>
-
-                        <ErrorMessage message={error} setMessage={setError} />
+                {step === 1 && (
+                    <form className={styles.input_form} onSubmit={(e) => { e.preventDefault(); setStep(2); }}>
+                    <label className={styles.input_label} htmlFor="firstName">First Name</label>
+                    <input
+                        className={styles.input_field}
+                        id="firstName"
+                        type="text"
+                        placeholder="Your first name"
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                    />
+                    <label className={styles.input_label} htmlFor="lastName">Last Name</label>
+                    <input
+                        className={styles.input_field}
+                        id="lastName"
+                        type="text"
+                        placeholder="Your last name"
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                    />
+                    <button type="submit" className={styles.input_button}>Continue</button>
                     </form>
+                )}
 
-                    <div className={styles.or_line}>
-                        <span className={styles.or_text}>OR</span>    
-                    </div>
-                    <span className={styles.content_text}>Already have account? Login and work with us</span>
-                    <div className={styles.button_card}>
-                        <div className={styles.button_container}>
-                            <button className={styles.button} onClick={() => navigate('/login')}>Sign in</button>
-                            <button className={`${styles.button} ${styles.active}`}>Sign up</button>
-                        </div>
-                    </div>
+                {step === 2 && (
+                    <>
+                        <form onSubmit={handleSubmit} className={styles.input_form}>
+                            <label className={styles.input_label} htmlFor='email'>Email</label>
+                            <input 
+                                className={styles.input_field}
+                                id='email' 
+                                type='text' 
+                                placeholder='Input email here...' 
+                                value={email} 
+                                onChange={(e) => setEmail(e.target.value)} 
+                            />
+                            <label className={styles.input_label} htmlFor='password'>Password</label>
+                            <input 
+                                className={styles.input_field}
+                                id='password' 
+                                type='password' 
+                                placeholder='Input password here...' 
+                                value={password} 
+                                onChange={(e) => setPassword(e.target.value)} 
+                            />
+                            <label className={styles.input_label} htmlFor='passwordConf'>Password confirm</label>
+                            <input 
+                                className={styles.input_field}
+                                id='passwordConf' 
+                                type='password' 
+                                placeholder='Input password confirm here...' 
+                                value={passwordConfirm} 
+                                onChange={(e) => setPasswordConfirm(e.target.value)} 
+                            />
+                            { error ? (
+                                <>
+                                    <span className={styles.error_message}>
+                                        <i className={`${styles.error_icon} fa-solid fa-circle-exclamation`}></i>
+                                        {error}
+                                    </span>
+                                </>
+                            ) : (
+                                <></>
+                            )}  
+
+                            { isLoading ? (
+                                <div className={styles.input_button}>
+                                    <div className={styles.spinner}></div>
+                                </div>
+                            ) : (
+                                <button type='submit' className={styles.input_button}>Logup</button>
+                            )}
+                        </form>
+                    </>
+                )}
+                <div className={styles.button_group}>
+                    <button className={styles.button} onClick={() => navigate('/login')}>Sign-in</button>
+                    <button className={`${styles.button} ${styles.active}`}>Sign-up</button>
                 </div>
             </div>
         </div>

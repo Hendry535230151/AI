@@ -5,8 +5,11 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import formatText from "../utils/formatText";
 import ReactMarkdown from "react-markdown";
+import useAuth from "../utils/auth";
+import LogoutButton from "../utils/logoutButton";
 
 function Chat() {
+  const isAuthenticated = useAuth();
   const navigate = useNavigate();
   const [message, setMessage] = useState("");
   const [chatHistory, setChatHistory] = useState([]);
@@ -14,6 +17,12 @@ function Chat() {
   const [isDragging, setIsDragging] = useState(false);
   const [droppedFile, setDroppedFile] = useState(null);
   const bottomRef = useRef(null);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/login");
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleDrop = (e) => {
     e.preventDefault();
@@ -166,7 +175,6 @@ function Chat() {
           "http://localhost:3000/ai/chat",
           {
             message: trimmedMessage,
-            userId,
           },
           {
             headers: {
@@ -203,7 +211,9 @@ function Chat() {
 
   return (
     <div className={styles.chat_container}>
-      <div className={styles.sidebar}>asdf</div>
+      <div className={styles.sidebar}>
+        <LogoutButton />
+      </div>
       <div className={styles.chat_area}>
         <h1 className={styles.main_text}>AInizer</h1>
         <div className={styles.chat_box_wrapper}>

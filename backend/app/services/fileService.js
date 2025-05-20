@@ -46,7 +46,7 @@ const fileService = {
         }
     },
 
-    createFile: async (userId, directoryId, fileName, fileType, fileSize) => {
+    createFile: async (userId, directoryId, fileName, fileType, fileSize, fileBuffer, description) => {
         try {
             if (!userId) {
                 throw new CustomError('User ID is required. Please provide a valid user ID and try again.', 400);
@@ -63,13 +63,19 @@ const fileService = {
             if (!fileSize) {
                 throw new CustomError('File size is required. Please provide a valid file size and try again.', 400);
             }
+            if (!fileBuffer) {
+                throw new CustomError('File buffer is required. Please provide a valid buffer and try again.', 400);
+            }
+            if (!description) {
+                throw new CustomError('File description is required. Please provide a valid description and try again.', 400);
+            }
 
             const checkDuplicate = await fileModel.checkDuplicateFile(fileName);
             if (checkDuplicate) {
                 throw new CustomError(`The file with name: ${fileName} is already in use. Please choose a different name.`, 409);
             }
 
-            const createFile = await fileModel.insertFile(userId, directoryId, fileName, fileType, fileSize);
+            const createFile = await fileModel.insertFile(userId, directoryId, fileName, fileType, fileSize, fileBuffer, description);
             if (!createFile) {
                 throw new CustomError('Failed to create the file. Please try again later.', 500);
             }

@@ -271,6 +271,24 @@
     display: flex;
 }
 
+.wave_wrapper {
+    display: block;
+    height: auto;
+    width: 100%;
+    max-width: 1500px;
+    overflow: hidden;
+    line-height: 0;
+}
+
+.wave_wrapper1 {
+    display: block;
+    height: auto;
+    width: 100%;
+    max-width: 1500px;
+    overflow: hidden;
+    line-height: 0;
+    transform: rotate(180deg);
+}
 
 .custom_footer {
     background-color: #0f0f0f;

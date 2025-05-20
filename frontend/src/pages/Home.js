@@ -68,9 +68,17 @@ function Home() {
                     </div>
                 </div>
             </div>
+            <div className={styles.wave_wrapper}>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+                    <path
+                    fill="#0f0f0f"
+                    fillOpacity="1"
+                    d="M0,32L0,224L130.9,224L130.9,64L261.8,64L261.8,288L392.7,288L392.7,128L523.6,128L523.6,0L654.5,0L654.5,288L785.5,288L785.5,192L916.4,192L916.4,224L1047.3,224L1047.3,32L1178.2,32L1178.2,160L1309.1,160L1309.1,224L1440,224L1440,320L1309.1,320L1309.1,320L1178.2,320L1178.2,320L1047.3,320L1047.3,320L916.4,320L916.4,320L785.5,320L785.5,320L654.5,320L654.5,320L523.6,320L523.6,320L392.7,320L392.7,320L261.8,320L261.8,320L130.9,320L130.9,320L0,320L0,320Z"
+                    ></path>
+                </svg>
+            </div>
             <div className={styles.features_section}>
                 <h2 className={styles.features_title}>Feature & Benefits</h2>
-                
                 <div className={styles.features_grid}>
                     <div className={styles.feature_benefit_card}>
                         <div className={styles.feature_icon}></div>
@@ -114,6 +122,15 @@ function Home() {
                         </p>
                     </div>
                 </div>
+            </div>
+            <div className={styles.wave_wrapper1}>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
+                    <path
+                    fill="#0f0f0f"
+                    fillOpacity="1"
+                    d="M0,32L0,224L130.9,224L130.9,64L261.8,64L261.8,288L392.7,288L392.7,128L523.6,128L523.6,0L654.5,0L654.5,288L785.5,288L785.5,192L916.4,192L916.4,224L1047.3,224L1047.3,32L1178.2,32L1178.2,160L1309.1,160L1309.1,224L1440,224L1440,320L1309.1,320L1309.1,320L1178.2,320L1178.2,320L1047.3,320L1047.3,320L916.4,320L916.4,320L785.5,320L785.5,320L654.5,320L654.5,320L523.6,320L523.6,320L392.7,320L392.7,320L261.8,320L261.8,320L130.9,320L130.9,320L0,320L0,320Z"
+                    ></path>
+                </svg>
             </div>
             <div className={styles.auth_card}>
             <h3 className={styles.subs_text}>It's Time To Work</h3>

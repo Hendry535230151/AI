@@ -331,7 +331,6 @@ function Chat() {
                     : styles.close_dropdown
                 }`}
               >
-                a
               </div>
             </>
           )}

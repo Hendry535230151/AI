@@ -21,6 +21,7 @@ function Chat() {
   const [isClosedSidebar, setIsClosedSidebar] = useState(false);
   const [isClosedDirectory, setIsClosedDirectory] = useState(false);
   const [isClosedHistory, setIsClosedHistory] = useState(false);
+  const bottomRef = useRef(null);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -130,6 +131,12 @@ function Chat() {
       clearTimeout(dragLeaveTimeout);
     };
   }, []);
+
+  useEffect(() => {
+    if (bottomRef.current) {
+      bottomRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [bottomRef, chatHistory]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -337,6 +344,7 @@ function Chat() {
             <p className={styles.profile_name}>User</p>
           )}
         </button>
+        <LogoutButton />
       </div>
       <div className={styles.main_area}>
         <header className={styles.header}>
@@ -408,6 +416,7 @@ function Chat() {
             </div>
           )}
         </div>
+        <div ref={bottomRef} />
       </div>
     </div>
   );

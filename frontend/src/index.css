@@ -19,7 +19,7 @@ body::-webkit-scrollbar-track {
 }
 
 body::-webkit-scrollbar-thumb {
-    background-color: rgba(234, 202, 145, 0.5);
+    background-color: #EACA91;
     border-radius: 4px;
     border: 2px solid transparent;
     background-clip: content-box;

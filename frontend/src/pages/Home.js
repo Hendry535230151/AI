@@ -55,11 +55,11 @@ function Home() {
                             Designers use random text to fill spaces in a layout or design to see how the final product will look once the actual content is added.
                         </p>
                     </div>
-                    <img src="icon1.png" alt="Icon 1" className={styles.icon_box} />
+                    <img src="/icon1.png" alt="Icon 1" className={styles.icon_box} />
                 </div>
 
                 <div className={styles.custom_row}>
-                    <img src="icon2.png" alt="Icon 2" className={styles.icon_box} />
+                    <img src="/icon2.png" alt="Icon 2" className={styles.icon_box} />
                     <div className={styles.text_box}>
                         <h2 className={styles.title}>Human 2</h2>
                         <p className={styles.paragraph}>
@@ -136,13 +136,15 @@ function Home() {
             <h3 className={styles.subs_text}>It's Time To Work</h3>
                 <div className={styles.button_container}>
                     <button className={styles.auth_button}>
-                    <span className={styles.icon}>📝</span>
+                    <span className={styles.icon}>
+                    <img src="/pencil.png" alt="Contoh" /></span>
                     Sign-up
                     </button>
 
                     <button className={styles.auth_button}>
-                    <span className={styles.icon}>👤➕</span>
-                    Sign-in
+                    <span className={styles.icon}>
+                    <img src="/profile.png" alt="Contoh" /></span>
+                    Sign-up
                     </button>
                 </div>
             </div>  

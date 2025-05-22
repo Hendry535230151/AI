@@ -13,9 +13,14 @@ function Chat() {
   const navigate = useNavigate();
   const [message, setMessage] = useState("");
   const [chatHistory, setChatHistory] = useState([]);
+  const [directoryList, setDirectoryList] = useState([]);
+  const [historyList, setHistoryList] = useState([]);
   const [error, setError] = useState("");
-  const [isDragging, setIsDragging] = useState(false);
   const [droppedFile, setDroppedFile] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isClosedSidebar, setIsClosedSidebar] = useState(false);
+  const [isClosedDirectory, setIsClosedDirectory] = useState(false);
+  const [isClosedHistory, setIsClosedHistory] = useState(false);
   const bottomRef = useRef(null);
 
   useEffect(() => {
@@ -69,6 +74,24 @@ function Chat() {
       }
     };
 
+    const fetchDirectory = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("User not authenticated. Please login.");
+        return;
+      }
+      try {
+        const res = await axios.get("http://localhost:3000/directories/", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setDirectoryList(res.data.data);
+      } catch (err) {
+        setError("Failed to load directory");
+      }
+    };
+
     const handleWindowDragOver = (e) => {
       e.preventDefault();
       dragCounter++;
@@ -95,6 +118,7 @@ function Chat() {
     };
 
     fetchHistory();
+    fetchDirectory();
 
     window.addEventListener("dragover", handleWindowDragOver);
     window.addEventListener("drop", handleWindowDrop);
@@ -175,6 +199,7 @@ function Chat() {
           "http://localhost:3000/ai/chat",
           {
             message: trimmedMessage,
+            userId,
           },
           {
             headers: {
@@ -210,59 +235,149 @@ function Chat() {
   };
 
   return (
-    <div className={styles.chat_container}>
+    <div
+      className={`${styles.main_container} ${
+        isClosedSidebar ? styles.close : ""
+      }`}
+    >
       <div className={styles.sidebar}>
+        <div className={styles.sidebar_button_group}>
+          <button
+            onClick={() => setIsClosedSidebar(!isClosedSidebar)}
+            className={styles.sidebar_button}
+          >
+            {isClosedSidebar ? (
+              <i
+                className={`fa-solid fa-align-left ${styles.sidebar_icon}`}
+              ></i>
+            ) : (
+              <>
+                <i className={`fa-solid fa-x ${styles.sidebar_icon}`}></i>
+              </>
+            )}
+          </button>
+          {isClosedSidebar ? (
+            <></>
+          ) : (
+            <>
+              <button className={styles.sidebar_button}>
+                <i
+                  className={`fa-solid fa-magnifying-glass ${styles.sidebar_icon}`}
+                ></i>
+              </button>
+              <button className={styles.sidebar_button}>
+                <i
+                  className={`fa-solid fa-pen-to-square ${styles.sidebar_icon}`}
+                ></i>
+              </button>
+            </>
+          )}
+        </div>
+        <div className={styles.dropdown_group}>
+          {isClosedSidebar ? (
+            <></>
+          ) : (
+            <>
+              <div
+                className={`${styles.dropdown_area} ${
+                  isClosedDirectory ? styles.close_dropdown : ""
+                }`}
+              >
+                <button
+                  className={styles.dropdown}
+                  onClick={() => setIsClosedDirectory((prev) => !prev)}
+                >
+                  <p className={styles.dropdown_text}>Directory</p>
+                  <i
+                    className={`fa-solid fa-caret-down ${styles.dropdown_icon}`}
+                  ></i>
+                </button>
+                {!isClosedDirectory && (
+                  <ul className={styles.dropdown_list}>
+                    {directoryList.length > 0 ? (
+                      directoryList.map((dir, idx) => (
+                        <li key={idx} className={styles.dropdown_item}>
+                          <i className="fa-solid fa-folder"></i>{" "}
+                          {dir.directory_name}
+                        </li>
+                      ))
+                    ) : (
+                      <li className={styles.dropdown_item}>
+                        No directories found
+                      </li>
+                    )}
+                  </ul>
+                )}
+              </div>
+              <div
+                className={`${styles.dropdown_area} ${
+                  isClosedHistory ? styles.close_dropdown : ""
+                }`}
+              >
+                <button
+                  className={styles.dropdown}
+                  onClick={() => setIsClosedHistory((prev) => !prev)}
+                >
+                  <p className={styles.dropdown_text}>History</p>
+                  <i
+                    className={`fa-solid fa-caret-down ${styles.dropdown_icon}`}
+                  ></i>
+                </button>
+              </div>
+              <div
+                className={`${styles.container3} ${
+                  isClosedDirectory && isClosedHistory
+                    ? styles.dropdown_area
+                    : styles.close_dropdown
+                }`}
+              >
+                a
+              </div>
+            </>
+          )}
+        </div>
+        <button className={styles.profile_group}>
+          <div className={styles.profile_circle}></div>
+          {isClosedSidebar ? (
+            <></>
+          ) : (
+            <p className={styles.profile_name}>User</p>
+          )}
+        </button>
         <LogoutButton />
       </div>
-      <div className={styles.chat_area}>
-        <h1 className={styles.main_text}>AInizer</h1>
-        <div className={styles.chat_box_wrapper}>
-          <div className={styles.chat_box}>
-            {chatHistory.map((chat, index) => (
-              <div
-                key={index}
-                className={
-                  chat.sender === "user"
-                    ? styles.user_message
-                    : chat.sender === "ai"
-                    ? styles.ai_message
-                    : styles.errorMessage
-                }
-              >
-                <strong>
-                  {chat.sender === "user"
-                    ? "You"
-                    : chat.sender === "ai"
-                    ? "AI"
-                    : "Error"}
-                  :
-                </strong>{" "}
-                <pre style={{ margin: 0, whiteSpace: "pre-wrap" }}>
-                  <ReactMarkdown>{formatText(chat.text)}</ReactMarkdown>
-                </pre>
-              </div>
-            ))}
-            <div ref={bottomRef} />
-          </div>
+      <div className={styles.main_area}>
+        <header className={styles.header}>
+          <h1 className={styles.logo}>AInizer</h1>
+        </header>
+        <div className={styles.chat_area}>
+          {chatHistory.map((chat, index) => (
+            <div
+              key={index}
+              className={
+                chat.sender === "user"
+                  ? styles.user_message
+                  : chat.sender === "ai"
+                  ? styles.ai_message
+                  : styles.errorMessage
+              }
+            >
+              <strong>
+                {chat.sender === "user"
+                  ? "You"
+                  : chat.sender === "ai"
+                  ? "AI"
+                  : "Error"}
+                :
+              </strong>{" "}
+              <pre style={{ margin: 0, whiteSpace: "pre-wrap" }}>
+                <ReactMarkdown>{formatText(chat.text)}</ReactMarkdown>
+              </pre>
+            </div>
+          ))}
         </div>
-
-        {isDragging && (
-          <div
-            className={styles.drop_zone}
-            onDragOver={(e) => e.preventDefault()}
-            onDragLeave={(e) => e.preventDefault()}
-            onDrop={handleDrop}
-          >
-            <p>
-              {droppedFile
-                ? `File ready: ${droppedFile.name}`
-                : "Drop your file here"}
-            </p>
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className={styles.chat_form}>
-          <div className={styles.input_wrapper}>
+        <div className={styles.query_area}>
+          <form onSubmit={handleSubmit} className={styles.query_form}>
             <input
               type="text"
               value={message}
@@ -272,12 +387,36 @@ function Chat() {
                   ? "Enter a description for the file..."
                   : "Type your message..."
               }
-              className={styles.chat_input}
+              className={styles.query_field}
               required
             />
-            <button type="submit" className={styles.chat_button}></button>
-          </div>
-        </form>
+            <button type="submit" className={styles.query_button}>
+              <i className={`fa-solid fa-file-import ${styles.query_icon}`}></i>
+            </button>
+          </form>
+          {isDragging && (
+            <div
+              className={styles.drop_zone}
+              onDragOver={(e) => e.preventDefault()}
+              onDragLeave={(e) => e.preventDefault()}
+              onDrop={handleDrop}
+            >
+              <p>
+                {droppedFile ? (
+                  `File ready: ${droppedFile.name}`
+                ) : (
+                  <div className={styles.drop_zone_group}>
+                    <i
+                      className={`fa-solid fa-droplet ${styles.drop_zone_icon}`}
+                    ></i>
+                    <h1 className={styles.drop_zone_file}>Drop file here</h1>
+                  </div>
+                )}
+              </p>
+            </div>
+          )}
+        </div>
+        <div ref={bottomRef} />
       </div>
     </div>
   );

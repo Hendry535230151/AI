@@ -7,7 +7,7 @@ function ErrorMessage({ message, setMessage  }) {
         <div className={styles.error_container}>
             <div className={styles.error_title}>
                 <span>Error</span>
-                <i class="fa-solid fa-xmark" onClick={() => setMessage('')}></i>
+                <i className="fa-solid fa-xmark" onClick={() => setMessage('')}></i>
             </div>
             <div className={styles.error_description}>
                 { message }

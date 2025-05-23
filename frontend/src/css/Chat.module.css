@@ -63,6 +63,7 @@ body::-webkit-scrollbar {
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
+    border: 1px solid #333333;
     cursor: pointer;
 }
 
@@ -87,9 +88,12 @@ body::-webkit-scrollbar {
 }
 
 .dropdown_text, .dropdown_icon, .dropdown_item  {
-    font-family: "Birthstone", cursive;
     font-size: 12px;
     color: #EACA91;
+}
+
+.dropdown_item {
+    margin: 5px 0;
 }
 
 .active {
@@ -129,9 +133,7 @@ body::-webkit-scrollbar {
 
 .header {
     width: 100%;
-    margin: 0 0 0 20px;
     display: flex;
-    align-items: center;
     position: sticky;
     top: 0;
     background-color: #131313;
@@ -146,6 +148,7 @@ body::-webkit-scrollbar {
     font-weight: 400;
     display: flex;
     align-items: center;
+    margin: 0 0 0 15px;
 }
 
 .chat_area {
@@ -178,41 +181,58 @@ body::-webkit-scrollbar {
     background-color: #242424;
 }
 
+.error_message {
+    padding: 20px;
+    background-color: #b1090937;
+    color: #b10909;
+    border: 2px solid#5a0404;
+    border-radius: 15px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: repeat(2, 1fr);
+    align-items: center;
+}
+
+.error_icon {
+    grid-row: span 2;
+    font-size: 30px;
+    margin: 0 20px 0 0;
+}
+
 .markdown_container {
-  margin: 0;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  overflow-x: auto;
-  max-width: 100%;
+    margin: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    overflow-x: auto;
+    max-width: 100%;
 }
 
 .markdown_container pre {
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  overflow-x: auto;
-  max-width: 100%;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    overflow-x: auto;
+    max-width: 100%;
 }
 
 .markdown_container code {
-  word-break: break-word;
-  white-space: pre-wrap;
+    word-break: break-word;
+    white-space: pre-wrap;
 }
 
 .markdown_container a {
-  word-break: break-all;
+    word-break: break-all;
 }
 
 .markdown_container p {
-  word-wrap: break-word;
-  white-space: pre-wrap;
+    word-wrap: break-word;
+    white-space: pre-wrap;
 }
 
 .query_area {
     width: 90%;
     max-width: 900px;
-    height: 70px;
     border-radius: 10px;
     background-color: #131313;
     position: sticky;
@@ -221,38 +241,43 @@ body::-webkit-scrollbar {
 
 .query_form {
     width: 100%;
-    position: relative;
+    min-height: 100px;
+    gap: 8px;
 }
 
 .query_field {
-    width: 100%;
-    height: auto;
-    min-height: 50px;
-    padding: 10px;
-    padding-left: 20px;
-    padding-right: 50px;
-    border: 1px solid #EACA91;
+    height: 100%;
+    max-height: 76px;
+    padding: 12px 50px 12px 20px;
+    line-height: 26px;
+    resize: none;
+    overflow-y: auto;
+    border: none;
     border-radius: 25px;
     background-color: #2A2A2A;
     color: #f5f5f5;
-    resize: none;
-    box-sizing: border-box;
-    text-align: left;
+    width: 100%;
 }
 
 .query_button {
     width: 40px;
-    height: 40px;
+    height: 40px; 
     position: absolute;
-    top: 50%;
+    bottom: 5px;
     right: 5px; 
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    transform: translateY(-50%);
     background-color: #EACA91;
     cursor: pointer;
+}
+
+.typing {
+    overflow-y: auto;
+    top: auto;
+    bottom: 29px;
+    right: 5px;
 }
 
 .query_icon {

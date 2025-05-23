@@ -21,7 +21,10 @@ function Chat() {
   const [isClosedSidebar, setIsClosedSidebar] = useState(false);
   const [isClosedDirectory, setIsClosedDirectory] = useState(false);
   const [isClosedHistory, setIsClosedHistory] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+  const queryFieldRef = useRef(null);
   const bottomRef = useRef(null);
+  const bottomButton = useRef(null);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -46,6 +49,17 @@ function Chat() {
       ]);
       e.dataTransfer.clearData();
     }
+  };
+
+  const handleInputChange = (e) => {
+    setMessage(e.target.value);
+
+    if (queryFieldRef.current) {
+      queryFieldRef.current.style.height = 'auto';
+      queryFieldRef.current.style.height = queryFieldRef.current.scrollHeight + 'px';
+    }
+
+    setIsTyping(e.target.value.length > 0);
   };
 
   useEffect(() => {
@@ -278,35 +292,30 @@ function Chat() {
             <></>
           ) : (
             <>
-              <div
-                className={`${styles.dropdown_area} ${
-                  isClosedDirectory ? styles.close_dropdown : ''
-                }`}
-              >
-                <button
-                  className={styles.dropdown}
-                  onClick={() => setIsClosedDirectory((prev) => !prev)}
-                >
+              <div className={`${styles.dropdown_area} ${isClosedDirectory ? styles.close_dropdown : ''}`}>
+                <button className={styles.dropdown} onClick={() => setIsClosedDirectory((prev) => !prev)}>
                   <p className={styles.dropdown_text}>Directory</p>
-                  <i
-                    className={`fa-solid fa-caret-down ${styles.dropdown_icon}`}
-                  ></i>
+                  <i className={`fa-solid fa-caret-down ${styles.dropdown_icon}`}></i>
                 </button>
                 {!isClosedDirectory && (
-                  <ul className={styles.dropdown_list}>
-                    {directoryList.length > 0 ? (
-                      directoryList.map((dir, idx) => (
-                        <li key={idx} className={styles.dropdown_item}>
-                          <i className='fa-solid fa-folder'></i>{' '}
-                          {dir.directory_name}
-                        </li>
-                      ))
-                    ) : (
-                      <li className={styles.dropdown_item}>
-                        No directories found
+                <ul className={styles.dropdown_list}>
+                  {directoryList.length > 0 ? (
+                    directoryList.map((dir, idx) => (
+                      <li
+                        key={idx}
+                        className={styles.dropdown_item}
+                        style={{ paddingLeft: `${dir.level * 20}px` }}
+                      >
+                        <i className="fa-solid fa-folder"></i>{' '}
+                        {dir.directory_name}
                       </li>
-                    )}
-                  </ul>
+                    ))
+                  ) : (
+                    <li className={styles.dropdown_item}>
+                      No directories found
+                    </li>
+                  )}
+                </ul>
                 )}
               </div>
               <div
@@ -361,13 +370,17 @@ function Chat() {
                   : styles.error_message
               }
             >
+              {chat.sender !== 'user' && chat.sender !== 'ai' ? (
+                <i className={`${styles.error_icon} fa-solid fa-circle-exclamation`}></i>
+              ) : (
+                <></>
+              )}
               <strong className={styles.user}>
                 {chat.sender === 'user'
                   ? 'You'
                   : chat.sender === 'ai'
                   ? 'AI'
-                  : 'Error'}
-                :
+                  : 'Error'}{' '}
               </strong>{' '}
               <div className={styles.markdown_container}>
                 <ReactMarkdown>{formatText(chat.text)}</ReactMarkdown>
@@ -378,43 +391,44 @@ function Chat() {
         <div className={styles.query_area}>
           <form onSubmit={handleSubmit} className={styles.query_form}>
             <textarea
-              type='text'
+              ref={queryFieldRef}
+              type="text"
               value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              onChange={handleInputChange}
               placeholder={
                 droppedFile
                   ? 'Enter a description for the file...'
                   : 'Type your message...'
-              }
+                }
               className={styles.query_field}
-              required
+              required={!droppedFile}
             />
-            <button type='submit' className={styles.query_button}>
+            <button type="submit" ref={bottomButton} className={`${styles.query_button} ${styles.typing}`}>
               <i className={`fa-solid fa-file-import ${styles.query_icon}`}></i>
             </button>
           </form>
-          {isDragging && (
-            <div
-              className={styles.drop_zone}
-              onDragOver={(e) => e.preventDefault()}
-              onDragLeave={(e) => e.preventDefault()}
-              onDrop={handleDrop}
-            >
-              <p>
-                {droppedFile ? (
-                  `File ready: ${droppedFile.name}`
-                ) : (
-                  <div className={styles.drop_zone_group}>
-                    <i
-                      className={`fa-solid fa-droplet ${styles.drop_zone_icon}`}
-                    ></i>
-                    <h1 className={styles.drop_zone_file}>Drop file here</h1>
-                  </div>
-                )}
-              </p>
-            </div>
-          )}
         </div>
+        {isDragging && (
+          <div
+            className={styles.drop_zone}
+            onDragOver={(e) => e.preventDefault()}
+            onDragLeave={(e) => e.preventDefault()}
+            onDrop={handleDrop}
+          >
+            <p>
+              {droppedFile ? (
+                `File ready: ${droppedFile.name}`
+              ) : (
+                <div className={styles.drop_zone_group}>
+                  <i
+                    className={`fa-solid fa-droplet ${styles.drop_zone_icon}`}
+                  ></i>
+                  <h1 className={styles.drop_zone_file}>Drop file here</h1>
+                </div>
+              )}
+            </p>
+          </div>
+        )}
         <div ref={bottomRef} />
       </div>
     </div>

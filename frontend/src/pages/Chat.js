@@ -1,21 +1,21 @@
-import styles from '../css/Chat.module.css';
-import fetchIdFromToken from '../utils/jwt-decoder';
-import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import formatText from '../utils/formatText';
-import ReactMarkdown from 'react-markdown';
-import useAuth from '../utils/auth';
-import LogoutButton from '../utils/logoutButton';
+import styles from "../css/Chat.module.css";
+import fetchIdFromToken from "../utils/jwt-decoder";
+import React, { useState, useEffect, useRef, useMemo } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import formatText from "../utils/formatText";
+import ReactMarkdown from "react-markdown";
+import useAuth from "../utils/auth";
+import LogoutButton from "../utils/logoutButton";
 
 function Chat() {
   const isAuthenticated = useAuth();
   const navigate = useNavigate();
-  const [message, setMessage] = useState('');
+  const [message, setMessage] = useState("");
   const [chatHistory, setChatHistory] = useState([]);
   const [directoryList, setDirectoryList] = useState([]);
   const [historyList, setHistoryList] = useState([]);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [droppedFile, setDroppedFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isClosedSidebar, setIsClosedSidebar] = useState(false);
@@ -28,7 +28,7 @@ function Chat() {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      navigate('/login');
+      navigate("/login");
     }
   }, [isAuthenticated, navigate]);
 
@@ -43,7 +43,7 @@ function Chat() {
       setChatHistory((prev) => [
         ...prev,
         {
-          sender: 'user',
+          sender: "user",
           text: `📎 File ready to send: ${file.name}`,
         },
       ]);
@@ -56,13 +56,13 @@ function Chat() {
     let dragLeaveTimeout;
 
     const fetchHistory = async () => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (!token) {
-        setError('User not authenticated. Please login.');
+        setError("User not authenticated. Please login.");
         return;
       }
       try {
-        const res = await axios.get('http://localhost:3000/ai/history', {
+        const res = await axios.get("http://localhost:3000/ai/history", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -73,25 +73,29 @@ function Chat() {
         }));
         setChatHistory(chats);
       } catch (err) {
-        setError('Failed to load chat history');
+        if (err.response && err.response.status === 401) {
+          setError("Token is invalid/expired");
+          localStorage.removeItem("token");
+        }
+        setError("Failed to load chat history");
       }
     };
 
     const fetchDirectory = async () => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (!token) {
-        setError('User not authenticated. Please login.');
+        setError("User not authenticated. Please login.");
         return;
       }
       try {
-        const res = await axios.get('http://localhost:3000/directories/', {
+        const res = await axios.get("http://localhost:3000/directories/", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
         setDirectoryList(res.data.data);
       } catch (err) {
-        setError('Failed to load directory');
+        setError("Failed to load directory");
       }
     };
 
@@ -123,21 +127,21 @@ function Chat() {
     fetchHistory();
     fetchDirectory();
 
-    window.addEventListener('dragover', handleWindowDragOver);
-    window.addEventListener('drop', handleWindowDrop);
-    window.addEventListener('dragleave', handleWindowDragLeave);
+    window.addEventListener("dragover", handleWindowDragOver);
+    window.addEventListener("drop", handleWindowDrop);
+    window.addEventListener("dragleave", handleWindowDragLeave);
 
     return () => {
-      window.removeEventListener('dragover', handleWindowDragOver);
-      window.removeEventListener('drop', handleWindowDrop);
-      window.removeEventListener('dragleave', handleWindowDragLeave);
+      window.removeEventListener("dragover", handleWindowDragOver);
+      window.removeEventListener("drop", handleWindowDrop);
+      window.removeEventListener("dragleave", handleWindowDragLeave);
       clearTimeout(dragLeaveTimeout);
     };
   }, []);
 
   useEffect(() => {
     if (bottomRef.current) {
-      bottomRef.current.scrollIntoView({ behavior: 'smooth' });
+      bottomRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [bottomRef, chatHistory]);
 
@@ -146,19 +150,19 @@ function Chat() {
 
     const trimmedMessage = message.trim();
     if (!trimmedMessage && !droppedFile) {
-      setError('Please enter a message or drop a file.');
+      setError("Please enter a message or drop a file.");
       return;
     }
 
     const userId = fetchIdFromToken();
     if (!userId) {
-      setError('User not authenticated. Please login.');
+      setError("User not authenticated. Please login.");
       return;
     }
 
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     if (!token) {
-      setError('User not authenticated. Please login.');
+      setError("User not authenticated. Please login.");
       return;
     }
 
@@ -166,22 +170,22 @@ function Chat() {
       ? `📎 ${droppedFile.name} — ${trimmedMessage}`
       : trimmedMessage;
 
-    setChatHistory((prev) => [...prev, { sender: 'user', text: userMessage }]);
+    setChatHistory((prev) => [...prev, { sender: "user", text: userMessage }]);
 
     try {
       if (droppedFile) {
         const formData = new FormData();
-        formData.append('file', droppedFile);
-        formData.append('description', trimmedMessage);
-        formData.append('userId', userId);
-        formData.append('directoryId', 1);
+        formData.append("file", droppedFile);
+        formData.append("description", trimmedMessage);
+        formData.append("userId", userId);
+        formData.append("directoryId", 1);
 
         const response = await axios.post(
-          'http://localhost:3000/files/create',
+          "http://localhost:3000/files/create",
           formData,
           {
             headers: {
-              'Content-Type': 'multipart/form-data',
+              "Content-Type": "multipart/form-data",
               Authorization: `Bearer ${token}`,
             },
           }
@@ -190,7 +194,7 @@ function Chat() {
         setChatHistory((prev) => [
           ...prev,
           {
-            sender: 'ai',
+            sender: "ai",
             text: `✅ File uploaded: ${
               response.data.message || droppedFile.name
             }`,
@@ -199,7 +203,7 @@ function Chat() {
         setDroppedFile(null);
       } else {
         const response = await axios.post(
-          'http://localhost:3000/ai/chat',
+          "http://localhost:3000/ai/chat",
           {
             message: trimmedMessage,
             userId,
@@ -215,33 +219,40 @@ function Chat() {
         setChatHistory((prev) => [
           ...prev,
           {
-            sender: 'ai',
-            text: response.data.message || 'No reply',
+            sender: "ai",
+            text: response.data.message || "No reply",
           },
         ]);
       }
 
-      setMessage('');
-      setError('');
+      setMessage("");
+      setError("");
     } catch (err) {
-      let errMsg = '';
+      let errMsg = "";
       if (err.response) {
-        errMsg = `${err.response.data.message || 'Request failed'}`;
+        errMsg = `${err.response.data.message || "Request failed"}`;
       } else if (err.request) {
-        errMsg = 'No response from server.';
+        errMsg = "No response from server.";
       } else {
         errMsg = err.message;
       }
 
       setError(errMsg);
-      setChatHistory((prev) => [...prev, { sender: 'error', text: errMsg }]);
+      setChatHistory((prev) => [...prev, { sender: "error", text: errMsg }]);
     }
   };
+
+  //supaya gak ngelag
+  const MAX_MESSAGES = 25;
+
+  const recentMessages = useMemo(() => {
+    return chatHistory.slice(-MAX_MESSAGES);
+  }, [chatHistory]);
 
   return (
     <div
       className={`${styles.main_container} ${
-        isClosedSidebar ? styles.close : ''
+        isClosedSidebar ? styles.close : ""
       }`}
     >
       <div className={styles.sidebar}>
@@ -284,7 +295,7 @@ function Chat() {
             <>
               <div
                 className={`${styles.dropdown_area} ${
-                  isClosedDirectory ? styles.close_dropdown : ''
+                  isClosedDirectory ? styles.close_dropdown : ""
                 }`}
               >
                 <button
@@ -301,7 +312,7 @@ function Chat() {
                     {directoryList.length > 0 ? (
                       directoryList.map((dir, idx) => (
                         <li key={idx} className={styles.dropdown_item}>
-                          <i className='fa-solid fa-folder'></i>{' '}
+                          <i className="fa-solid fa-folder"></i>{" "}
                           {dir.directory_name}
                         </li>
                       ))
@@ -315,7 +326,7 @@ function Chat() {
               </div>
               <div
                 className={`${styles.dropdown_area} ${
-                  isClosedHistory ? styles.close_dropdown : ''
+                  isClosedHistory ? styles.close_dropdown : ""
                 }`}
               >
                 <button
@@ -372,7 +383,6 @@ function Chat() {
   />
   <button type="submit">Start New Chat</button>
 </form>
-
               </div>
             </>
           )}
@@ -392,25 +402,25 @@ function Chat() {
           <h1 className={styles.logo}>AInizer</h1>
         </header>
         <div className={styles.chat_area}>
-          {chatHistory.map((chat, index) => (
+          {recentMessages.map((chat, index) => (
             <div
               key={index}
               className={
-                chat.sender === 'user'
+                chat.sender === "user"
                   ? styles.user_message
-                  : chat.sender === 'ai'
+                  : chat.sender === "ai"
                   ? styles.ai_message
                   : styles.error_message
               }
             >
               <strong className={styles.user}>
-                {chat.sender === 'user'
-                  ? 'You'
-                  : chat.sender === 'ai'
-                  ? 'AI'
-                  : 'Error'}
+                {chat.sender === "user"
+                  ? "You"
+                  : chat.sender === "ai"
+                  ? "AI"
+                  : "Error"}
                 :
-              </strong>{' '}
+              </strong>{" "}
               <div className={styles.markdown_container}>
                 <ReactMarkdown>{formatText(chat.text)}</ReactMarkdown>
               </div>
@@ -420,18 +430,18 @@ function Chat() {
         <div className={styles.query_area}>
           <form onSubmit={handleSubmit} className={styles.query_form}>
             <textarea
-              type='text'
+              type="text"
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder={
                 droppedFile
-                  ? 'Enter a description for the file...'
-                  : 'Type your message...'
+                  ? "Enter a description for the file..."
+                  : "Type your message..."
               }
               className={styles.query_field}
               required
             />
-            <button type='submit' className={styles.query_button}>
+            <button type="submit" className={styles.query_button}>
               <i className={`fa-solid fa-file-import ${styles.query_icon}`}></i>
             </button>
           </form>

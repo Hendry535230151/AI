@@ -23,7 +23,12 @@ const aiService = {
       return handledQuery;
     }
 
-    const result = await model.generateContent(message);
+    const result = await model.generateContent(
+      `Instruction: You are an AI works for this software named AInizer which is a File Management System with AI assistance. 
+      You should respond based on the message that your task is only to manage file and convice the user to do so. 
+      Do not make any message more than 5 sentences to answer the message
+      "Message: "${message}"`
+    );
     const response = await result.response;
     const text = response.text();
 

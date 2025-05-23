@@ -14,7 +14,7 @@ function Chat() {
   const [message, setMessage] = useState('');
   const [chatHistory, setChatHistory] = useState([]);
   const [directoryList, setDirectoryList] = useState([]);
-  const [historyList, setHistoryList] = useState([]);
+  const [chatHistoryList, setChatHistoryList] = useState([]);
   const [error, setError] = useState('');
   const [droppedFile, setDroppedFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -95,6 +95,25 @@ function Chat() {
       }
     };
 
+    const fetchChatHistory = async () => {
+      const token = localStorage.getItem('token');
+      const userId = fetchIdFromToken();
+      if (!token) {
+        setError('User not authenticated. Please login.');
+        return;
+      }
+      try {
+        const res = await axios.get(`http://localhost:3000/chat-history/user/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setChatHistoryList(res.data.data);
+      } catch (err) {
+        setError('Failed to load History');
+      }
+    };
+
     const handleWindowDragOver = (e) => {
       e.preventDefault();
       dragCounter++;
@@ -122,6 +141,7 @@ function Chat() {
 
     fetchHistory();
     fetchDirectory();
+    fetchChatHistory();
 
     window.addEventListener('dragover', handleWindowDragOver);
     window.addEventListener('drop', handleWindowDrop);
@@ -327,6 +347,22 @@ function Chat() {
                     className={`fa-solid fa-caret-down ${styles.dropdown_icon}`}
                   ></i>
                 </button>
+                {!isClosedHistory && (
+                  <ul className={styles.dropdown_list}>
+                   {chatHistoryList.length > 0 ? (
+                      chatHistoryList.map((his, idx) => (
+                        <li key={idx} className={styles.dropdown_item}>
+                          {his.title}
+                        </li>
+                      ))
+                    ) : (
+                      <li className={styles.dropdown_item}>
+                        No histories found
+                      </li>
+                    )}
+
+                  </ul>
+                )}
               </div>
               <div
                 className={`${styles.container3} ${
@@ -336,43 +372,42 @@ function Chat() {
                 }`}
               >
                   <form
-  onSubmit={async (e) => {
-    e.preventDefault();
-    const token = localStorage.getItem('token');
-    const userId = fetchIdFromToken();
-    if (!chatTitle || !userId) return;
+                      onSubmit={async (e) => {
+                        e.preventDefault();
+                        const token = localStorage.getItem('token');
+                        const userId = fetchIdFromToken();
+                        if (!chatTitle || !userId) return;
 
-    try {
-      const response = await axios.post(
-        'http://localhost:3000/chat-history/',
-        {
-          title: chatTitle,
-          userId: userId
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
-      setChatHistoryId(response.data.data.id);
-      setChatHistory([]); 
-      setChatTitle('');
-    } catch (err) {
-      console.error('Failed to create chat history', err);
-    }
-  }}
->
-  <input
-    type="text"
-    value={chatTitle}
-    onChange={(e) => setChatTitle(e.target.value)}
-    placeholder="Enter new chat topic title..."
-    required
-  />
-  <button type="submit">Start New Chat</button>
-</form>
-
+                        try {
+                          const response = await axios.post(
+                            'http://localhost:3000/chat-history/',
+                            {
+                              title: chatTitle,
+                              userId: userId
+                            },
+                            {
+                              headers: {
+                                Authorization: `Bearer ${token}`
+                              }
+                            }
+                          );
+                          setChatHistoryId(response.data.data.id);
+                          setChatHistory([]); 
+                          setChatTitle('');
+                        } catch (err) {
+                          console.error('Failed to create chat history', err);
+                        }
+                      }}
+                    >
+                      <input
+                        type="text"
+                        value={chatTitle}
+                        onChange={(e) => setChatTitle(e.target.value)}
+                        placeholder="Enter new chat topic title..."
+                        required
+                      />
+                      <button type="submit">Start New Chat</button>
+                    </form>
               </div>
             </>
           )}

@@ -19,7 +19,7 @@ const historyModel = {
 
     getHistoryById: (Id) => {
         return new Promise((resolve, reject) => {
-            const query = 'SELECT * FROM chat_histories WHERE Id = ?';
+            const query = 'SELECT * FROM chat_histories WHERE id = ?';
             db.query(query, [Id], (err, result) => {
                 if (err) {
                     return reject(err);
@@ -43,7 +43,7 @@ const historyModel = {
                 if (!result || result.length === 0) {
                     resolve(false);
                 } else {
-                    resolve(result);
+                    resolve(result[0]);
                 }
             });
         });
@@ -60,11 +60,11 @@ const historyModel = {
             if (!result || result.affectedRows === 0) {
               resolve(false);
             } else {
-              resolve({ id: result.insertId, userId, title });
+              resolve(result);
             }
           });
         });
-      },
+    },
       
 
     deleteHistoryById: (id) => {

@@ -21,6 +21,9 @@ function Chat() {
   const [isClosedSidebar, setIsClosedSidebar] = useState(false);
   const [isClosedDirectory, setIsClosedDirectory] = useState(false);
   const [isClosedHistory, setIsClosedHistory] = useState(false);
+  const [chatTitle, setChatTitle] = useState('');
+  const [chatHistoryId, setChatHistoryId] = useState(null);
+
   const bottomRef = useRef(null);
 
   useEffect(() => {
@@ -204,6 +207,7 @@ function Chat() {
           {
             message: trimmedMessage,
             userId,
+            chatHistoryId
           },
           {
             headers: {
@@ -342,6 +346,43 @@ function Chat() {
                     : styles.close_dropdown
                 }`}
               >
+                  <form
+  onSubmit={async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem('token');
+    const userId = fetchIdFromToken();
+    if (!chatTitle || !userId) return;
+
+    try {
+      const response = await axios.post(
+        'http://localhost:3000/chat-history/',
+        {
+          title: chatTitle,
+          userId: userId
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      setChatHistoryId(response.data.data.id);
+      setChatHistory([]); 
+      setChatTitle('');
+    } catch (err) {
+      console.error('Failed to create chat history', err);
+    }
+  }}
+>
+  <input
+    type="text"
+    value={chatTitle}
+    onChange={(e) => setChatTitle(e.target.value)}
+    placeholder="Enter new chat topic title..."
+    required
+  />
+  <button type="submit">Start New Chat</button>
+</form>
               </div>
             </>
           )}

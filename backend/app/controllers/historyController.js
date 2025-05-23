@@ -21,9 +21,9 @@ const historyController = {
     },
     
     getHistoryByUserId: async (req, res) => {
-        const { User_Id } = req.params;
+        const { userId } = req.params;
         try {
-            const history = await historyService.getHistoryByUserId(User_Id);
+            const history = await historyService.getHistoryByUserId(userId);
             res.status(200).json({ success: true, data: history });
         } catch (err) {
             res.status(err.statusCode || 400).json({ success: false, message: err.message });
@@ -31,14 +31,15 @@ const historyController = {
     },
 
     createHistory: async (req, res) => {
-        const { User_Id, title } = req.body;
+        const { userId, title } = req.body;
         try {
-            const newHistory = await historyService.createHistory(User_Id, title);
-            res.status(201).json({ success: true, message: 'History created successfully', data: newHistory });
+          const newHistory = await historyService.createHistory(userId, title);
+          res.status(201).json({ success: true, message: 'History created successfully', data: newHistory });
         } catch (err) {
-            res.status(err.statusCode || 400).json({ success: false, message: err.message || 'Failed to create history' });
+          res.status(err.statusCode || 400).json({ success: false, message: err.message || 'Failed to create history' });
         }
-    },
+      },
+      
 
 
 

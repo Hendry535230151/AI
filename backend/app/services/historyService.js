@@ -33,15 +33,15 @@ const historyService = {
     },
 
     
-    getHistoryByUserId: async (User_Id) => {
+    getHistoryByUserId: async (userId) => {
         try {
-            if (!User_Id) {
+            if (!userId) {
                 throw new customError('History ID is required. Please provide a valid ID and try again.', 400);
             }
             
-            const findHistory = await historyModel.getHistoryByUserId(User_Id);
+            const findHistory = await historyModel.getHistoryByUserId(userId);
             if (!findHistory) {
-                throw new customError(`No History found with ID: ${User_Id}. Please verify the ID and try again.`, 404);
+                throw new customError(`No History found with ID: ${userId}. Please verify the ID and try again.`, 404);
             }
 
             return findHistory;
@@ -49,20 +49,17 @@ const historyService = {
             throw err;
         }
     },
-    createHistory: async (User_Id, title) => {
-        try {
-            if (!User_Id || !title) {
-                throw new customError('History ID and title are required.', 400);
-            }
-            const created = await historyModel.createHistory(User_Id, title);
-            if (!created) {
-                throw new customError('Failed to create history.', 500);
-            }
-            return { User_Id, title };
-        } catch (err) {
-            throw err;
+    createHistory: async (userId, title) => {
+        if (!userId || !title) {
+          throw new customError('User ID and title are required.', 400);
         }
-    },
+        const created = await historyModel.createHistory(userId, title);
+        if (!created) {
+          throw new customError('Failed to create history.', 500);
+        }
+        return created; 
+      },
+      
 
     deleteHistoryById: async (id) => {
         try {
@@ -70,16 +67,11 @@ const historyService = {
                 throw new customError('User ID is required. Please provide a valid ID and try again', 400);
             }
 
-            const findHistory = await historyModel.deleteHistoryById(id);
-            if (!findHistory) {
-                throw new customError(`User with ID: ${id} not found. Please verify the ID and try again.`, 400);
-            } 
-            const deleteHistory = await historyModelistoryModel.deleteById(id);
-            if (!deleteHistory) {
-                throw new customError(`Failed to delete user with ID: ${id}. The user may not exist. Please verify the ID and try again.`, 400);
+            const deletedHistory = await historyModel.deleteHistoryById(id);
+            if (!deletedHistory) {
+                throw new customError(`Failed to delete history with ID: ${id}. Please verify the ID and try again.`, 400);
             }
-
-            return deleteHistory;
+            return deletedHistory;
         } catch (err) {
             throw err;
         }

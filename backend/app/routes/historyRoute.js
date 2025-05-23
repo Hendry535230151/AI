@@ -1,9 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const authMiddleware = require("../middleware/auth");
 const historyController = require("../controllers/historyController");
 
-router.get("/chat_history", authMiddleware, historyController.getAllHistories);
-router.post("/chat_history", authMiddleware, historyController.createHistory);
+router.post("/", historyController.createHistory);
+router.get("/", historyController.getAllHistories);
+router.get("/:id", historyController.getHistoryById);
+router.get("/user/:userId", historyController.getHistoryByUserId);
+router.delete("/:id", historyController.deleteHistoryById);
+
 
 module.exports = router;

@@ -33,41 +33,39 @@ const historyModel = {
         });
     },
 
-    getHistoryByUserId: (User_Id) => {
+    getHistoryByUserId: (userId) => {
         return new Promise((resolve, reject) => {
-            const query = 'SELECT * FROM chat_histories WHERE User_Id = ?';
-            db.query(query, [User_Id], (err, result) => {
+            const query = 'SELECT * FROM chat_histories WHERE user_id = ?';
+            db.query(query, [userId], (err, result) => {
                 if (err) {
                     return reject(err);
                 }
                 if (!result || result.length === 0) {
                     resolve(false);
                 } else {
-                    resolve(result[0]);
+                    resolve(result);
                 }
             });
         });
     },
 
 
-    createHistory: (User_Id, title) => {
+    createHistory: (userId, title) => {
         return new Promise((resolve, reject) => {
-            const query = 'INSERT INTO chat_histories (User_Id, title) VALUES (?, ?)';
-            db.query(query, [User_Id, title], (err, result) => {
-                if (err) {
-                    return reject(err);
-                } 
-                if (!result || result.affectedRows === 0) {
-                    resolve(false);
-                } else {
-                    resolve(true);
-                }
-            });
+          const query = 'INSERT INTO chat_histories (user_id, title) VALUES (?, ?)';
+          db.query(query, [userId, title], (err, result) => {
+            if (err) {
+              return reject(err);
+            }
+            if (!result || result.affectedRows === 0) {
+              resolve(false);
+            } else {
+              resolve({ id: result.insertId, userId, title });
+            }
+          });
         });
-    },
-
-
-
+      },
+      
 
     deleteHistoryById: (id) => {
         return new Promise((resolve, reject) => {

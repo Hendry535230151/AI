@@ -23,8 +23,10 @@ function Chat() {
   const [isClosedHistory, setIsClosedHistory] = useState(false);
   const [chatTitle, setChatTitle] = useState('');
   const [chatHistoryId, setChatHistoryId] = useState(null);
-
+  const [isTyping, setIsTyping] = useState(false);
+  const queryFieldRef = useRef(null);
   const bottomRef = useRef(null);
+  const bottomButton = useRef(null);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -49,6 +51,11 @@ function Chat() {
       ]);
       e.dataTransfer.clearData();
     }
+  };
+
+  const handleInputChange = (e) => {
+    setMessage(e.target.value);
+    setIsTyping(e.target.value.length > 0);
   };
 
   useEffect(() => {
@@ -242,6 +249,49 @@ function Chat() {
     }
   };
 
+
+
+  const buildDirectoryTree = (list) => {
+    const map = {};
+    const roots = [];
+
+    list.forEach((item) => {
+      map[item.id] = { ...item, children: [] };
+    });
+
+    list.forEach((item) => {
+      if (item.parent_directory && map[item.parent_directory]) {
+        map[item.parent_directory].children.push(map[item.id]);
+      } else {
+        roots.push(map[item.id]);
+      }
+    });
+
+    return roots;
+  };
+
+  const directoryTree = useMemo(() => buildDirectoryTree(directoryList), [directoryList]);
+  
+  const renderDirectoryTree = (nodes, level = 0) => {
+    return (
+      <ul style={{ listStyleType: "none", paddingLeft: level === 0 ? 0 : 10 }}>
+        {nodes.map((node) => (
+          <li
+            key={node.id}
+            className={styles.dropdown_item}
+            style={{ paddingLeft: level }}
+          >
+            <i className="fa-solid fa-folder"></i> {node.directory_name}{" "}
+            <span style={{ color: "gray", fontSize: "0.9em" }}>
+              ({node.file_count ?? 0} files)
+            </span>
+            {node.children && node.children.length > 0 && renderDirectoryTree(node.children, level + 1)}
+          </li>
+        ))}
+      </ul>
+    );
+  };
+
   //supaya gak ngelag
   const MAX_MESSAGES = 25;
 
@@ -293,36 +343,39 @@ function Chat() {
             <></>
           ) : (
             <>
-              <div
-                className={`${styles.dropdown_area} ${
-                  isClosedDirectory ? styles.close_dropdown : ""
-                }`}
-              >
-                <button
-                  className={styles.dropdown}
-                  onClick={() => setIsClosedDirectory((prev) => !prev)}
-                >
+              <div className={`${styles.dropdown_area} ${isClosedDirectory ? styles.close_dropdown : ''}`}>
+                <button className={styles.dropdown} onClick={() => setIsClosedDirectory((prev) => !prev)}>
                   <p className={styles.dropdown_text}>Directory</p>
-                  <i
-                    className={`fa-solid fa-caret-down ${styles.dropdown_icon}`}
-                  ></i>
+                  <i className={`fa-solid fa-caret-down ${styles.dropdown_icon}`}></i>
                 </button>
                 {!isClosedDirectory && (
-                  <ul className={styles.dropdown_list}>
-                    {directoryList.length > 0 ? (
-                      directoryList.map((dir, idx) => (
-                        <li key={idx} className={styles.dropdown_item}>
-                          <i className="fa-solid fa-folder"></i>{" "}
-                          {dir.directory_name}
-                        </li>
-                      ))
-                    ) : (
-                      <li className={styles.dropdown_item}>
-                        No directories found
+                <ul className={styles.dropdown_list}>
+                  {/* {directoryList.length > 0 ? (
+                    directoryList.map((dir, idx) => (
+                      <li
+                        key={idx}
+                        className={styles.dropdown_item}
+                        style={{ paddingLeft: `${dir.level * 20}px` }}
+                      >
+                        <i className="fa-solid fa-folder"></i>{' '}
+                        {dir.directory_name}
                       </li>
-                    )}
-                  </ul>
+                    ))
+                  ) : (
+                    <li className={styles.dropdown_item}>
+                      No directories found
+                    </li>
+                  )} */}
+                  {directoryTree.length > 0 ? (
+                    renderDirectoryTree(directoryTree)
+                  ) : (
+                    <li className={styles.dropdown_item}>
+                      No directories found
+                    </li>
+                  )}
+                </ul>
                 )}
+
               </div>
               <div
                 className={`${styles.dropdown_area} ${
@@ -346,43 +399,43 @@ function Chat() {
                     : styles.close_dropdown
                 }`}
               >
-                  <form
-  onSubmit={async (e) => {
-    e.preventDefault();
-    const token = localStorage.getItem('token');
-    const userId = fetchIdFromToken();
-    if (!chatTitle || !userId) return;
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    const token = localStorage.getItem('token');
+                    const userId = fetchIdFromToken();
+                    if (!chatTitle || !userId) return;
 
-    try {
-      const response = await axios.post(
-        'http://localhost:3000/chat-history/',
-        {
-          title: chatTitle,
-          userId: userId
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
-      setChatHistoryId(response.data.data.id);
-      setChatHistory([]); 
-      setChatTitle('');
-    } catch (err) {
-      console.error('Failed to create chat history', err);
-    }
-  }}
->
-  <input
-    type="text"
-    value={chatTitle}
-    onChange={(e) => setChatTitle(e.target.value)}
-    placeholder="Enter new chat topic title..."
-    required
-  />
-  <button type="submit">Start New Chat</button>
-</form>
+                    try {
+                      const response = await axios.post(
+                        'http://localhost:3000/chat-history/',
+                        {
+                          title: chatTitle,
+                          userId: userId
+                        },
+                        {
+                          headers: {
+                            Authorization: `Bearer ${token}`
+                          }
+                        }
+                      );
+                      setChatHistoryId(response.data.data.id);
+                      setChatHistory([]); 
+                      setChatTitle('');
+                    } catch (err) {
+                      console.error('Failed to create chat history', err);
+                    }
+                  }}
+                >
+                  <input
+                    type="text"
+                    value={chatTitle}
+                    onChange={(e) => setChatTitle(e.target.value)}
+                    placeholder="Enter new chat topic title..."
+                    required
+                  />
+                  <button type="submit">Start New Chat</button>
+                </form>
               </div>
             </>
           )}
@@ -413,14 +466,18 @@ function Chat() {
                   : styles.error_message
               }
             >
+              {chat.sender !== 'user' && chat.sender !== 'ai' ? (
+                <i className={`${styles.error_icon} fa-solid fa-circle-exclamation`}></i>
+              ) : (
+                <></>
+              )}
               <strong className={styles.user}>
-                {chat.sender === "user"
-                  ? "You"
-                  : chat.sender === "ai"
-                  ? "AI"
-                  : "Error"}
-                :
-              </strong>{" "}
+                {chat.sender === 'user'
+                  ? 'You'
+                  : chat.sender === 'ai'
+                  ? 'AI'
+                  : 'Error'}{' '}
+              </strong>{' '}
               <div className={styles.markdown_container}>
                 <ReactMarkdown>{formatText(chat.text)}</ReactMarkdown>
               </div>
@@ -430,43 +487,44 @@ function Chat() {
         <div className={styles.query_area}>
           <form onSubmit={handleSubmit} className={styles.query_form}>
             <textarea
+              ref={queryFieldRef}
               type="text"
               value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              onChange={handleInputChange}
               placeholder={
                 droppedFile
-                  ? "Enter a description for the file..."
-                  : "Type your message..."
-              }
+                  ? 'Enter a description for the file...'
+                  : 'Type your message...'
+                }
               className={styles.query_field}
-              required
+              required={!droppedFile}
             />
-            <button type="submit" className={styles.query_button}>
+            <button type="submit" ref={bottomButton} className={`${styles.query_button} ${styles.typing}`}>
               <i className={`fa-solid fa-file-import ${styles.query_icon}`}></i>
             </button>
           </form>
-          {isDragging && (
-            <div
-              className={styles.drop_zone}
-              onDragOver={(e) => e.preventDefault()}
-              onDragLeave={(e) => e.preventDefault()}
-              onDrop={handleDrop}
-            >
-              <p>
-                {droppedFile ? (
-                  `File ready: ${droppedFile.name}`
-                ) : (
-                  <div className={styles.drop_zone_group}>
-                    <i
-                      className={`fa-solid fa-droplet ${styles.drop_zone_icon}`}
-                    ></i>
-                    <h1 className={styles.drop_zone_file}>Drop file here</h1>
-                  </div>
-                )}
-              </p>
-            </div>
-          )}
         </div>
+        {isDragging && (
+          <div
+            className={styles.drop_zone}
+            onDragOver={(e) => e.preventDefault()}
+            onDragLeave={(e) => e.preventDefault()}
+            onDrop={handleDrop}
+          >
+            <p>
+              {droppedFile ? (
+                `File ready: ${droppedFile.name}`
+              ) : (
+                <div className={styles.drop_zone_group}>
+                  <i
+                    className={`fa-solid fa-droplet ${styles.drop_zone_icon}`}
+                  ></i>
+                  <h1 className={styles.drop_zone_file}>Drop file here</h1>
+                </div>
+              )}
+            </p>
+          </div>
+        )}
         <div ref={bottomRef} />
       </div>
     </div>

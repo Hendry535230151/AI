@@ -6,22 +6,24 @@ import { useNavigate } from "react-router-dom";
 import formatText from "../utils/formatText";
 import ReactMarkdown from "react-markdown";
 import useAuth from "../utils/auth";
-import LogoutButton from "../utils/logoutButton";
+// import LogoutButton from "../utils/logoutButton";
 
 function Chat() {
   const isAuthenticated = useAuth();
   const navigate = useNavigate();
-  const [message, setMessage] = useState("");
   const [chatHistory, setChatHistory] = useState([]);
   const [directoryList, setDirectoryList] = useState([]);
   const [historyList, setHistoryList] = useState([]);
+  const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [chatTitle, setChatTitle] = useState("");
+  const [activeSetting, setActiveSetting] = useState("");
   const [droppedFile, setDroppedFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isClosedSidebar, setIsClosedSidebar] = useState(false);
   const [isClosedDirectory, setIsClosedDirectory] = useState(false);
   const [isClosedHistory, setIsClosedHistory] = useState(false);
-  const [chatTitle, setChatTitle] = useState('');
+  const [isOpenSetting, setIsOpenSetting] = useState(false);
   const [chatHistoryId, setChatHistoryId] = useState(null);
   const [isTyping, setIsTyping] = useState(false);
   const queryFieldRef = useRef(null);
@@ -33,6 +35,11 @@ function Chat() {
       navigate("/login");
     }
   }, [isAuthenticated, navigate]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
 
   const handleDrop = (e) => {
     e.preventDefault();
@@ -249,8 +256,6 @@ function Chat() {
     }
   };
 
-
-
   const buildDirectoryTree = (list) => {
     const map = {};
     const roots = [];
@@ -440,15 +445,17 @@ function Chat() {
             </>
           )}
         </div>
-        <button className={styles.profile_group}>
-          <div className={styles.profile_circle}></div>
-          {isClosedSidebar ? (
-            <></>
-          ) : (
-            <p className={styles.profile_name}>User</p>
-          )}
-        </button>
-        <LogoutButton />
+        <div className={styles.profile_container}>
+          <button className={styles.profile_group} onClick={() => setIsOpenSetting(true)}>
+            <div className={styles.profile_circle}></div>
+            {isClosedSidebar ? (
+              <></>
+            ) : (
+              <p className={styles.profile_name}>User</p>
+            )}
+          </button>
+        </div>
+        {/* <LogoutButton /> */}
       </div>
       <div className={styles.main_area}>
         <header className={styles.header}>
@@ -526,6 +533,62 @@ function Chat() {
           </div>
         )}
         <div ref={bottomRef} />
+        {/* Setting area */}
+        {isOpenSetting ? (
+          <div className={styles.setting_wrapper}>
+            <div className={styles.setting_card}>
+              <div className={styles.setting_circle}></div>
+              <div className={styles.setting_profile}>
+                <h1 className={styles.setting_title}>Hello, Human</h1>
+                <p className={styles.setting_description}>lorem</p>
+              </div>
+              <div className={styles.setting_container}>
+                <div className={styles.setting_selection}>
+                  <ul className={styles.setting_group}>
+                    <li onClick={() => setActiveSetting("basic")} className={activeSetting === "basic" ? styles.setting_active : ""}>Basic setting</li>
+                    <li onClick={() => setActiveSetting("theme")} className={activeSetting === "theme" ? styles.setting_active : ""}>Theme setting</li>
+                    <li onClick={() => setActiveSetting("language")} className={activeSetting === "language" ? styles.setting_active : ""}>Language setting</li>
+                    <li onClick={() => setActiveSetting("collaboration")} className={activeSetting === "collaboration" ? styles.setting_active : ""}>Collaboration setting</li>
+                    <li onClick={handleLogout}>Logout</li>
+                  </ul>
+                </div>
+
+                <div className={styles.setting_list}>
+                  <ul className={styles.setting_item_list}>
+                    <li onClick={() => setActiveSetting("dir_list")} className={activeSetting === "dir_list" ? styles.setting_active : ""}>Directory list</li>
+                    <li onClick={() => setActiveSetting("collab_list")} className={activeSetting === "collab_list" ? styles.setting_active : ""}>Collaboration list</li>
+                  </ul>
+                </div>
+              </div>
+              <div className={styles.setting_content}>
+                  {activeSetting === "basic" && (
+                    <p>This is basic setting</p>
+                  )}
+                  {activeSetting === "theme" && (
+                    <p>This is theme setting</p>
+                  )}
+                  {activeSetting === "language" && (
+                    <p>This is language setting</p>
+                  )}
+                  {activeSetting === "collaboration" && (
+                    <p>This is collaboration setting</p>
+                  )}
+                  {/* {activeSetting === "logout" && (
+                    <p>This is logout setting</p>
+                  )} */}
+                  {activeSetting === "dir_list" && (
+                    <p>This is dir_list setting</p>
+                  )}
+                  {activeSetting === "collab_list" && (
+                    <p>This is collab_list  setting</p>
+                  )}
+              </div>
+              <i className={`fa-solid fa-xmark ${styles.close_setting_icon}`} onClick={() => setIsOpenSetting(false)}></i>
+            </div>
+          </div>
+        ) : (
+          <></>
+        )};
       </div>
     </div>
   );

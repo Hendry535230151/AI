@@ -32,21 +32,6 @@ const chatModel = {
       });
     });
   },
-  getChatById: (id) => {
-    return new Promise((resolve, reject) => {
-      const query = "SELECT * FROM chats WHERE id = ?";
-      db.query(query, [id], (err, result) => {
-        if (err) {
-          return reject(err);
-        }
-        if (!result || result.length === 0) {
-          resolve(false);
-        } else {
-          resolve(result[0]);
-        }
-      });
-    });
-  },
 
   getChatByUserId: (id) => {
     return new Promise((resolve, reject) => {
@@ -64,11 +49,11 @@ const chatModel = {
     });
   },
 
-  insertChat: (userId, sender, text) => {
+  insertChat: (chatHistoryId, userId, sender, text) => {
     return new Promise((resolve, reject) => {
       const query =
-        "INSERT INTO chats (user_id, sender, text) VALUES (?, ?, ?)";
-      db.query(query, [userId, sender, text], (err, result) => {
+      "INSERT INTO chats (chat_history_id, user_id, sender, text) VALUES (?, ?, ?, ?)";
+      db.query(query, [chatHistoryId, userId, sender, text], (err, result) => {
         if (err) {
           return reject(err);
         }
@@ -76,6 +61,22 @@ const chatModel = {
           resolve(false);
         } else {
           resolve(true);
+        }
+      });
+    });
+  },
+  
+  getChatByHistoryId: (chatHistoryId) => {
+    return new Promise((resolve, reject) => {
+      const query = "SELECT * FROM chats WHERE chat_history_id = ?";
+      db.query(query, [chatHistoryId], (err, result) => {
+        if (err) {
+          return reject(err);
+        }
+        if (!result || result.length === 0) {
+          resolve(false);
+        } else {
+          resolve(result);
         }
       });
     });

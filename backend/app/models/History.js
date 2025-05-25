@@ -43,14 +43,14 @@ const historyModel = {
                 if (!result || result.length === 0) {
                     resolve(false);
                 } else {
-                    resolve(result[0]);
+                    resolve(result);
                 }
             });
         });
     },
 
 
-    createHistory: (userId, title) => {
+    createHistory: (userId, title= "new chat") => {
         return new Promise((resolve, reject) => {
           const query = 'INSERT INTO chat_histories (user_id, title) VALUES (?, ?)';
           db.query(query, [userId, title], (err, result) => {
@@ -60,7 +60,7 @@ const historyModel = {
             if (!result || result.affectedRows === 0) {
               resolve(false);
             } else {
-              resolve(result);
+              resolve(result.insertId);
             }
           });
         });

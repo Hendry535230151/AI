@@ -51,35 +51,30 @@ function Chat() {
     }
   };
 
+  const fetchChatHistory = async () => {
+    const token = localStorage.getItem('token');
+    const userId = fetchIdFromToken();
+    if (!token) {
+      setError('User not authenticated. Please login.');
+      return;
+    }
+    try {
+      const res = await axios.get(`http://localhost:3000/chat-history/user/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const responseData = res.data.data;
+      setChatHistoryList(Array.isArray(responseData) ? responseData : [responseData]);
+    } catch (err) {
+      setError('Failed to load History');
+    }
+  };
+
+
   useEffect(() => {
     let dragCounter = 0;
     let dragLeaveTimeout;
-
-    const fetchHistory = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setError("User not authenticated. Please login.");
-        return;
-      }
-      try {
-        const res = await axios.get("http://localhost:3000/ai/history", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const chats = res.data.data.map((chat) => ({
-          sender: chat.sender,
-          text: chat.text,
-        }));
-        setChatHistory(chats);
-      } catch (err) {
-        if (err.response && err.response.status === 401) {
-          setError("Token is invalid/expired");
-          localStorage.removeItem("token");
-        }
-        setError("Failed to load chat history");
-      }
-    };
 
     const fetchDirectory = async () => {
       const token = localStorage.getItem('token');
@@ -93,30 +88,13 @@ function Chat() {
             Authorization: `Bearer ${token}`,
           },
         });
-        setChatHistoryList(res.data.data);
+        setDirectoryList(res.data.data);
       } catch (err) {
         setError('Failed to load directory');
       }
     };
 
-    const fetchChatHistory = async () => {
-      const token = localStorage.getItem('token');
-      const userId = fetchIdFromToken();
-      if (!token) {
-        setError('User not authenticated. Please login.');
-        return;
-      }
-      try {
-        const res = await axios.get(`http://localhost:3000/chat-history/user/${userId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setChatHistoryList(res.data.data);
-      } catch (err) {
-        setError('Failed to load History');
-      }
-    };
+  
 
     const handleWindowDragOver = (e) => {
       e.preventDefault();
@@ -143,7 +121,6 @@ function Chat() {
       }
     };
 
-    fetchHistory();
     fetchDirectory();
     fetchChatHistory();
 
@@ -160,6 +137,12 @@ function Chat() {
   }, []);
 
   useEffect(() => {
+    if (chatHistoryId) {
+      setError("");
+    }
+  }, [chatHistoryId]);
+  
+  useEffect(() => {
     if (bottomRef.current) {
       bottomRef.current.scrollIntoView({ behavior: "smooth" });
     }
@@ -167,13 +150,18 @@ function Chat() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+        
     const trimmedMessage = message.trim();
     if (!trimmedMessage && !droppedFile) {
       setError("Please enter a message or drop a file.");
       return;
     }
-
+    
+    if (!chatHistoryId) {
+      setError("Please create or select a chat topic first.");
+      return;
+    }
+    
     const userId = fetchIdFromToken();
     if (!userId) {
       setError("User not authenticated. Please login.");
@@ -360,19 +348,46 @@ function Chat() {
                 </button>
                 {!isClosedHistory && (
                   <ul className={styles.dropdown_list}>
-                   {chatHistoryList.length > 0 ? (
-                      chatHistoryList.map((his, idx) => (
-                        <li key={idx} className={styles.dropdown_item}>
-                          {his.title}
-                        </li>
-                      ))
-                    ) : (
-                      <li className={styles.dropdown_item}>
-                        No histories found
+                  {chatHistoryList.length > 0 ? (
+                    chatHistoryList.map((his, idx) => (
+                      <li
+                        key={idx}
+                        className={styles.dropdown_item}
+                        onClick={async () => {
+                          setChatHistoryId(his.id);
+                          setChatTitle(his.title);
+                          setChatHistory([]);
+                          await fetchChatHistory();
+                          const token = localStorage.getItem('token');
+                          try {
+                            const res = await axios.get(
+                              `http://localhost:3000/ai/history/${his.id}`,
+                              {
+                                headers: {
+                                  Authorization: `Bearer ${token}`,
+                                },
+                              }
+                            );
+                            const data = res.data.data;
+                            const chats = Array.isArray(data) ? data.map(chat => ({
+                              sender: chat.sender,
+                              text: chat.text,
+                            })) : [];
+                            setChatHistory(chats);
+                          } catch (err) {
+                            setError('Failed to load chat history for selected topic');
+                          }
+                        }}
+                      >
+                        {his.title}
                       </li>
-                    )}
-
-                  </ul>
+                    ))
+                  ) : (
+                    <li className={styles.dropdown_item}>
+                      No histories found
+                    </li>
+                  )}
+                </ul>                
                 )}
               </div>
               <div
@@ -405,6 +420,7 @@ function Chat() {
                           setChatHistoryId(response.data.data.id);
                           setChatHistory([]); 
                           setChatTitle('');
+                          await fetchChatHistory();
                         } catch (err) {
                           console.error('Failed to create chat history', err);
                         }
@@ -464,6 +480,11 @@ function Chat() {
           ))}
         </div>
         <div className={styles.query_area}>
+        {!chatHistoryId && (
+            <div className={styles.warning_text}>
+              Please create a new chat topic before starting.
+            </div>
+          )}
           <form onSubmit={handleSubmit} className={styles.query_form}>
             <textarea
               type="text"
@@ -476,8 +497,14 @@ function Chat() {
               }
               className={styles.query_field}
               required
+              disabled={!chatHistoryId}
             />
-            <button type="submit" className={styles.query_button}>
+            <button
+              type="submit"
+              className={styles.query_button}
+              disabled={!chatHistoryId} 
+              title={!chatHistoryId ? "Please create or select a chat topic first" : ""}
+            >
               <i className={`fa-solid fa-file-import ${styles.query_icon}`}></i>
             </button>
           </form>

@@ -80,10 +80,13 @@ body::-webkit-scrollbar {
     border-radius: 10px;
     background-color: #242424;
 }
-
 .dropdown_list {
     padding: 0 0 0 10px;
     list-style-type: none;
+    max-height: 230px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #EACA91 #242424;
 }
 
 .dropdown_text, .dropdown_icon, .dropdown_item  {
@@ -291,4 +294,70 @@ body::-webkit-scrollbar {
 
 .drop_zone_file {
 
+}
+
+.warning_text {
+    width: 100%;
+    max-width: 900px;
+    margin: 10px auto;
+    padding: 15px 20px;
+    background-color: #EACA91;
+    color: #131313;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-align: center;
+    border-radius: 10px;
+    box-shadow: 0 0 8px rgba(234, 202, 145, 0.5);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+
+.container3 {
+    width: 100%;
+    max-width: 900px;
+    margin: 10px auto;
+    padding: 15px;
+    background-color: #242424;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px; 
+}
+
+    .container3 form {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.container3 input[type="text"] {
+  flex: 1;
+  padding: 10px 15px;
+  border-radius: 20px;
+  border: 1px solid #EACA91;
+  background-color: #2A2A2A;
+  color: #f5f5f5;
+  font-size: 0.9rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.container3 input[type="text"]::placeholder {
+  color: #cccccc;
+}
+
+
+.container3 button {
+  padding: 10px 20px;
+  background-color: #EACA91;
+  color: #131313;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.2s ease;
+}
+
+.container3 button:hover {
+  background-color: #d9b773;
 }

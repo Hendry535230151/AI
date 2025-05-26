@@ -89,11 +89,27 @@ const userModel = {
                     return reject(err);
                 }
                 if (!result || result.affectedRows === 0) {
-                    return resolve(false);
+                    resolve(false);
                 } else {
-                    return resolve(true);
+                    resolve(true);
                 }
             });     
+        });
+    },
+
+    setTheme: (id, theme) => {
+        return new Promise((resolve, reject) => {
+            const query = 'UPDATE users SET theme = ? WHERE id = ?';
+            db.query(query, [theme, id], (err, result) => {
+                if (err) {
+                    return reject(err);
+                }
+                if (!result || result.affectedRows === 0) {
+                    resolve(false);
+                } else {
+                    resolve(true);
+                }
+            });
         });
     },
 

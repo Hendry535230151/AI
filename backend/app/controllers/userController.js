@@ -39,6 +39,17 @@ const userController = {
             return res.status(err.statusCode || 500).json({ success: false, message: err.message || 'Internal server error' });
         }
     },
+    
+    setTheme: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const { theme } = req.body;
+            const user = await userService.setTheme(id, theme);
+            return res.status(200).json({ success: true, data: user });
+        } catch (err) {
+            return res.status(err.statusCode || 500).json({ success: false, message: err.message || 'Internal server error' });
+        }
+    },
 
     deleteUserById: async (req, res) => {
         try {

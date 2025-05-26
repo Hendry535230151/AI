@@ -38,13 +38,11 @@ function Chat() {
 
 useEffect(() => {
   if (isDarkMode) {
-    document.body.classList.remove(`${styles.light_mode}`); // dark mode = default (tanpa light_mode)
+    document.body.classList.remove(`${styles.light_mode}`);
   } else {
-    document.body.classList.add(`${styles.light_mode}`); // light mode aktif saat false
+    document.body.classList.add(`${styles.light_mode}`);
   }
 }, [isDarkMode]);
-
-
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -457,7 +455,9 @@ useEffect(() => {
         </div>
         <div className={styles.profile_container}>
           <button className={styles.profile_group} onClick={() => setIsOpenSetting(true)}>
-            <div className={styles.profile_circle}></div>
+            <div className={styles.profile_circle}>
+              <i className="fa-solid fa-user"></i>
+            </div>
             {isClosedSidebar ? (
               <></>
             ) : (
@@ -547,7 +547,9 @@ useEffect(() => {
         {isOpenSetting ? (
           <div className={styles.setting_wrapper}>
             <div className={styles.setting_card}>
-              <div className={styles.setting_circle}></div>
+              <div className={styles.setting_circle}>
+                <i className={`fa-solid fa-user ${styles.big_profile}`}></i>
+              </div>
               <div className={styles.setting_profile}>
                 <h1 className={styles.setting_title}>Hello, Human</h1>
                 <p className={styles.setting_description}>lorem</p>
@@ -612,7 +614,7 @@ useEffect(() => {
                         <form className={styles.setting_form_inline}>
                           <label htmlFor="themeChange" className={styles.setting_input_container}>Fell boring? change the theme now</label>
                           <div className={styles.checkbox_group}>
-                            <input id="themeChange" type="checkbox" className={styles.checkbox} onChange={(e) => setIsDarkMode(e.target.checked)}/>
+                            <input id="themeChange" type="checkbox" className={styles.checkbox} checked={isDarkMode} onChange={(e) => setIsDarkMode(e.target.checked)}/>
                             <span className={styles.slider}></span>
                           </div>
                         </form>

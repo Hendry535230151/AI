@@ -6,7 +6,6 @@ import { useNavigate } from "react-router-dom";
 import formatText from "../utils/formatText";
 import ReactMarkdown from "react-markdown";
 import useAuth from "../utils/auth";
-// import LogoutButton from "../utils/logoutButton";
 
 function Chat() {
   const isAuthenticated = useAuth();
@@ -17,13 +16,14 @@ function Chat() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [chatTitle, setChatTitle] = useState("");
-  const [activeSetting, setActiveSetting] = useState("");
+  const [activeSetting, setActiveSetting] = useState("basic");
   const [droppedFile, setDroppedFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isClosedSidebar, setIsClosedSidebar] = useState(false);
   const [isClosedDirectory, setIsClosedDirectory] = useState(false);
   const [isClosedHistory, setIsClosedHistory] = useState(false);
   const [isOpenSetting, setIsOpenSetting] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true);
   const [chatHistoryId, setChatHistoryId] = useState(null);
   const [isTyping, setIsTyping] = useState(false);
   const queryFieldRef = useRef(null);
@@ -35,6 +35,16 @@ function Chat() {
       navigate("/login");
     }
   }, [isAuthenticated, navigate]);
+
+useEffect(() => {
+  if (isDarkMode) {
+    document.body.classList.remove(`${styles.light_mode}`); // dark mode = default (tanpa light_mode)
+  } else {
+    document.body.classList.add(`${styles.light_mode}`); // light mode aktif saat false
+  }
+}, [isDarkMode]);
+
+
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -562,10 +572,52 @@ function Chat() {
               </div>
               <div className={styles.setting_content}>
                   {activeSetting === "basic" && (
-                    <p>This is basic setting</p>
+                    <>
+                      <div className={styles.setting_group_type}>
+                        <h4 className={styles.setting_title_type}>Change Name</h4>
+                        <div className={styles.setting_types}>
+                          <form className={styles.setting_form}>
+                            <label htmlFor="changeName" className={styles.setting_description_type}>Want to change name? Please enter your new name</label>
+                            <div className={styles.setting_input_container}>
+                              <input id="changeName" type="text" className={styles.setting_input} placeholder="New name here ..."></input>
+                              <button type="submit" className={styles.change_request_group}> 
+                                <i className={`fa-regular fa-paper-plane ${styles.change_request_icon}`}></i>
+                              </button>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                      <div className={styles.setting_group_type}>
+                        <h4 className={styles.setting_title_type}>Change Description</h4>
+                        <form className={styles.setting_form}>
+                          <label htmlFor="changeDescription" className={styles.setting_description_type}>Tell everybody that you want to let them know</label>
+                            <div className={styles.setting_input_container}>
+                              <textarea id="changeName" type="text" className={styles.setting_textarea} placeholder="New name here ..."></textarea>
+                              <button type="submit" className={styles.description_button}>
+                                <i className={`fa-regular fa-paper-plane ${styles.change_request_icon}`}></i>
+                              </button>
+                            </div>
+                        </form>
+                      </div>
+                      <div className={styles.setting_group_type}>
+                        <h4 className={styles.setting_titile_type}>Change Password</h4>
+                        <p className={styles.setting_description_type}>This is basic setting</p>
+                      </div>
+                    </>
                   )}
                   {activeSetting === "theme" && (
-                    <p>This is theme setting</p>
+                    <div className={styles.setting_group_type}>
+                      <h4 className={styles.setting_title_type}>Change Name</h4>
+                      <div className={styles.setting_types}>
+                        <form className={styles.setting_form_inline}>
+                          <label htmlFor="themeChange" className={styles.setting_input_container}>Fell boring? change the theme now</label>
+                          <div className={styles.checkbox_group}>
+                            <input id="themeChange" type="checkbox" className={styles.checkbox} onChange={(e) => setIsDarkMode(e.target.checked)}/>
+                            <span className={styles.slider}></span>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
                   )}
                   {activeSetting === "language" && (
                     <p>This is language setting</p>

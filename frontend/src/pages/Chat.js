@@ -221,7 +221,7 @@ function Chat() {
           {
             message: trimmedMessage,
             userId,
-            chatHistoryId
+            chatHistoryId,
           },
           {
             headers: {
@@ -239,7 +239,6 @@ function Chat() {
         ]);
       }
 
-      setMessage("");
       setError("");
     } catch (err) {
       let errMsg = "";
@@ -275,8 +274,11 @@ function Chat() {
     return roots;
   };
 
-  const directoryTree = useMemo(() => buildDirectoryTree(directoryList), [directoryList]);
-  
+  const directoryTree = useMemo(
+    () => buildDirectoryTree(directoryList),
+    [directoryList]
+  );
+
   const renderDirectoryTree = (nodes, level = 0) => {
     return (
       <ul style={{ listStyleType: "none", paddingLeft: level === 0 ? 0 : 10 }}>
@@ -290,7 +292,9 @@ function Chat() {
             <span style={{ color: "gray", fontSize: "0.9em" }}>
               ({node.file_count ?? 0} files)
             </span>
-            {node.children && node.children.length > 0 && renderDirectoryTree(node.children, level + 1)}
+            {node.children &&
+              node.children.length > 0 &&
+              renderDirectoryTree(node.children, level + 1)}
           </li>
         ))}
       </ul>
@@ -348,14 +352,23 @@ function Chat() {
             <></>
           ) : (
             <>
-              <div className={`${styles.dropdown_area} ${isClosedDirectory ? styles.close_dropdown : ''}`}>
-                <button className={styles.dropdown} onClick={() => setIsClosedDirectory((prev) => !prev)}>
+              <div
+                className={`${styles.dropdown_area} ${
+                  isClosedDirectory ? styles.close_dropdown : ""
+                }`}
+              >
+                <button
+                  className={styles.dropdown}
+                  onClick={() => setIsClosedDirectory((prev) => !prev)}
+                >
                   <p className={styles.dropdown_text}>Directory</p>
-                  <i className={`fa-solid fa-caret-down ${styles.dropdown_icon}`}></i>
+                  <i
+                    className={`fa-solid fa-caret-down ${styles.dropdown_icon}`}
+                  ></i>
                 </button>
                 {!isClosedDirectory && (
-                <ul className={styles.dropdown_list}>
-                  {/* {directoryList.length > 0 ? (
+                  <ul className={styles.dropdown_list}>
+                    {/* {directoryList.length > 0 ? (
                     directoryList.map((dir, idx) => (
                       <li
                         key={idx}
@@ -371,16 +384,15 @@ function Chat() {
                       No directories found
                     </li>
                   )} */}
-                  {directoryTree.length > 0 ? (
-                    renderDirectoryTree(directoryTree)
-                  ) : (
-                    <li className={styles.dropdown_item}>
-                      No directories found
-                    </li>
-                  )}
-                </ul>
+                    {directoryTree.length > 0 ? (
+                      renderDirectoryTree(directoryTree)
+                    ) : (
+                      <li className={styles.dropdown_item}>
+                        No directories found
+                      </li>
+                    )}
+                  </ul>
                 )}
-
               </div>
               <div
                 className={`${styles.dropdown_area} ${
@@ -407,28 +419,28 @@ function Chat() {
                 <form
                   onSubmit={async (e) => {
                     e.preventDefault();
-                    const token = localStorage.getItem('token');
+                    const token = localStorage.getItem("token");
                     const userId = fetchIdFromToken();
                     if (!chatTitle || !userId) return;
 
                     try {
                       const response = await axios.post(
-                        'http://localhost:3000/chat-history/',
+                        "http://localhost:3000/chat-history/",
                         {
                           title: chatTitle,
-                          userId: userId
+                          userId: userId,
                         },
                         {
                           headers: {
-                            Authorization: `Bearer ${token}`
-                          }
+                            Authorization: `Bearer ${token}`,
+                          },
                         }
                       );
                       setChatHistoryId(response.data.data.id);
-                      setChatHistory([]); 
-                      setChatTitle('');
+                      setChatHistory([]);
+                      setChatTitle("");
                     } catch (err) {
-                      console.error('Failed to create chat history', err);
+                      console.error("Failed to create chat history", err);
                     }
                   }}
                 >
@@ -446,7 +458,10 @@ function Chat() {
           )}
         </div>
         <div className={styles.profile_container}>
-          <button className={styles.profile_group} onClick={() => setIsOpenSetting(true)}>
+          <button
+            className={styles.profile_group}
+            onClick={() => setIsOpenSetting(true)}
+          >
             <div className={styles.profile_circle}></div>
             {isClosedSidebar ? (
               <></>
@@ -455,7 +470,6 @@ function Chat() {
             )}
           </button>
         </div>
-        {/* <LogoutButton /> */}
       </div>
       <div className={styles.main_area}>
         <header className={styles.header}>
@@ -473,18 +487,20 @@ function Chat() {
                   : styles.error_message
               }
             >
-              {chat.sender !== 'user' && chat.sender !== 'ai' ? (
-                <i className={`${styles.error_icon} fa-solid fa-circle-exclamation`}></i>
+              {chat.sender !== "user" && chat.sender !== "ai" ? (
+                <i
+                  className={`${styles.error_icon} fa-solid fa-circle-exclamation`}
+                ></i>
               ) : (
                 <></>
               )}
               <strong className={styles.user}>
-                {chat.sender === 'user'
-                  ? 'You'
-                  : chat.sender === 'ai'
-                  ? 'AI'
-                  : 'Error'}{' '}
-              </strong>{' '}
+                {chat.sender === "user"
+                  ? "You"
+                  : chat.sender === "ai"
+                  ? "AI"
+                  : "Error"}{" "}
+              </strong>{" "}
               <div className={styles.markdown_container}>
                 <ReactMarkdown>{formatText(chat.text)}</ReactMarkdown>
               </div>
@@ -500,13 +516,24 @@ function Chat() {
               onChange={handleInputChange}
               placeholder={
                 droppedFile
-                  ? 'Enter a description for the file...'
-                  : 'Type your message...'
-                }
+                  ? "Enter a description for the file..."
+                  : "Type your message..."
+              }
               className={styles.query_field}
               required={!droppedFile}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSubmit(e);
+                  setMessage("");
+                }
+              }}
             />
-            <button type="submit" ref={bottomButton} className={`${styles.query_button} ${styles.typing}`}>
+            <button
+              type="submit"
+              ref={bottomButton}
+              className={`${styles.query_button} ${styles.typing}`}
+            >
               <i className={`fa-solid fa-file-import ${styles.query_icon}`}></i>
             </button>
           </form>
@@ -545,50 +572,100 @@ function Chat() {
               <div className={styles.setting_container}>
                 <div className={styles.setting_selection}>
                   <ul className={styles.setting_group}>
-                    <li onClick={() => setActiveSetting("basic")} className={activeSetting === "basic" ? styles.setting_active : ""}>Basic setting</li>
-                    <li onClick={() => setActiveSetting("theme")} className={activeSetting === "theme" ? styles.setting_active : ""}>Theme setting</li>
-                    <li onClick={() => setActiveSetting("language")} className={activeSetting === "language" ? styles.setting_active : ""}>Language setting</li>
-                    <li onClick={() => setActiveSetting("collaboration")} className={activeSetting === "collaboration" ? styles.setting_active : ""}>Collaboration setting</li>
+                    <li
+                      onClick={() => setActiveSetting("basic")}
+                      className={
+                        activeSetting === "basic" ? styles.setting_active : ""
+                      }
+                    >
+                      Basic setting
+                    </li>
+                    <li
+                      onClick={() => setActiveSetting("theme")}
+                      className={
+                        activeSetting === "theme" ? styles.setting_active : ""
+                      }
+                    >
+                      Theme setting
+                    </li>
+                    <li
+                      onClick={() => setActiveSetting("language")}
+                      className={
+                        activeSetting === "language"
+                          ? styles.setting_active
+                          : ""
+                      }
+                    >
+                      Language setting
+                    </li>
+                    <li
+                      onClick={() => setActiveSetting("collaboration")}
+                      className={
+                        activeSetting === "collaboration"
+                          ? styles.setting_active
+                          : ""
+                      }
+                    >
+                      Collaboration setting
+                    </li>
                     <li onClick={handleLogout}>Logout</li>
                   </ul>
                 </div>
 
                 <div className={styles.setting_list}>
                   <ul className={styles.setting_item_list}>
-                    <li onClick={() => setActiveSetting("dir_list")} className={activeSetting === "dir_list" ? styles.setting_active : ""}>Directory list</li>
-                    <li onClick={() => setActiveSetting("collab_list")} className={activeSetting === "collab_list" ? styles.setting_active : ""}>Collaboration list</li>
+                    <li
+                      onClick={() => setActiveSetting("dir_list")}
+                      className={
+                        activeSetting === "dir_list"
+                          ? styles.setting_active
+                          : ""
+                      }
+                    >
+                      Directory list
+                    </li>
+                    <li
+                      onClick={() => setActiveSetting("collab_list")}
+                      className={
+                        activeSetting === "collab_list"
+                          ? styles.setting_active
+                          : ""
+                      }
+                    >
+                      Collaboration list
+                    </li>
                   </ul>
                 </div>
               </div>
               <div className={styles.setting_content}>
-                  {activeSetting === "basic" && (
-                    <p>This is basic setting</p>
-                  )}
-                  {activeSetting === "theme" && (
-                    <p>This is theme setting</p>
-                  )}
-                  {activeSetting === "language" && (
-                    <p>This is language setting</p>
-                  )}
-                  {activeSetting === "collaboration" && (
-                    <p>This is collaboration setting</p>
-                  )}
-                  {/* {activeSetting === "logout" && (
+                {activeSetting === "basic" && <p>This is basic setting</p>}
+                {activeSetting === "theme" && <p>This is theme setting</p>}
+                {activeSetting === "language" && (
+                  <p>This is language setting</p>
+                )}
+                {activeSetting === "collaboration" && (
+                  <p>This is collaboration setting</p>
+                )}
+                {/* {activeSetting === "logout" && (
                     <p>This is logout setting</p>
                   )} */}
-                  {activeSetting === "dir_list" && (
-                    <p>This is dir_list setting</p>
-                  )}
-                  {activeSetting === "collab_list" && (
-                    <p>This is collab_list  setting</p>
-                  )}
+                {activeSetting === "dir_list" && (
+                  <p>This is dir_list setting</p>
+                )}
+                {activeSetting === "collab_list" && (
+                  <p>This is collab_list setting</p>
+                )}
               </div>
-              <i className={`fa-solid fa-xmark ${styles.close_setting_icon}`} onClick={() => setIsOpenSetting(false)}></i>
+              <i
+                className={`fa-solid fa-xmark ${styles.close_setting_icon}`}
+                onClick={() => setIsOpenSetting(false)}
+              ></i>
             </div>
           </div>
         ) : (
           <></>
-        )};
+        )}
+        ;
       </div>
     </div>
   );

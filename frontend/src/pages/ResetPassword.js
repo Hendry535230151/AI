@@ -1,20 +1,23 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
 import styles from "../css/Login.module.css";
 import React, { useEffect, useState, useRef } from "react";
 import ErrorMessage from "../components/ErrorMessage.js";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import useAuth from "../utils/auth.js";
 
-function Login() {
+function ResetPassword() {
   const isAuthenticated = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [passwordConfirm, setPasswordConfirm] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const passwordRef = useRef(null);
   const [success, setSucess] = useState("");
+  const passwordRef = useRef(null);
+  const passwordConfirmRef = useRef(null);
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const token = queryParams.get("token");
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -26,22 +29,21 @@ function Login() {
     e.preventDefault();
     setIsLoading(true);
 
-    const loginForm = { email, password };
+    const resetForm = { password, passwordConfirm };
+    console.log(token);
 
     try {
-      const response = await axios.post(
-        "http://localhost:3000/auth/login",
-        loginForm
+      const response = await axios.put(
+        `http://localhost:3000/auth/reset-password?token=${token}`,
+        resetForm
       );
-      //console.log("Login successful:", response.data);
+      console.log("Reset successful:", response.data);
 
-      const token = response.data.token;
-      localStorage.setItem("token", token);
-
-      setSucess("Login Success!");
+      setSucess("Reset Success!");
+      setError(false);
 
       setTimeout(() => {
-        navigate("/chat");
+        navigate("/login");
       }, 3000);
     } catch (err) {
       setTimeout(() => {
@@ -63,29 +65,11 @@ function Login() {
         <h1 className={styles.logo}>AInizer</h1>
       </header>
       <div className={styles.card_container}>
-        <h1 className={styles.main_text}>Hello again</h1>
+        <h1 className={styles.main_text}>Reset</h1>
 
         <form onSubmit={handleSubmit} className={styles.input_form}>
-          <label className={styles.input_label} htmlFor="email">
-            Email
-          </label>
-          <input
-            className={styles.input_field}
-            id="email"
-            type="text"
-            placeholder="Input email here..."
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                passwordRef.current?.focus();
-              }
-            }}
-          />
-
           <label className={styles.input_label} htmlFor="password">
-            Password
+            New Password
           </label>
           <input
             className={styles.input_field}
@@ -93,13 +77,32 @@ function Login() {
             type="password"
             placeholder="Input password here..."
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
             ref={passwordRef}
+            onChange={(e) => setPassword(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                passwordConfirmRef.current?.focus();
+              }
+            }}
+          />
+          <label className={styles.input_label} htmlFor="passwordConf">
+            New Password confirm
+          </label>
+          <input
+            className={styles.input_field}
+            id="passwordConf"
+            type="password"
+            placeholder="Input password confirm here..."
+            value={passwordConfirm}
+            ref={passwordConfirmRef}
+            onChange={(e) => setPasswordConfirm(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
               }
             }}
           />
+
           {error ? (
             <>
               <span className={styles.error_message}>
@@ -132,36 +135,13 @@ function Login() {
               className={styles.input_button}
               disabled={isLoading}
             >
-              Login
+              Reset
             </button>
           )}
         </form>
-
-        <span className={styles.sub_text}>
-          Forgot your password?{" "}
-          <a
-            className={styles.forgot_password}
-            onClick={() => navigate("/forgot_password")}
-          >
-            Forgot Password
-          </a>
-        </span>
-
-        <div className={styles.button_group}>
-          <button className={`${styles.button} ${styles.active}`}>
-            Sign-in
-          </button>
-          <button
-            className={styles.button}
-            onClick={() => navigate("/register")}
-            disabled={isLoading}
-          >
-            Sign-up
-          </button>
-        </div>
       </div>
     </div>
   );
 }
 
-export default Login;
+export default ResetPassword;

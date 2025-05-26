@@ -1,6 +1,6 @@
 import styles from "../css/Register.module.css";
 import ErrorMessage from "../components/ErrorMessage.js";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
@@ -14,6 +14,12 @@ function Register() {
   const [lastName, setLastName] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const firstNameRef = useRef(null);
+  const lastNameRef = useRef(null);
+  const emailRef = useRef(null);
+  const passwordRef = useRef(null);
+  const passwordConfirmRef = useRef(null);
+  const [success, setSucess] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -32,9 +38,11 @@ function Register() {
         "http://localhost:3000/auth/register",
         registerForm
       );
+
+      setSucess("Register Success!");
       setTimeout(() => {
         navigate("/login");
-      }, 5000);
+      }, 3000);
     } catch (err) {
       setTimeout(() => {
         setIsLoading(false);
@@ -70,6 +78,7 @@ function Register() {
             className={styles.input_form}
             onSubmit={(e) => {
               e.preventDefault();
+              emailRef.current?.focus();
               setStep(2);
             }}
           >
@@ -82,7 +91,14 @@ function Register() {
               type="text"
               placeholder="Your first name"
               value={firstName}
+              ref={firstNameRef}
               onChange={(e) => setFirstName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  lastNameRef.current?.focus();
+                }
+              }}
             />
             <label className={styles.input_label} htmlFor="lastName">
               Last Name
@@ -93,7 +109,12 @@ function Register() {
               type="text"
               placeholder="Your last name"
               value={lastName}
+              ref={lastNameRef}
               onChange={(e) => setLastName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                }
+              }}
             />
             <button type="submit" className={styles.input_button}>
               Continue
@@ -113,7 +134,14 @@ function Register() {
                 type="text"
                 placeholder="Input email here..."
                 value={email}
+                ref={emailRef}
                 onChange={(e) => setEmail(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    passwordRef.current?.focus();
+                  }
+                }}
               />
               <label className={styles.input_label} htmlFor="password">
                 Password
@@ -124,7 +152,14 @@ function Register() {
                 type="password"
                 placeholder="Input password here..."
                 value={password}
+                ref={passwordRef}
                 onChange={(e) => setPassword(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    passwordConfirmRef.current?.focus();
+                  }
+                }}
               />
               <label className={styles.input_label} htmlFor="passwordConf">
                 Password confirm
@@ -135,7 +170,12 @@ function Register() {
                 type="password"
                 placeholder="Input password confirm here..."
                 value={passwordConfirm}
+                ref={passwordConfirmRef}
                 onChange={(e) => setPasswordConfirm(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                  }
+                }}
               />
               {error ? (
                 <>
@@ -149,6 +189,15 @@ function Register() {
               ) : (
                 <></>
               )}
+
+              {success ? (
+                <span className={styles.success_message}>
+                  <i
+                    className={`${styles.success_icon} fa-solid fa-circle-check`}
+                  ></i>
+                  {success}
+                </span>
+              ) : null}
 
               {isLoading ? (
                 <div className={styles.input_button}>

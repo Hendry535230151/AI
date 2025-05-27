@@ -1,152 +1,173 @@
 body {
-    background-color: #131313;
+  background-color: #131313;
 }
 
 .main_container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .header {
-    width: 100%;
-    height: 50px;
-    margin: 0 0 50px 0;
-    padding-left: 30px;
-    display: flex;
-    align-items: center;
+  width: 100%;
+  height: 50px;
+  margin: 0 0 50px 0;
+  padding-left: 30px;
+  display: flex;
+  align-items: center;
 }
 
-.logo, .main_text {
-    color: #EACA91;
-    font-size: 1.7rem;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    font-weight: 400;
+.logo,
+.main_text {
+  color: #eaca91;
+  font-size: 1.7rem;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  font-weight: 400;
 }
 
 .main_text {
-    color: #f5f5f5;
-    margin-bottom: 20px;
-    text-shadow: 
-        0 0 5px rgba(245, 245, 245, 0.3),
-        0 0 10px rgba(245, 245, 245, 0.2),
-        0 0 15px rgba(245, 245, 245, 0.1);
+  color: #f5f5f5;
+  margin-bottom: 20px;
+  text-shadow: 0 0 5px rgba(245, 245, 245, 0.3),
+    0 0 10px rgba(245, 245, 245, 0.2), 0 0 15px rgba(245, 245, 245, 0.1);
 }
 
 .card_container {
-    width: 100%;
-    max-width: 350px;
-    height: 100%;
-    min-height: 510px;
-    padding: 50px 30px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border-radius: 30px;
-    background-color: #242424;
-    box-shadow: 0 0 20px rgba(234, 202, 145, 0.3), 
-                0 0 40px rgba(234, 202, 145, 0.2),
-                0 0 60px rgba(234, 202, 145, 0.1);
+  width: 100%;
+  max-width: 350px;
+  height: 100%;
+  min-height: 510px;
+  padding: 50px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 30px;
+  background-color: #242424;
+  box-shadow: 0 0 20px rgba(234, 202, 145, 0.3),
+    0 0 40px rgba(234, 202, 145, 0.2), 0 0 60px rgba(234, 202, 145, 0.1);
 }
 
 .input_form {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .input_field {
-    height: 40px;
-    margin: 8px 0 16px 0;
-    padding-inline: 16px;
-    border-radius: 10px;
-    font-size: 14px;
-    background-color: #131313;
-    border: 1px solid #EACA91;
-    color: #f5f5f5;
+  height: 40px;
+  margin: 8px 0 16px 0;
+  padding-inline: 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  background-color: #131313;
+  border: 1px solid #eaca91;
+  color: #f5f5f5;
 }
 
 .input_field::placeholder {
-    font-size: 14px;
+  font-size: 14px;
 }
 
 .input_field:last-of-type {
-    margin: 8px 0;
+  margin: 8px 0;
 }
 
 .input_label {
-    font-size: 14px;
-    padding: 0 0 0 16px;
-    color: #f5f5f5;
+  font-size: 14px;
+  padding: 0 0 0 16px;
+  color: #f5f5f5;
 }
 
 .input_button {
-    width: 100%;
-    height: 40px;
-    margin: 24px 0;
-    border-radius: 10px;
-    background-color: #EED9B1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  width: 100%;
+  height: 40px;
+  margin: 24px 0;
+  border-radius: 10px;
+  background-color: #eed9b1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .sub_text {
-    font-size: 12px;
-    color: #f5f5f5;
+  font-size: 12px;
+  color: #f5f5f5;
 }
 
 .forgot_password {
-    cursor: pointer;
-    color: #EACA91;
+  cursor: pointer;
+  color: #eaca91;
+}
+
+.forgot_password:hover {
+  cursor: pointer;
+  color: #eaca91;
+  text-decoration: underline;
 }
 
 .button_group {
-    height: 50px;
-    width: 100%;
-    padding: 5px;
-    margin: 24px 30px 0 30px;
-    background-color: #131313;
-    border-radius: 10px;
-    display: flex;
+  height: 50px;
+  width: 100%;
+  padding: 5px;
+  margin: 24px 30px 0 30px;
+  background-color: #131313;
+  border-radius: 10px;
+  display: flex;
 }
 
 .button {
-    flex: 1;
-    border-radius: 6px;
-    background-color: transparent;
-    color: #7a7a7a;
+  flex: 1;
+  border-radius: 6px;
+  background-color: transparent;
+  color: #7a7a7a;
+}
+
+.input_button:hover {
+  cursor: pointer;
 }
 
 .button.active {
-    background-color: #f5f5f5;
-    color: #131313;
+  background-color: #f5f5f5;
+  color: #131313;
 }
 
 .error_message {
-    font-size: 12px;
-    color: #b10909;   
-    display: flex;
-    align-items: center;
+  font-size: 12px;
+  color: #b10909;
+  display: flex;
+  align-items: center;
 }
 
 .error_icon {
-    margin: 0 10px 0 0;
-    font-size: 14px;
+  margin: 0 10px 0 0;
+  font-size: 14px;
 }
 
 .spinner {
-    width: 24px;
-    height: 24px;
-    margin: 10px;
-    border: 4px solid rgba(0, 0, 0, 0.3);
-    border-top: 4px solid #131313;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
+  width: 24px;
+  height: 24px;
+  margin: 10px;
+  border: 4px solid rgba(0, 0, 0, 0.3);
+  border-top: 4px solid #131313;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.success_message {
+  color: #28a745;
+  margin-top: 10px;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+}
+
+.success_icon {
+  margin-right: 6px;
 }

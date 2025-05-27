@@ -1,26 +1,21 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
 import styles from "../css/Login.module.css";
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import ErrorMessage from "../components/ErrorMessage.js";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../utils/auth.js";
 
-function Login() {
+function ForgotPassword() {
   const isAuthenticated = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const passwordRef = useRef(null);
   const [success, setSucess] = useState("");
 
   useEffect(() => {
     if (isAuthenticated) {
-      setTimeout(() => {
-        navigate("/chat");
-      }, 5000);
+      navigate("/chat");
     }
   }, [isAuthenticated, navigate]);
 
@@ -28,26 +23,18 @@ function Login() {
     e.preventDefault();
     setIsLoading(true);
 
-    const loginForm = { email, password };
+    const resetForm = { email };
 
     try {
       const response = await axios.post(
-        "http://localhost:3000/auth/login",
-        loginForm
+        "http://localhost:3000/auth/request-reset-password",
+        resetForm
       );
-      //console.log("Login successful:", response.data);
+      console.log("Request sent successful:", response.data);
 
-      const token = response.data.token;
-      localStorage.setItem("token", token);
-
-      setTimeout(() => {
-        setSucess("Login Success!");
-        setIsLoading(false);
-      }, 4000);
-
-      setTimeout(() => {
-        navigate("/chat");
-      }, 5000);
+      setSucess("Please check your email to reset your password!");
+      setIsLoading(false);
+      setError(false);
     } catch (err) {
       setTimeout(() => {
         setIsLoading(false);
@@ -68,7 +55,7 @@ function Login() {
         <h1 className={styles.logo}>AInizer</h1>
       </header>
       <div className={styles.card_container}>
-        <h1 className={styles.main_text}>Hello again</h1>
+        <h1 className={styles.main_text}>Forgot?</h1>
 
         <form onSubmit={handleSubmit} className={styles.input_form}>
           <label className={styles.input_label} htmlFor="email">
@@ -81,30 +68,8 @@ function Login() {
             placeholder="Input email here..."
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                passwordRef.current?.focus();
-              }
-            }}
           />
 
-          <label className={styles.input_label} htmlFor="password">
-            Password
-          </label>
-          <input
-            className={styles.input_field}
-            id="password"
-            type="password"
-            placeholder="Input password here..."
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            ref={passwordRef}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-              }
-            }}
-          />
           {error ? (
             <>
               <span className={styles.error_message}>
@@ -137,18 +102,18 @@ function Login() {
               className={styles.input_button}
               disabled={isLoading}
             >
-              Login
+              Reset
             </button>
           )}
         </form>
 
         <span className={styles.sub_text}>
-          Forgot your password?{" "}
+          Back to login?{" "}
           <a
             className={styles.forgot_password}
-            onClick={() => navigate("/forgot_password")}
+            onClick={() => navigate("/login")}
           >
-            Forgot Password
+            Login{" "}
           </a>
         </span>
 
@@ -169,4 +134,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default ForgotPassword;

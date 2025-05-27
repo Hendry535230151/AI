@@ -38,10 +38,7 @@ const historyController = {
         } catch (err) {
           res.status(err.statusCode || 400).json({ success: false, message: err.message || 'Failed to create history' });
         }
-      },
-      
-
-
+    },
 
     deleteHistoryById: async (req, res) => {
         const { id } = req.params;

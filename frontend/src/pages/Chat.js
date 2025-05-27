@@ -6,24 +6,25 @@ import { useNavigate } from "react-router-dom";
 import formatText from "../utils/formatText";
 import ReactMarkdown from "react-markdown";
 import useAuth from "../utils/auth";
-// import LogoutButton from "../utils/logoutButton";
 
 function Chat() {
   const isAuthenticated = useAuth();
   const navigate = useNavigate();
   const [chatHistory, setChatHistory] = useState([]);
   const [directoryList, setDirectoryList] = useState([]);
+  const [chatHistoryList, setChatHistoryList] = useState([]);
   const [historyList, setHistoryList] = useState([]);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [chatTitle, setChatTitle] = useState("");
-  const [activeSetting, setActiveSetting] = useState("");
+  const [activeSetting, setActiveSetting] = useState("basic");
   const [droppedFile, setDroppedFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isClosedSidebar, setIsClosedSidebar] = useState(false);
   const [isClosedDirectory, setIsClosedDirectory] = useState(false);
   const [isClosedHistory, setIsClosedHistory] = useState(false);
   const [isOpenSetting, setIsOpenSetting] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true);
   const [chatHistoryId, setChatHistoryId] = useState(null);
   const [isTyping, setIsTyping] = useState(false);
   const queryFieldRef = useRef(null);
@@ -35,6 +36,14 @@ function Chat() {
       navigate("/login");
     }
   }, [isAuthenticated, navigate]);
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.body.classList.remove(`${styles.light_mode}`);
+    } else {
+      document.body.classList.add(`${styles.light_mode}`);
+    }
+  }, [isDarkMode]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -60,6 +69,31 @@ function Chat() {
     }
   };
 
+  const fetchChatHistory = async () => {
+    const token = localStorage.getItem("token");
+    const userId = fetchIdFromToken();
+    if (!token) {
+      setError("User not authenticated. Please login.");
+      return;
+    }
+    try {
+      const res = await axios.get(
+        `http://localhost:3000/chat-history/user/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const responseData = res.data.data;
+      setChatHistoryList(
+        Array.isArray(responseData) ? responseData : [responseData]
+      );
+    } catch (err) {
+      setError("Failed to load History");
+    }
+  };
+
   const handleInputChange = (e) => {
     setMessage(e.target.value);
     setIsTyping(e.target.value.length > 0);
@@ -68,32 +102,6 @@ function Chat() {
   useEffect(() => {
     let dragCounter = 0;
     let dragLeaveTimeout;
-
-    const fetchHistory = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setError("User not authenticated. Please login.");
-        return;
-      }
-      try {
-        const res = await axios.get("http://localhost:3000/ai/history", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const chats = res.data.data.map((chat) => ({
-          sender: chat.sender,
-          text: chat.text,
-        }));
-        setChatHistory(chats);
-      } catch (err) {
-        if (err.response && err.response.status === 401) {
-          setError("Token is invalid/expired");
-          localStorage.removeItem("token");
-        }
-        setError("Failed to load chat history");
-      }
-    };
 
     const fetchDirectory = async () => {
       const token = localStorage.getItem("token");
@@ -138,8 +146,8 @@ function Chat() {
       }
     };
 
-    fetchHistory();
     fetchDirectory();
+    fetchChatHistory();
 
     window.addEventListener("dragover", handleWindowDragOver);
     window.addEventListener("drop", handleWindowDrop);
@@ -154,6 +162,12 @@ function Chat() {
   }, []);
 
   useEffect(() => {
+    if (chatHistoryId) {
+      setError("");
+    }
+  }, [chatHistoryId]);
+
+  useEffect(() => {
     if (bottomRef.current) {
       bottomRef.current.scrollIntoView({ behavior: "smooth" });
     }
@@ -165,6 +179,11 @@ function Chat() {
     const trimmedMessage = message.trim();
     if (!trimmedMessage && !droppedFile) {
       setError("Please enter a message or drop a file.");
+      return;
+    }
+
+    if (!chatHistoryId) {
+      setError("Please create or select a chat topic first.");
       return;
     }
 
@@ -239,6 +258,7 @@ function Chat() {
         ]);
       }
 
+      setMessage("");
       setError("");
     } catch (err) {
       let errMsg = "";
@@ -408,6 +428,53 @@ function Chat() {
                     className={`fa-solid fa-caret-down ${styles.dropdown_icon}`}
                   ></i>
                 </button>
+                {!isClosedHistory && (
+                  <ul className={styles.dropdown_list}>
+                    {chatHistoryList.length > 0 ? (
+                      chatHistoryList.map((his, idx) => (
+                        <li
+                          key={idx}
+                          className={styles.dropdown_item}
+                          onClick={async () => {
+                            setChatHistoryId(his.id);
+                            setChatTitle(his.title);
+                            setChatHistory([]);
+                            await fetchChatHistory();
+                            const token = localStorage.getItem("token");
+                            try {
+                              const res = await axios.get(
+                                `http://localhost:3000/ai/history/${his.id}`,
+                                {
+                                  headers: {
+                                    Authorization: `Bearer ${token}`,
+                                  },
+                                }
+                              );
+                              const data = res.data.data;
+                              const chats = Array.isArray(data)
+                                ? data.map((chat) => ({
+                                    sender: chat.sender,
+                                    text: chat.text,
+                                  }))
+                                : [];
+                              setChatHistory(chats);
+                            } catch (err) {
+                              setError(
+                                "Failed to load chat history for selected topic"
+                              );
+                            }
+                          }}
+                        >
+                          {his.title}
+                        </li>
+                      ))
+                    ) : (
+                      <li className={styles.dropdown_item}>
+                        No histories found
+                      </li>
+                    )}
+                  </ul>
+                )}
               </div>
               <div
                 className={`${styles.container3} ${
@@ -462,7 +529,9 @@ function Chat() {
             className={styles.profile_group}
             onClick={() => setIsOpenSetting(true)}
           >
-            <div className={styles.profile_circle}></div>
+            <div className={styles.profile_circle}>
+              <i className="fa-solid fa-user"></i>
+            </div>
             {isClosedSidebar ? (
               <></>
             ) : (
@@ -470,6 +539,7 @@ function Chat() {
             )}
           </button>
         </div>
+        {/* <LogoutButton /> */}
       </div>
       <div className={styles.main_area}>
         <header className={styles.header}>
@@ -508,6 +578,11 @@ function Chat() {
           ))}
         </div>
         <div className={styles.query_area}>
+          {!chatHistoryId && (
+            <div className={styles.warning_text}>
+              Please create a new chat topic before starting.
+            </div>
+          )}
           <form onSubmit={handleSubmit} className={styles.query_form}>
             <textarea
               ref={queryFieldRef}
@@ -520,14 +595,19 @@ function Chat() {
                   : "Type your message..."
               }
               className={styles.query_field}
+              required
+              disabled={!chatHistoryId}
+            />
+            <button
+              type="submit"
+              // className={styles.query_button}
+              disabled={!chatHistoryId}
+              title={
+                !chatHistoryId
+                  ? "Please create or select a chat topic first"
+                  : ""
+              }
               required={!droppedFile}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSubmit(e);
-                  setMessage("");
-                }
-              }}
             />
             <button
               type="submit"
@@ -564,7 +644,9 @@ function Chat() {
         {isOpenSetting ? (
           <div className={styles.setting_wrapper}>
             <div className={styles.setting_card}>
-              <div className={styles.setting_circle}></div>
+              <div className={styles.setting_circle}>
+                <i className={`fa-solid fa-user ${styles.big_profile}`}></i>
+              </div>
               <div className={styles.setting_profile}>
                 <h1 className={styles.setting_title}>Hello, Human</h1>
                 <p className={styles.setting_description}>lorem</p>
@@ -638,8 +720,101 @@ function Chat() {
                 </div>
               </div>
               <div className={styles.setting_content}>
-                {activeSetting === "basic" && <p>This is basic setting</p>}
-                {activeSetting === "theme" && <p>This is theme setting</p>}
+                {activeSetting === "basic" && (
+                  <>
+                    <div className={styles.setting_group_type}>
+                      <h4 className={styles.setting_title_type}>Change Name</h4>
+                      <div className={styles.setting_types}>
+                        <form className={styles.setting_form}>
+                          <label
+                            htmlFor="changeName"
+                            className={styles.setting_description_type}
+                          >
+                            Want to change name? Please enter your new name
+                          </label>
+                          <div className={styles.setting_input_container}>
+                            <input
+                              id="changeName"
+                              type="text"
+                              className={styles.setting_input}
+                              placeholder="New name here ..."
+                            ></input>
+                            <button
+                              type="submit"
+                              className={styles.change_request_group}
+                            >
+                              <i
+                                className={`fa-regular fa-paper-plane ${styles.change_request_icon}`}
+                              ></i>
+                            </button>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                    <div className={styles.setting_group_type}>
+                      <h4 className={styles.setting_title_type}>
+                        Change Description
+                      </h4>
+                      <form className={styles.setting_form}>
+                        <label
+                          htmlFor="changeDescription"
+                          className={styles.setting_description_type}
+                        >
+                          Tell everybody that you want to let them know
+                        </label>
+                        <div className={styles.setting_input_container}>
+                          <textarea
+                            id="changeName"
+                            type="text"
+                            className={styles.setting_textarea}
+                            placeholder="New name here ..."
+                          ></textarea>
+                          <button
+                            type="submit"
+                            className={styles.description_button}
+                          >
+                            <i
+                              className={`fa-regular fa-paper-plane ${styles.change_request_icon}`}
+                            ></i>
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                    <div className={styles.setting_group_type}>
+                      <h4 className={styles.setting_titile_type}>
+                        Change Password
+                      </h4>
+                      <p className={styles.setting_description_type}>
+                        This is basic setting
+                      </p>
+                    </div>
+                  </>
+                )}
+                {activeSetting === "theme" && (
+                  <div className={styles.setting_group_type}>
+                    <h4 className={styles.setting_title_type}>Change Name</h4>
+                    <div className={styles.setting_types}>
+                      <form className={styles.setting_form_inline}>
+                        <label
+                          htmlFor="themeChange"
+                          className={styles.setting_input_container}
+                        >
+                          Fell boring? change the theme now
+                        </label>
+                        <div className={styles.checkbox_group}>
+                          <input
+                            id="themeChange"
+                            type="checkbox"
+                            className={styles.checkbox}
+                            checked={isDarkMode}
+                            onChange={(e) => setIsDarkMode(e.target.checked)}
+                          />
+                          <span className={styles.slider}></span>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                )}
                 {activeSetting === "language" && (
                   <p>This is language setting</p>
                 )}

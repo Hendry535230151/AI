@@ -32,7 +32,6 @@ const historyService = {
         }
     },
 
-    
     getHistoryByUserId: async (userId) => {
         try {
             if (!userId) {
@@ -49,18 +48,21 @@ const historyService = {
             throw err;
         }
     },
+
     createHistory: async (userId, title) => {
-        if (!userId || !title) {
-          throw new customError('User ID and title are required.', 400);
+        if (!userId) {
+            throw new customError('User ID and title are required.', 400);
+        } else if (!title) {
+            throw new customError('User ID and title are required.', 400);
         }
+        
         const created = await historyModel.createHistory(userId, title);
         if (!created) {
-          throw new customError('Failed to create history.', 500);
+            throw new customError('Failed to create history.', 500);
         }
         return created; 
-      },
+    },
       
-
     deleteHistoryById: async (id) => {
         try {
             if (!id) {

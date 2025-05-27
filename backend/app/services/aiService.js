@@ -1,5 +1,6 @@
 require("dotenv").config();
 const chatModel = require("../models/ChatModel");
+const historyModel = require("../models/History");
 const CustomError = require("../errors/CustomError");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
@@ -7,16 +8,18 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const handleQueryFile = require("../utils/handle_query/handleQueryFile");
 
 const aiService = {
-  aiChatting: async (userId, message) => {
+  aiChatting: async (userId, message, providedHistoryId) => {
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
+    
+    const chatHistoryId = providedHistoryId || await historyModel.createHistory(userId);
 
     const handledQuery = await handleQueryFile(message, userId);
     if (handledQuery) {
-      const userChat = await chatModel.insertChat(userId, "user", message);
+      const userChat = await chatModel.insertChat(chatHistoryId, userId, "user", message);
       if (!userChat) {
         throw new CustomError("Error A", 500);
       }
-      const aiChat = await chatModel.insertChat(userId, "ai", handledQuery);
+      const aiChat = await chatModel.insertChat(chatHistoryId, userId, "ai", handledQuery);
       if (!aiChat) {
         throw new CustomError("Error B", 500);
       }
@@ -32,11 +35,11 @@ const aiService = {
     const response = await result.response;
     const text = response.text();
 
-    const userChat = await chatModel.insertChat(userId, "user", message);
+    const userChat = await chatModel.insertChat(chatHistoryId, userId, "user", message);
     if (!userChat) {
       throw new CustomError("Error A", 500);
     }
-    const aiChat = await chatModel.insertChat(userId, "ai", text);
+    const aiChat = await chatModel.insertChat(chatHistoryId, userId, "ai", text);
     if (!aiChat) {
       throw new CustomError("Error B", 500);
     }
@@ -46,6 +49,22 @@ const aiService = {
   getChatByUserId: async (userId) => {
     try {
       const fetchAll = await chatModel.getChatByUserId(userId);
+      if (!fetchAll || fetchAll.length === 0) {
+        throw new CustomError(
+          "No chats found. Please ensure the database is correctly populated and try again.",
+          404
+        );
+      }
+
+      return fetchAll;
+    } catch (err) {
+      throw err;
+    }
+  },
+
+  getChatByHistoryId: async (chatHistoryId) => {
+    try {
+      const fetchAll = await chatModel.getChatByHistoryId(chatHistoryId);
       if (!fetchAll || fetchAll.length === 0) {
         throw new CustomError(
           "No chats found. Please ensure the database is correctly populated and try again.",

@@ -38,10 +38,33 @@ function Chat() {
   }, [isAuthenticated, navigate]);
 
   useEffect(() => {
+    const fetchTheme = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("User not authenticated. Please login.");
+        return;
+      }
+      try {
+        const userId = fetchIdFromToken();
+        const res = await axios.get(`http://localhost:3000/users/find-user/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const themeFromDb = res.data.data.theme;
+        setIsDarkMode(themeFromDb === "dark");
+      } catch (err) {
+        setError("Failed to fetch theme");
+      }
+    };
+    fetchTheme();
+  }, []);
+
+  useEffect(() => {
     if (isDarkMode) {
-      document.body.classList.remove(`${styles.light_mode}`);
+      document.body.classList.remove(styles.light_mode);
     } else {
-      document.body.classList.add(`${styles.light_mode}`);
+      document.body.classList.add(styles.light_mode);
     }
   }, [isDarkMode]);
 
@@ -319,6 +342,27 @@ function Chat() {
         ))}
       </ul>
     );
+  };
+
+  const updateTheme = async (checked) => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setError("User not authenticated. Please login.");
+      return;
+    }
+    try {
+      const userId = fetchIdFromToken();
+      await axios.put(`http://localhost:3000/users/theme/${userId}`, {
+        theme: checked ? "dark" : "light" 
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    } catch (err) {
+      setError('Failed post theme');
+    }
   };
 
   //supaya gak ngelag
@@ -809,13 +853,17 @@ function Chat() {
                           Fell boring? change the theme now
                         </label>
                         <div className={styles.checkbox_group}>
-                          <input
-                            id="themeChange"
-                            type="checkbox"
-                            className={styles.checkbox}
-                            checked={isDarkMode}
-                            onChange={(e) => setIsDarkMode(e.target.checked)}
-                          />
+                            <input
+                              id="themeChange"
+                              type="checkbox"
+                              className={styles.checkbox}
+                              checked={isDarkMode}
+                              onChange={(e) => {
+                                const checked = e.target.checked;
+                                setIsDarkMode(checked);
+                                updateTheme(checked);
+                              }}
+                            />
                           <span className={styles.slider}></span>
                         </div>
                       </form>
@@ -828,9 +876,6 @@ function Chat() {
                 {activeSetting === "collaboration" && (
                   <p>This is collaboration setting</p>
                 )}
-                {/* {activeSetting === "logout" && (
-                    <p>This is logout setting</p>
-                  )} */}
                 {activeSetting === "dir_list" && (
                   <p>This is dir_list setting</p>
                 )}

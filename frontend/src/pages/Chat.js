@@ -6,31 +6,50 @@ import { useNavigate } from "react-router-dom";
 import formatText from "../utils/formatText";
 import ReactMarkdown from "react-markdown";
 import useAuth from "../utils/auth";
-import LogoutButton from "../utils/logoutButton";
 
 function Chat() {
   const isAuthenticated = useAuth();
   const navigate = useNavigate();
-  const [message, setMessage] = useState("");
   const [chatHistory, setChatHistory] = useState([]);
   const [directoryList, setDirectoryList] = useState([]);
   const [chatHistoryList, setChatHistoryList] = useState([]);
   const [error, setError] = useState('');
+  const [historyList, setHistoryList] = useState([]);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [chatTitle, setChatTitle] = useState("");
+  const [activeSetting, setActiveSetting] = useState("basic");
   const [droppedFile, setDroppedFile] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
   const [isClosedSidebar, setIsClosedSidebar] = useState(false);
   const [isClosedDirectory, setIsClosedDirectory] = useState(false);
   const [isClosedHistory, setIsClosedHistory] = useState(false);
-  const [chatTitle, setChatTitle] = useState('');
+  const [isOpenSetting, setIsOpenSetting] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true);
   const [chatHistoryId, setChatHistoryId] = useState(null);
-
+  const [isTyping, setIsTyping] = useState(false);
+  const queryFieldRef = useRef(null);
   const bottomRef = useRef(null);
+  const bottomButton = useRef(null);
 
   useEffect(() => {
     if (!isAuthenticated) {
       navigate("/login");
     }
   }, [isAuthenticated, navigate]);
+
+useEffect(() => {
+  if (isDarkMode) {
+    document.body.classList.remove(`${styles.light_mode}`);
+  } else {
+    document.body.classList.add(`${styles.light_mode}`);
+  }
+}, [isDarkMode]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
 
   const handleDrop = (e) => {
     e.preventDefault();
@@ -51,6 +70,7 @@ function Chat() {
     }
   };
 
+
   const fetchChatHistory = async () => {
     const token = localStorage.getItem('token');
     const userId = fetchIdFromToken();
@@ -69,6 +89,12 @@ function Chat() {
     } catch (err) {
       setError('Failed to load History');
     }
+  };
+
+
+  const handleInputChange = (e) => {
+    setMessage(e.target.value);
+    setIsTyping(e.target.value.length > 0);
   };
 
 
@@ -250,6 +276,47 @@ function Chat() {
     }
   };
 
+  const buildDirectoryTree = (list) => {
+    const map = {};
+    const roots = [];
+
+    list.forEach((item) => {
+      map[item.id] = { ...item, children: [] };
+    });
+
+    list.forEach((item) => {
+      if (item.parent_directory && map[item.parent_directory]) {
+        map[item.parent_directory].children.push(map[item.id]);
+      } else {
+        roots.push(map[item.id]);
+      }
+    });
+
+    return roots;
+  };
+
+  const directoryTree = useMemo(() => buildDirectoryTree(directoryList), [directoryList]);
+  
+  const renderDirectoryTree = (nodes, level = 0) => {
+    return (
+      <ul style={{ listStyleType: "none", paddingLeft: level === 0 ? 0 : 10 }}>
+        {nodes.map((node) => (
+          <li
+            key={node.id}
+            className={styles.dropdown_item}
+            style={{ paddingLeft: level }}
+          >
+            <i className="fa-solid fa-folder"></i> {node.directory_name}{" "}
+            <span style={{ color: "gray", fontSize: "0.9em" }}>
+              ({node.file_count ?? 0} files)
+            </span>
+            {node.children && node.children.length > 0 && renderDirectoryTree(node.children, level + 1)}
+          </li>
+        ))}
+      </ul>
+    );
+  };
+
   //supaya gak ngelag
   const MAX_MESSAGES = 25;
 
@@ -301,36 +368,39 @@ function Chat() {
             <></>
           ) : (
             <>
-              <div
-                className={`${styles.dropdown_area} ${
-                  isClosedDirectory ? styles.close_dropdown : ""
-                }`}
-              >
-                <button
-                  className={styles.dropdown}
-                  onClick={() => setIsClosedDirectory((prev) => !prev)}
-                >
+              <div className={`${styles.dropdown_area} ${isClosedDirectory ? styles.close_dropdown : ''}`}>
+                <button className={styles.dropdown} onClick={() => setIsClosedDirectory((prev) => !prev)}>
                   <p className={styles.dropdown_text}>Directory</p>
-                  <i
-                    className={`fa-solid fa-caret-down ${styles.dropdown_icon}`}
-                  ></i>
+                  <i className={`fa-solid fa-caret-down ${styles.dropdown_icon}`}></i>
                 </button>
                 {!isClosedDirectory && (
-                  <ul className={styles.dropdown_list}>
-                    {directoryList.length > 0 ? (
-                      directoryList.map((dir, idx) => (
-                        <li key={idx} className={styles.dropdown_item}>
-                          <i className="fa-solid fa-folder"></i>{" "}
-                          {dir.directory_name}
-                        </li>
-                      ))
-                    ) : (
-                      <li className={styles.dropdown_item}>
-                        No directories found
+                <ul className={styles.dropdown_list}>
+                  {/* {directoryList.length > 0 ? (
+                    directoryList.map((dir, idx) => (
+                      <li
+                        key={idx}
+                        className={styles.dropdown_item}
+                        style={{ paddingLeft: `${dir.level * 20}px` }}
+                      >
+                        <i className="fa-solid fa-folder"></i>{' '}
+                        {dir.directory_name}
                       </li>
-                    )}
-                  </ul>
+                    ))
+                  ) : (
+                    <li className={styles.dropdown_item}>
+                      No directories found
+                    </li>
+                  )} */}
+                  {directoryTree.length > 0 ? (
+                    renderDirectoryTree(directoryTree)
+                  ) : (
+                    <li className={styles.dropdown_item}>
+                      No directories found
+                    </li>
+                  )}
+                </ul>
                 )}
+
               </div>
               <div
                 className={`${styles.dropdown_area} ${
@@ -397,6 +467,7 @@ function Chat() {
                     : styles.close_dropdown
                 }`}
               >
+
                   <form
                       onSubmit={async (e) => {
                         e.preventDefault();
@@ -435,19 +506,62 @@ function Chat() {
                       />
                       <button type="submit">Start New Chat</button>
                     </form>
+
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+                    const token = localStorage.getItem('token');
+                    const userId = fetchIdFromToken();
+                    if (!chatTitle || !userId) return;
+
+                    try {
+                      const response = await axios.post(
+                        'http://localhost:3000/chat-history/',
+                        {
+                          title: chatTitle,
+                          userId: userId
+                        },
+                        {
+                          headers: {
+                            Authorization: `Bearer ${token}`
+                          }
+                        }
+                      );
+                      setChatHistoryId(response.data.data.id);
+                      setChatHistory([]); 
+                      setChatTitle('');
+                    } catch (err) {
+                      console.error('Failed to create chat history', err);
+                    }
+                  }}
+                >
+                  <input
+                    type="text"
+                    value={chatTitle}
+                    onChange={(e) => setChatTitle(e.target.value)}
+                    placeholder="Enter new chat topic title..."
+                    required
+                  />
+                  <button type="submit">Start New Chat</button>
+                </form>
+
               </div>
             </>
           )}
         </div>
-        <button className={styles.profile_group}>
-          <div className={styles.profile_circle}></div>
-          {isClosedSidebar ? (
-            <></>
-          ) : (
-            <p className={styles.profile_name}>User</p>
-          )}
-        </button>
-        <LogoutButton />
+        <div className={styles.profile_container}>
+          <button className={styles.profile_group} onClick={() => setIsOpenSetting(true)}>
+            <div className={styles.profile_circle}>
+              <i className="fa-solid fa-user"></i>
+            </div>
+            {isClosedSidebar ? (
+              <></>
+            ) : (
+              <p className={styles.profile_name}>User</p>
+            )}
+          </button>
+        </div>
+        {/* <LogoutButton /> */}
       </div>
       <div className={styles.main_area}>
         <header className={styles.header}>
@@ -465,14 +579,18 @@ function Chat() {
                   : styles.error_message
               }
             >
+              {chat.sender !== 'user' && chat.sender !== 'ai' ? (
+                <i className={`${styles.error_icon} fa-solid fa-circle-exclamation`}></i>
+              ) : (
+                <></>
+              )}
               <strong className={styles.user}>
-                {chat.sender === "user"
-                  ? "You"
-                  : chat.sender === "ai"
-                  ? "AI"
-                  : "Error"}
-                :
-              </strong>{" "}
+                {chat.sender === 'user'
+                  ? 'You'
+                  : chat.sender === 'ai'
+                  ? 'AI'
+                  : 'Error'}{' '}
+              </strong>{' '}
               <div className={styles.markdown_container}>
                 <ReactMarkdown>{formatText(chat.text)}</ReactMarkdown>
               </div>
@@ -487,15 +605,17 @@ function Chat() {
           )}
           <form onSubmit={handleSubmit} className={styles.query_form}>
             <textarea
+              ref={queryFieldRef}
               type="text"
               value={message}
-              onChange={(e) => setMessage(e.target.value)}
+              onChange={handleInputChange}
               placeholder={
                 droppedFile
-                  ? "Enter a description for the file..."
-                  : "Type your message..."
-              }
+                  ? 'Enter a description for the file...'
+                  : 'Type your message...'
+                }
               className={styles.query_field}
+
               required
               disabled={!chatHistoryId}
             />
@@ -505,32 +625,137 @@ function Chat() {
               disabled={!chatHistoryId} 
               title={!chatHistoryId ? "Please create or select a chat topic first" : ""}
             >
+
+              required={!droppedFile}
+            />
+            <button type="submit" ref={bottomButton} className={`${styles.query_button} ${styles.typing}`}>
+
               <i className={`fa-solid fa-file-import ${styles.query_icon}`}></i>
             </button>
           </form>
-          {isDragging && (
-            <div
-              className={styles.drop_zone}
-              onDragOver={(e) => e.preventDefault()}
-              onDragLeave={(e) => e.preventDefault()}
-              onDrop={handleDrop}
-            >
-              <p>
-                {droppedFile ? (
-                  `File ready: ${droppedFile.name}`
-                ) : (
-                  <div className={styles.drop_zone_group}>
-                    <i
-                      className={`fa-solid fa-droplet ${styles.drop_zone_icon}`}
-                    ></i>
-                    <h1 className={styles.drop_zone_file}>Drop file here</h1>
-                  </div>
-                )}
-              </p>
-            </div>
-          )}
         </div>
+        {isDragging && (
+          <div
+            className={styles.drop_zone}
+            onDragOver={(e) => e.preventDefault()}
+            onDragLeave={(e) => e.preventDefault()}
+            onDrop={handleDrop}
+          >
+            <p>
+              {droppedFile ? (
+                `File ready: ${droppedFile.name}`
+              ) : (
+                <div className={styles.drop_zone_group}>
+                  <i
+                    className={`fa-solid fa-droplet ${styles.drop_zone_icon}`}
+                  ></i>
+                  <h1 className={styles.drop_zone_file}>Drop file here</h1>
+                </div>
+              )}
+            </p>
+          </div>
+        )}
         <div ref={bottomRef} />
+        {/* Setting area */}
+        {isOpenSetting ? (
+          <div className={styles.setting_wrapper}>
+            <div className={styles.setting_card}>
+              <div className={styles.setting_circle}>
+                <i className={`fa-solid fa-user ${styles.big_profile}`}></i>
+              </div>
+              <div className={styles.setting_profile}>
+                <h1 className={styles.setting_title}>Hello, Human</h1>
+                <p className={styles.setting_description}>lorem</p>
+              </div>
+              <div className={styles.setting_container}>
+                <div className={styles.setting_selection}>
+                  <ul className={styles.setting_group}>
+                    <li onClick={() => setActiveSetting("basic")} className={activeSetting === "basic" ? styles.setting_active : ""}>Basic setting</li>
+                    <li onClick={() => setActiveSetting("theme")} className={activeSetting === "theme" ? styles.setting_active : ""}>Theme setting</li>
+                    <li onClick={() => setActiveSetting("language")} className={activeSetting === "language" ? styles.setting_active : ""}>Language setting</li>
+                    <li onClick={() => setActiveSetting("collaboration")} className={activeSetting === "collaboration" ? styles.setting_active : ""}>Collaboration setting</li>
+                    <li onClick={handleLogout}>Logout</li>
+                  </ul>
+                </div>
+
+                <div className={styles.setting_list}>
+                  <ul className={styles.setting_item_list}>
+                    <li onClick={() => setActiveSetting("dir_list")} className={activeSetting === "dir_list" ? styles.setting_active : ""}>Directory list</li>
+                    <li onClick={() => setActiveSetting("collab_list")} className={activeSetting === "collab_list" ? styles.setting_active : ""}>Collaboration list</li>
+                  </ul>
+                </div>
+              </div>
+              <div className={styles.setting_content}>
+                  {activeSetting === "basic" && (
+                    <>
+                      <div className={styles.setting_group_type}>
+                        <h4 className={styles.setting_title_type}>Change Name</h4>
+                        <div className={styles.setting_types}>
+                          <form className={styles.setting_form}>
+                            <label htmlFor="changeName" className={styles.setting_description_type}>Want to change name? Please enter your new name</label>
+                            <div className={styles.setting_input_container}>
+                              <input id="changeName" type="text" className={styles.setting_input} placeholder="New name here ..."></input>
+                              <button type="submit" className={styles.change_request_group}> 
+                                <i className={`fa-regular fa-paper-plane ${styles.change_request_icon}`}></i>
+                              </button>
+                            </div>
+                          </form>
+                        </div>
+                      </div>
+                      <div className={styles.setting_group_type}>
+                        <h4 className={styles.setting_title_type}>Change Description</h4>
+                        <form className={styles.setting_form}>
+                          <label htmlFor="changeDescription" className={styles.setting_description_type}>Tell everybody that you want to let them know</label>
+                            <div className={styles.setting_input_container}>
+                              <textarea id="changeName" type="text" className={styles.setting_textarea} placeholder="New name here ..."></textarea>
+                              <button type="submit" className={styles.description_button}>
+                                <i className={`fa-regular fa-paper-plane ${styles.change_request_icon}`}></i>
+                              </button>
+                            </div>
+                        </form>
+                      </div>
+                      <div className={styles.setting_group_type}>
+                        <h4 className={styles.setting_titile_type}>Change Password</h4>
+                        <p className={styles.setting_description_type}>This is basic setting</p>
+                      </div>
+                    </>
+                  )}
+                  {activeSetting === "theme" && (
+                    <div className={styles.setting_group_type}>
+                      <h4 className={styles.setting_title_type}>Change Name</h4>
+                      <div className={styles.setting_types}>
+                        <form className={styles.setting_form_inline}>
+                          <label htmlFor="themeChange" className={styles.setting_input_container}>Fell boring? change the theme now</label>
+                          <div className={styles.checkbox_group}>
+                            <input id="themeChange" type="checkbox" className={styles.checkbox} checked={isDarkMode} onChange={(e) => setIsDarkMode(e.target.checked)}/>
+                            <span className={styles.slider}></span>
+                          </div>
+                        </form>
+                      </div>
+                    </div>
+                  )}
+                  {activeSetting === "language" && (
+                    <p>This is language setting</p>
+                  )}
+                  {activeSetting === "collaboration" && (
+                    <p>This is collaboration setting</p>
+                  )}
+                  {/* {activeSetting === "logout" && (
+                    <p>This is logout setting</p>
+                  )} */}
+                  {activeSetting === "dir_list" && (
+                    <p>This is dir_list setting</p>
+                  )}
+                  {activeSetting === "collab_list" && (
+                    <p>This is collab_list  setting</p>
+                  )}
+              </div>
+              <i className={`fa-solid fa-xmark ${styles.close_setting_icon}`} onClick={() => setIsOpenSetting(false)}></i>
+            </div>
+          </div>
+        ) : (
+          <></>
+        )};
       </div>
     </div>
   );

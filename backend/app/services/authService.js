@@ -31,7 +31,7 @@ const authService = {
                 throw new customError('Passwords do not match. Please try another password.', 400);
             };
 
-            const token = jwt.sign({id: user.id, email: user.email}, process.env.JWT_SECRET_KEY, {expiresIn: '1h'});
+            const token = jwt.sign({id: user.id, email: user.email}, process.env.JWT_SECRET_KEY, {expiresIn: '30d'});
             return token;
         } catch (err) {
             throw err;

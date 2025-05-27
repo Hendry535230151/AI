@@ -6,6 +6,7 @@ router.get('/', userController.getAllUsers);
 router.get('/email', userController.getUserByEmail);
 router.get('/name', userController.getUserByName);
 router.get('/find-user/:id', userController.getUserById);
+router.put('/theme/:id', userController.setTheme);
 router.delete('/delete-user/:id', userController.deleteUserById);
 
 module.exports = router;

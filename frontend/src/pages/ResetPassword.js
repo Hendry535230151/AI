@@ -39,12 +39,14 @@ function ResetPassword() {
       );
       console.log("Reset successful:", response.data);
 
-      setSucess("Reset Success!");
-      setError(false);
+      setTimeout(() => {
+        setSucess("Reset Success!");
+        setError(false);
+      }, 5000);
 
       setTimeout(() => {
         navigate("/login");
-      }, 3000);
+      }, 8000);
     } catch (err) {
       setTimeout(() => {
         setIsLoading(false);

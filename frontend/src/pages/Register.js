@@ -39,10 +39,14 @@ function Register() {
         registerForm
       );
 
-      setSucess("Register Success!");
+      setTimeout(() => {
+        setSucess("Register Success!");
+        setIsLoading(false);
+      }, 5000);
+
       setTimeout(() => {
         navigate("/login");
-      }, 3000);
+      }, 8000);
     } catch (err) {
       setTimeout(() => {
         setIsLoading(false);

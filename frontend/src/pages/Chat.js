@@ -24,6 +24,7 @@ function Chat() {
   const [isClosedDirectory, setIsClosedDirectory] = useState(false);
   const [isClosedHistory, setIsClosedHistory] = useState(false);
   const [isOpenSetting, setIsOpenSetting] = useState(false);
+  const [isOpenSearch, setIsOpenSearch] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [chatHistoryId, setChatHistoryId] = useState(null);
   const [isTyping, setIsTyping] = useState(false);
@@ -398,7 +399,9 @@ function Chat() {
             <></>
           ) : (
             <>
-              <button className={styles.sidebar_button}>
+              <button className={styles.sidebar_button} onClick={() => {
+                setIsOpenSearch(true);
+              }}>
                 <i
                   className={`fa-solid fa-magnifying-glass ${styles.sidebar_icon}`}
                 ></i>
@@ -892,7 +895,31 @@ function Chat() {
         ) : (
           <></>
         )}
-        ;
+        {isOpenSearch ? (
+          <div className={styles.search_wrapper}>
+            <div className={styles.search_card}>
+              <form className={styles.search_form}>
+                <div className={styles.search_container}>
+                  <input id="searchBar" type="text" className={styles.search_field} placeholder="What thing that you need to find?"></input>
+                  <button className={styles.magnifying_button}>
+                    <i className={`fa-solid fa-magnifying-glass ${styles.magnifying_icon}`}></i>
+                  </button>
+                </div>
+                <i className={`fa-solid fa-xmark ${styles.close_setting_icon}`}  onClick={() => { setIsOpenSearch(false) }}></i>
+              </form>
+              <div className={styles.result_container}>
+                <div className={styles.directory_result}>
+                  <p className={styles.search_description}>Directories</p>
+                </div>              
+                <div className={styles.history_result}>
+                  <p className={styles.search_description}>History</p>
+                </div>              
+              </div>
+            </div>
+          </div>
+        ) : (
+          <></>
+        )}
       </div>
     </div>
   );

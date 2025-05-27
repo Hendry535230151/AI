@@ -597,6 +597,13 @@ function Chat() {
               className={styles.query_field}
               required
               disabled={!chatHistoryId}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSubmit(e);
+                  setMessage("");
+                }
+              }}
             />
             <button
               type="submit"

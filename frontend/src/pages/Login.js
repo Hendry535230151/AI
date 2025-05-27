@@ -18,7 +18,9 @@ function Login() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/chat");
+      setTimeout(() => {
+        navigate("/chat");
+      }, 5000);
     }
   }, [isAuthenticated, navigate]);
 
@@ -38,11 +40,14 @@ function Login() {
       const token = response.data.token;
       localStorage.setItem("token", token);
 
-      setSucess("Login Success!");
+      setTimeout(() => {
+        setSucess("Login Success!");
+        setIsLoading(false);
+      }, 4000);
 
       setTimeout(() => {
         navigate("/chat");
-      }, 3000);
+      }, 5000);
     } catch (err) {
       setTimeout(() => {
         setIsLoading(false);

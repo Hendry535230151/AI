@@ -5,5 +5,7 @@ const authMiddleware = require("../middleware/auth");
 
 router.post("/chat", authMiddleware, aiController.aiChatting);
 router.get("/history", authMiddleware, aiController.getHistory);
+router.get("/history/:chathistoryid", authMiddleware, aiController.getHistoryId);
+
 
 module.exports = router;

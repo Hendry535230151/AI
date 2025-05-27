@@ -12,6 +12,8 @@ function Chat() {
   const navigate = useNavigate();
   const [chatHistory, setChatHistory] = useState([]);
   const [directoryList, setDirectoryList] = useState([]);
+  const [chatHistoryList, setChatHistoryList] = useState([]);
+  const [error, setError] = useState('');
   const [historyList, setHistoryList] = useState([]);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -68,58 +70,57 @@ useEffect(() => {
     }
   };
 
+
+  const fetchChatHistory = async () => {
+    const token = localStorage.getItem('token');
+    const userId = fetchIdFromToken();
+    if (!token) {
+      setError('User not authenticated. Please login.');
+      return;
+    }
+    try {
+      const res = await axios.get(`http://localhost:3000/chat-history/user/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const responseData = res.data.data;
+      setChatHistoryList(Array.isArray(responseData) ? responseData : [responseData]);
+    } catch (err) {
+      setError('Failed to load History');
+    }
+  };
+
+
   const handleInputChange = (e) => {
     setMessage(e.target.value);
     setIsTyping(e.target.value.length > 0);
   };
 
+
   useEffect(() => {
     let dragCounter = 0;
     let dragLeaveTimeout;
 
-    const fetchHistory = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        setError("User not authenticated. Please login.");
-        return;
-      }
-      try {
-        const res = await axios.get("http://localhost:3000/ai/history", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const chats = res.data.data.map((chat) => ({
-          sender: chat.sender,
-          text: chat.text,
-        }));
-        setChatHistory(chats);
-      } catch (err) {
-        if (err.response && err.response.status === 401) {
-          setError("Token is invalid/expired");
-          localStorage.removeItem("token");
-        }
-        setError("Failed to load chat history");
-      }
-    };
-
     const fetchDirectory = async () => {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem('token');
       if (!token) {
-        setError("User not authenticated. Please login.");
+        setError('User not authenticated. Please login.');
         return;
       }
       try {
-        const res = await axios.get("http://localhost:3000/directories/", {
+        const res = await axios.get('http://localhost:3000/directories/', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
         setDirectoryList(res.data.data);
       } catch (err) {
-        setError("Failed to load directory");
+        setError('Failed to load directory');
       }
     };
+
+  
 
     const handleWindowDragOver = (e) => {
       e.preventDefault();
@@ -146,8 +147,8 @@ useEffect(() => {
       }
     };
 
-    fetchHistory();
     fetchDirectory();
+    fetchChatHistory();
 
     window.addEventListener("dragover", handleWindowDragOver);
     window.addEventListener("drop", handleWindowDrop);
@@ -162,6 +163,12 @@ useEffect(() => {
   }, []);
 
   useEffect(() => {
+    if (chatHistoryId) {
+      setError("");
+    }
+  }, [chatHistoryId]);
+  
+  useEffect(() => {
     if (bottomRef.current) {
       bottomRef.current.scrollIntoView({ behavior: "smooth" });
     }
@@ -169,13 +176,18 @@ useEffect(() => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+        
     const trimmedMessage = message.trim();
     if (!trimmedMessage && !droppedFile) {
       setError("Please enter a message or drop a file.");
       return;
     }
-
+    
+    if (!chatHistoryId) {
+      setError("Please create or select a chat topic first.");
+      return;
+    }
+    
     const userId = fetchIdFromToken();
     if (!userId) {
       setError("User not authenticated. Please login.");
@@ -404,6 +416,49 @@ useEffect(() => {
                     className={`fa-solid fa-caret-down ${styles.dropdown_icon}`}
                   ></i>
                 </button>
+                {!isClosedHistory && (
+                  <ul className={styles.dropdown_list}>
+                  {chatHistoryList.length > 0 ? (
+                    chatHistoryList.map((his, idx) => (
+                      <li
+                        key={idx}
+                        className={styles.dropdown_item}
+                        onClick={async () => {
+                          setChatHistoryId(his.id);
+                          setChatTitle(his.title);
+                          setChatHistory([]);
+                          await fetchChatHistory();
+                          const token = localStorage.getItem('token');
+                          try {
+                            const res = await axios.get(
+                              `http://localhost:3000/ai/history/${his.id}`,
+                              {
+                                headers: {
+                                  Authorization: `Bearer ${token}`,
+                                },
+                              }
+                            );
+                            const data = res.data.data;
+                            const chats = Array.isArray(data) ? data.map(chat => ({
+                              sender: chat.sender,
+                              text: chat.text,
+                            })) : [];
+                            setChatHistory(chats);
+                          } catch (err) {
+                            setError('Failed to load chat history for selected topic');
+                          }
+                        }}
+                      >
+                        {his.title}
+                      </li>
+                    ))
+                  ) : (
+                    <li className={styles.dropdown_item}>
+                      No histories found
+                    </li>
+                  )}
+                </ul>                
+                )}
               </div>
               <div
                 className={`${styles.container3} ${
@@ -412,6 +467,46 @@ useEffect(() => {
                     : styles.close_dropdown
                 }`}
               >
+
+                  <form
+                      onSubmit={async (e) => {
+                        e.preventDefault();
+                        const token = localStorage.getItem('token');
+                        const userId = fetchIdFromToken();
+                        if (!chatTitle || !userId) return;
+
+                        try {
+                          const response = await axios.post(
+                            'http://localhost:3000/chat-history/',
+                            {
+                              title: chatTitle,
+                              userId: userId
+                            },
+                            {
+                              headers: {
+                                Authorization: `Bearer ${token}`
+                              }
+                            }
+                          );
+                          setChatHistoryId(response.data.data.id);
+                          setChatHistory([]); 
+                          setChatTitle('');
+                          await fetchChatHistory();
+                        } catch (err) {
+                          console.error('Failed to create chat history', err);
+                        }
+                      }}
+                    >
+                      <input
+                        type="text"
+                        value={chatTitle}
+                        onChange={(e) => setChatTitle(e.target.value)}
+                        placeholder="Enter new chat topic title..."
+                        required
+                      />
+                      <button type="submit">Start New Chat</button>
+                    </form>
+
                 <form
                   onSubmit={async (e) => {
                     e.preventDefault();
@@ -449,6 +544,7 @@ useEffect(() => {
                   />
                   <button type="submit">Start New Chat</button>
                 </form>
+
               </div>
             </>
           )}
@@ -502,6 +598,11 @@ useEffect(() => {
           ))}
         </div>
         <div className={styles.query_area}>
+        {!chatHistoryId && (
+            <div className={styles.warning_text}>
+              Please create a new chat topic before starting.
+            </div>
+          )}
           <form onSubmit={handleSubmit} className={styles.query_form}>
             <textarea
               ref={queryFieldRef}
@@ -514,9 +615,21 @@ useEffect(() => {
                   : 'Type your message...'
                 }
               className={styles.query_field}
+
+              required
+              disabled={!chatHistoryId}
+            />
+            <button
+              type="submit"
+              className={styles.query_button}
+              disabled={!chatHistoryId} 
+              title={!chatHistoryId ? "Please create or select a chat topic first" : ""}
+            >
+
               required={!droppedFile}
             />
             <button type="submit" ref={bottomButton} className={`${styles.query_button} ${styles.typing}`}>
+
               <i className={`fa-solid fa-file-import ${styles.query_icon}`}></i>
             </button>
           </form>

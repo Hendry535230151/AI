@@ -231,9 +231,10 @@ body::-webkit-scrollbar {
 }
 
 .error_icon {
-  grid-row: span 2;
-  font-size: 30px;
-  margin: 0 20px 0 0;
+    grid-row: span 2;
+    font-size: 30px;
+    margin: 0 20px 0 0;
+    color: #b10909;
 }
 
 .markdown_container {

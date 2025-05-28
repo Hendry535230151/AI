@@ -3,21 +3,13 @@ import React, { useEffect, useState } from "react";
 import ErrorMessage from "../components/ErrorMessage.js";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import useAuth from "../utils/auth.js";
 
 function ForgotPassword() {
-  const isAuthenticated = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [success, setSucess] = useState("");
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/chat");
-    }
-  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

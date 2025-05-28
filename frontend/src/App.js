@@ -6,15 +6,66 @@ import ForgotPassword from "./pages/ForgotPassword";
 import Home from "./pages/Home";
 import Chat from "./pages/Chat";
 import ResetPassword from "./pages/ResetPassword";
+import PrivateRoute from "./components/PrivateRoute";
+import PublicRoute from "./components/PublicRoute";
 
 const router = createBrowserRouter([
-  { path: "/", element: <Login /> },
-  { path: "/login", element: <Login /> },
-  { path: "/register", element: <Register /> },
-  { path: "/forgot_password", element: <ForgotPassword /> },
-  { path: "/reset_password", element: <ResetPassword /> },
-  { path: "/home", element: <Home /> },
-  { path: "/chat", element: <Chat /> },
+  {
+    path: "/",
+    element: (
+      <PublicRoute>
+        <Login />
+      </PublicRoute>
+    ),
+  },
+  {
+    path: "/login",
+    element: (
+      <PublicRoute>
+        <Login />
+      </PublicRoute>
+    ),
+  },
+  {
+    path: "/register",
+    element: (
+      <PublicRoute>
+        <Register />
+      </PublicRoute>
+    ),
+  },
+  {
+    path: "/forgot_password",
+    element: (
+      <PublicRoute>
+        <ForgotPassword />
+      </PublicRoute>
+    ),
+  },
+  {
+    path: "/reset_password",
+    element: (
+      <PublicRoute>
+        <ResetPassword />
+      </PublicRoute>
+    ),
+  },
+  {
+    path: "/home",
+    element: (
+      <PublicRoute>
+        <Home />{" "}
+      </PublicRoute>
+    ),
+  },
+  {
+    path: "/chat",
+    element: (
+      <PrivateRoute>
+        <Chat />
+      </PrivateRoute>
+    ),
+  },
 ]);
 
 function App() {

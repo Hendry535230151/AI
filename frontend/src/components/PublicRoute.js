@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import useAuth from "../utils/auth";
 
 const PublicRoute = ({ children }) => {
-  const isAuthenticated = useAuth();
+  const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {

@@ -1,14 +1,12 @@
 import styles from "../css/Chat.module.css";
 import fetchIdFromToken from "../utils/jwt-decoder";
 import React, { useState, useEffect, useRef, useMemo } from "react";
-import axios from "axios";
+import axios from "../utils/axiosInstance";
 import { useNavigate } from "react-router-dom";
 import formatText from "../utils/formatText";
 import ReactMarkdown from "react-markdown";
-import useAuth from "../utils/auth";
 
 function Chat() {
-  const isAuthenticated = useAuth();
   const navigate = useNavigate();
   const [chatHistory, setChatHistory] = useState([]);
   const [directoryList, setDirectoryList] = useState([]);
@@ -32,12 +30,6 @@ function Chat() {
   const bottomButton = useRef(null);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      navigate("/login");
-    }
-  }, [isAuthenticated, navigate]);
-
-  useEffect(() => {
     const fetchTheme = async () => {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -46,11 +38,14 @@ function Chat() {
       }
       try {
         const userId = fetchIdFromToken();
-        const res = await axios.get(`http://localhost:3000/users/find-user/${userId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await axios.get(
+          `http://localhost:3000/users/find-user/${userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         const themeFromDb = res.data.data.theme;
         setIsDarkMode(themeFromDb === "dark");
       } catch (err) {
@@ -352,16 +347,19 @@ function Chat() {
     }
     try {
       const userId = fetchIdFromToken();
-      await axios.put(`http://localhost:3000/users/theme/${userId}`, {
-        theme: checked ? "dark" : "light" 
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      await axios.put(
+        `http://localhost:3000/users/theme/${userId}`,
+        {
+          theme: checked ? "dark" : "light",
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
     } catch (err) {
-      setError('Failed post theme');
+      setError("Failed post theme");
     }
   };
 
@@ -853,17 +851,17 @@ function Chat() {
                           Fell boring? change the theme now
                         </label>
                         <div className={styles.checkbox_group}>
-                            <input
-                              id="themeChange"
-                              type="checkbox"
-                              className={styles.checkbox}
-                              checked={isDarkMode}
-                              onChange={(e) => {
-                                const checked = e.target.checked;
-                                setIsDarkMode(checked);
-                                updateTheme(checked);
-                              }}
-                            />
+                          <input
+                            id="themeChange"
+                            type="checkbox"
+                            className={styles.checkbox}
+                            checked={isDarkMode}
+                            onChange={(e) => {
+                              const checked = e.target.checked;
+                              setIsDarkMode(checked);
+                              updateTheme(checked);
+                            }}
+                          />
                           <span className={styles.slider}></span>
                         </div>
                       </form>

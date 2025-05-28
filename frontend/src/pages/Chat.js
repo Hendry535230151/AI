@@ -77,6 +77,12 @@ function Chat() {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
+    
+    if (!chatHistoryId) {
+      setError("Please create or select a chat topic first.");
+      return;
+    }
+
 
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const file = e.dataTransfer.files[0];
@@ -495,12 +501,10 @@ function Chat() {
                                 }
                               );
                               const data = res.data.data;
-                              const chats = Array.isArray(data)
-                                ? data.map((chat) => ({
-                                    sender: chat.sender,
-                                    text: chat.text,
-                                  }))
-                                : [];
+                              const chats = Array.isArray(data) ? data.map(chat => ({
+                                sender: chat.sender,
+                                text: chat.text,
+                              })) : [];
                               setChatHistory(chats);
                             } catch (err) {
                               setError(
@@ -550,6 +554,7 @@ function Chat() {
                       setChatHistoryId(response.data.data.id);
                       setChatHistory([]);
                       setChatTitle("");
+                      await fetchChatHistory();
                     } catch (err) {
                       console.error("Failed to create chat history", err);
                     }
@@ -624,7 +629,7 @@ function Chat() {
         <div className={styles.query_area}>
           {!chatHistoryId && (
             <div className={styles.warning_text}>
-              Please create a new chat topic before starting.
+              Please create a new chat topic or select a topic.
             </div>
           )}
           <form onSubmit={handleSubmit} className={styles.query_form}>

@@ -28,16 +28,16 @@ function Chat() {
   const queryFieldRef = useRef(null);
   const bottomRef = useRef(null);
   const bottomButton = useRef(null);
+  const token = localStorage.getItem("token");
+  const userId = fetchIdFromToken();
 
   useEffect(() => {
     const fetchTheme = async () => {
-      const token = localStorage.getItem("token");
       if (!token) {
         setError("User not authenticated. Please login.");
         return;
       }
       try {
-        const userId = fetchIdFromToken();
         const res = await axios.get(
           `http://localhost:3000/users/find-user/${userId}`,
           {
@@ -72,12 +72,11 @@ function Chat() {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
-    
+
     if (!chatHistoryId) {
       setError("Please create or select a chat topic first.");
       return;
     }
-
 
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const file = e.dataTransfer.files[0];
@@ -94,8 +93,6 @@ function Chat() {
   };
 
   const fetchChatHistory = async () => {
-    const token = localStorage.getItem("token");
-    const userId = fetchIdFromToken();
     if (!token) {
       setError("User not authenticated. Please login.");
       return;
@@ -128,17 +125,19 @@ function Chat() {
     let dragLeaveTimeout;
 
     const fetchDirectory = async () => {
-      const token = localStorage.getItem("token");
       if (!token) {
         setError("User not authenticated. Please login.");
         return;
       }
       try {
-        const res = await axios.get("http://localhost:3000/directories/", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await axios.get(
+          `http://localhost:3000/directories/find-user-directory/${userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         setDirectoryList(res.data.data);
       } catch (err) {
         setError("Failed to load directory");
@@ -211,20 +210,18 @@ function Chat() {
       return;
     }
 
-    const userId = fetchIdFromToken();
     if (!userId) {
       setError("User not authenticated. Please login.");
       return;
     }
 
-    const token = localStorage.getItem("token");
     if (!token) {
       setError("User not authenticated. Please login.");
       return;
     }
 
     const userMessage = droppedFile
-      ? `📎 ${droppedFile.name} — ${trimmedMessage}`
+      ? `📎 ${droppedFile.name} \n\n ${trimmedMessage}`
       : trimmedMessage;
 
     setChatHistory((prev) => [...prev, { sender: "user", text: userMessage }]);
@@ -235,14 +232,13 @@ function Chat() {
         formData.append("file", droppedFile);
         formData.append("description", trimmedMessage);
         formData.append("userId", userId);
-        formData.append("directoryId", 1);
+        formData.append("chatHistoryId", chatHistoryId);
 
         const response = await axios.post(
-          "http://localhost:3000/files/create",
+          "http://localhost:3000/ai/chat-insert-file",
           formData,
           {
             headers: {
-              "Content-Type": "multipart/form-data",
               Authorization: `Bearer ${token}`,
             },
           }
@@ -252,9 +248,7 @@ function Chat() {
           ...prev,
           {
             sender: "ai",
-            text: `✅ File uploaded: ${
-              response.data.message || droppedFile.name
-            }`,
+            text: ` ${response.data.message}`,
           },
         ]);
         setDroppedFile(null);
@@ -282,7 +276,7 @@ function Chat() {
         ]);
       }
 
-      setMessage("");
+      // setMessage("");
       setError("");
     } catch (err) {
       let errMsg = "";
@@ -346,13 +340,11 @@ function Chat() {
   };
 
   const updateTheme = async (checked) => {
-    const token = localStorage.getItem("token");
     if (!token) {
       setError("User not authenticated. Please login.");
       return;
     }
     try {
-      const userId = fetchIdFromToken();
       await axios.put(
         `http://localhost:3000/users/theme/${userId}`,
         {
@@ -370,7 +362,7 @@ function Chat() {
   };
 
   //supaya gak ngelag
-  const MAX_MESSAGES = 25;
+  const MAX_MESSAGES = 100;
 
   const recentMessages = useMemo(() => {
     return chatHistory.slice(-MAX_MESSAGES);
@@ -488,7 +480,7 @@ function Chat() {
                             setChatTitle(his.title);
                             setChatHistory([]);
                             await fetchChatHistory();
-                            const token = localStorage.getItem("token");
+
                             try {
                               const res = await axios.get(
                                 `http://localhost:3000/ai/history/${his.id}`,
@@ -499,10 +491,12 @@ function Chat() {
                                 }
                               );
                               const data = res.data.data;
-                              const chats = Array.isArray(data) ? data.map(chat => ({
-                                sender: chat.sender,
-                                text: chat.text,
-                              })) : [];
+                              const chats = Array.isArray(data)
+                                ? data.map((chat) => ({
+                                    sender: chat.sender,
+                                    text: chat.text,
+                                  }))
+                                : [];
                               setChatHistory(chats);
                             } catch (err) {
                               setError(
@@ -532,8 +526,7 @@ function Chat() {
                 <form
                   onSubmit={async (e) => {
                     e.preventDefault();
-                    const token = localStorage.getItem("token");
-                    const userId = fetchIdFromToken();
+
                     if (!chatTitle || !userId) return;
 
                     try {
@@ -638,7 +631,8 @@ function Chat() {
               onChange={handleInputChange}
               placeholder={
                 droppedFile
-                  ? "Enter a description for the file..."
+                  ? // ? "Enter a description for the file..."
+                    "Type your message..."
                   : "Type your message..."
               }
               className={styles.query_field}

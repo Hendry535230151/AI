@@ -4,22 +4,33 @@ const historyModel = require("../models/History");
 const CustomError = require("../errors/CustomError");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
-const handleQueryFile = require("../utils/handle_query/handleQueryFile");
-
+const fileModel = require("../models/Files");
+const handleQueryGetFile = require("../utils/handle_query/handleQueryFile");
+const handleQueryInsertFile = require("../utils/handle_query/handleQueryInsertFile");
 const aiService = {
   aiChatting: async (userId, message, providedHistoryId) => {
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
-    
-    const chatHistoryId = providedHistoryId || await historyModel.createHistory(userId);
+    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-    const handledQuery = await handleQueryFile(message, userId);
+    const chatHistoryId =
+      providedHistoryId || (await historyModel.createHistory(userId));
+
+    const handledQuery = await handleQueryGetFile(message, userId);
     if (handledQuery) {
-      const userChat = await chatModel.insertChat(chatHistoryId, userId, "user", message);
+      const userChat = await chatModel.insertChat(
+        chatHistoryId,
+        userId,
+        "user",
+        message
+      );
       if (!userChat) {
         throw new CustomError("Error A", 500);
       }
-      const aiChat = await chatModel.insertChat(chatHistoryId, userId, "ai", handledQuery);
+      const aiChat = await chatModel.insertChat(
+        chatHistoryId,
+        userId,
+        "ai",
+        handledQuery
+      );
       if (!aiChat) {
         throw new CustomError("Error B", 500);
       }
@@ -35,15 +46,92 @@ const aiService = {
     const response = await result.response;
     const text = response.text();
 
-    const userChat = await chatModel.insertChat(chatHistoryId, userId, "user", message);
+    const userChat = await chatModel.insertChat(
+      chatHistoryId,
+      userId,
+      "user",
+      message
+    );
     if (!userChat) {
       throw new CustomError("Error A", 500);
     }
-    const aiChat = await chatModel.insertChat(chatHistoryId, userId, "ai", text);
+    const aiChat = await chatModel.insertChat(
+      chatHistoryId,
+      userId,
+      "ai",
+      text
+    );
     if (!aiChat) {
       throw new CustomError("Error B", 500);
     }
     return text;
+  },
+
+  aiInsertFile: async (
+    userId,
+    fileName,
+    fileType,
+    fileSize,
+    fileBuffer,
+    description,
+    chatHistoryId
+  ) => {
+    try {
+      const response = await handleQueryInsertFile(
+        userId,
+        fileName,
+        description
+      );
+
+      if (response.action === "error") {
+        throw new CustomError(response.message, 400);
+      }
+
+      if (response.action === "create_dir") {
+        return response.message;
+      }
+
+      if (response.action === "noop") {
+        return response.message;
+      }
+
+      const success = await fileModel.insertFile(
+        userId,
+        response.directoryId,
+        fileName,
+        fileType,
+        fileSize,
+        fileBuffer,
+        response.keyword
+      );
+
+      if (!success) {
+        throw new CustomError("Failed to upload file", 501);
+      }
+      const userChat = await chatModel.insertChat(
+        chatHistoryId,
+        userId,
+        "user",
+        `📎 ${fileName}\n\n${description}`
+      );
+      if (!userChat) {
+        throw new CustomError("Error No User Chat", 500);
+      }
+
+      const aiChat = await chatModel.insertChat(
+        chatHistoryId,
+        userId,
+        "ai",
+        response.message || response
+      );
+      if (!aiChat) {
+        throw new CustomError("Error No Ai Chat", 500);
+      }
+
+      return response.message;
+    } catch (err) {
+      throw err;
+    }
   },
 
   getChatByUserId: async (userId) => {

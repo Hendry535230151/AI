@@ -50,18 +50,68 @@ const historyService = {
     },
 
     createHistory: async (userId, title) => {
-        if (!userId) {
-            throw new customError('User ID and title are required.', 400);
-        } else if (!title) {
-            throw new customError('User ID and title are required.', 400);
+        try {
+            if (!userId) {
+              throw new customError(
+                "User ID and Directory name are required. Please provide valid data and try again.",
+                400
+              );
+            } else if (!title) {
+              throw new customError("Error");
+            }
+      
+            const checkDuplicate = await historyModel.checkDuplicateTitle(
+              userId,
+              title
+            );
+            if (checkDuplicate) {
+              throw new customError("Error");
+            }
+            const createTitle = await historyModel.createHistory(
+              userId,
+              title,
+            );
+            if (!createTitle) {
+              throw new customError(
+                "Failed to create Title. Please check the input and try again.",
+                500
+              );
+            }
+            return createTitle;
+          } catch (err) {
+            throw err;
+          }
+        },
+
+    updateHistoryById: async (id, userId, title) => {
+        try {
+          if (!id) {
+            throw new customError(
+              "Title ID and new name are required. Please provide valid data and try again.",
+              400
+            );
+          } else if (!userId) {
+            throw new customError("User Id not found");
+          } else if (!title) {
+            throw new customError("Title Dont have");
+          }
+
+          const updateName = await historyModel.updateHistoryById(
+            id,
+            userId,
+            title
+          );
+          if (!updateName) {
+            throw new customError(
+              `Failed to update title with ID: ${id}. Please verify the ID and try again.`,
+              404
+            );
+          }
+          return updateName;
+        } catch (err) {
+          throw err;
         }
-        
-        const created = await historyModel.createHistory(userId, title);
-        if (!created) {
-            throw new customError('Failed to create history.', 500);
-        }
-        return created; 
-    },
+      },
       
     deleteHistoryById: async (id) => {
         try {

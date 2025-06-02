@@ -7,6 +7,6 @@ router.get("/", historyController.getAllHistories);
 router.get("/:id", historyController.getHistoryById);
 router.get("/user/:userId", historyController.getHistoryByUserId);
 router.delete("/:id", historyController.deleteHistoryById);
-
+router.put("/:id", historyController.updateHistoryById);
 
 module.exports = router;

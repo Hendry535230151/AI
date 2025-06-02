@@ -40,6 +40,30 @@ const historyController = {
         }
     },
 
+      updateHistoryById: async (req, res) => {
+        const { id } = req.params;
+        const { userId, title } = req.body;
+
+        try {
+            const updated = await historyService.updateHistoryById(
+              id,
+              userId,
+              title,
+            );
+            res.status(200).json({
+              success: true,
+              message: "Title updated successfully",
+              data: updated,
+            });
+          } catch (err) {
+            res.status(err.statusCode || 500).json({
+              success: false,
+              message: err.message || "Failed to update title",
+            });
+          }
+        },
+
+
     deleteHistoryById: async (req, res) => {
         const { id } = req.params;
 

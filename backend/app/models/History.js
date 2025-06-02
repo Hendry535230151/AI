@@ -49,8 +49,26 @@ const historyModel = {
         });
     },
 
+    checkDuplicateTitle: (userId, title) => {
+        return new Promise((resolve, reject) => {
+          const query =
+            "SELECT * FROM chat_histories WHERE title = ? AND user_id = ?";
+          db.query(query, [title, userId], (err, result) => {
+            if (err) {
+              return reject(err);
+            }
+            if (!result || result.length === 0) {
+              resolve(false);
+            } else {
+              resolve(result);
+            }
+          });
+        });
+      },
+    
 
-    createHistory: (userId, title= "new chat") => {
+
+    createHistory: (userId, title) => {
         return new Promise((resolve, reject) => {
           const query = 'INSERT INTO chat_histories (user_id, title) VALUES (?, ?)';
           db.query(query, [userId, title], (err, result) => {
@@ -65,6 +83,24 @@ const historyModel = {
           });
         });
     },
+
+    updateHistoryById: (id, userId, title) => {
+        return new Promise((resolve, reject) => {
+          const query =
+            "UPDATE chat_histories SET title = ? WHERE id = ? AND user_id = ?"
+          db.query(query, [title, id, userId], (err, result) => {
+            if (err) {
+              return reject(err);
+            }
+            if (!result || result.affectedRows === 0) {
+              resolve(false);
+            } else {
+              resolve(result);
+            }
+          });
+        });
+      },
+    
       
 
     deleteHistoryById: (id) => {

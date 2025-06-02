@@ -33,10 +33,27 @@ const fileModel = {
     });
   },
 
-  getFileByUserId: (user_id) => {
+  getFileByUserId: (userId) => {
     return new Promise((resolve, reject) => {
       const query = "SELECT * FROM files WHERE user_id = ?";
-      db.query(query, [user_id], (err, result) => {
+      db.query(query, [userId], (err, result) => {
+        if (err) {
+          return reject(err);
+        }
+        if (!result || result.length === 0) {
+          resolve(false);
+        } else {
+          resolve(result);
+        }
+      });
+    });
+  },
+
+  getFilesByDirectoryId: (directoryId) => {
+    return new Promise((resolve, reject) => {
+      const query = "SELECT * FROM files WHERE directory_id = ?";
+      db.query(query, [directoryId], (err, result) => {
+        console.log(result)
         if (err) {
           return reject(err);
         }

@@ -122,6 +122,22 @@ const directoryModel = {
     });
   },
 
+  updateDirecotryFileCount: (id, totalFiles) => {
+    return new Promise((resolve, reject) => {
+      const query = 'UPDATE directories SET total_files = ? WHERE id = ?';
+      db.query(query, [totalFiles, id], (err, result) => {
+        if (err) {
+          return reject(err);
+        } 
+        if (!result || result.affectedRows === 0) {
+          resolve(false);
+        } else {
+          resolve(result);
+        }
+      });
+    });
+  },
+
   deleteDirectory: (id) => {
     return new Promise((resolve, reject) => {
       const query = "DELETE FROM directories WHERE id = ?";

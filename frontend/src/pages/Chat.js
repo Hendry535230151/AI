@@ -13,7 +13,6 @@ function Chat() {
   const [chatHistoryList, setChatHistoryList] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [editingTitle, setEditingTitle] = useState("");
-
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [chatTitle, setChatTitle] = useState("");
@@ -33,58 +32,57 @@ function Chat() {
   const token = localStorage.getItem("token");
   const userId = fetchIdFromToken();
 
-    const fetchDirectory = async () => {
-      if (!token) {
-        setError("User not authenticated. Please login.");
-        return;
-      }
-      try {
-        const res = await axios.get(
-          `http://localhost:3000/directories/find-user-directory/${userId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        setDirectoryList(res.data.data);
-      } catch (err) {
-        setError("Failed to load directory");
-      }
-    };
-
-    const updateTotalFiles = async () => {
-      if (!token || !userId) {
-        setError("User not authenticated. Please login.");
-        return;
-      }
-
-      try {
-        const res = await axios.put(
-          `http://localhost:3000/directories/update-total-file/${userId}`,
-          {},
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        console.log("Update total file success:", res.data.message);
-        fetchDirectory();
-      } catch (err) {
-        let errMsg = "";
-        if (err.response) {
-          errMsg = `${err.response.data.message || "Request failed"}`;
-        } else if (err.request) {
-          errMsg = "No response from server.";
-        } else {
-          errMsg = err.message;
+  const fetchDirectory = async () => {
+    if (!token) {
+      setError("User not authenticated. Please login.");
+      return;
+    }
+    try {
+      const res = await axios.get(
+        `http://localhost:3000/directories/find-user-directory/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-        setError(errMsg);
-        console.error("Error update total file:", errMsg);
-      }
-    };
+      );
+      setDirectoryList(res.data.data);
+    } catch (err) {
+      setError("Failed to load directory");
+    }
+  };
 
+  const updateTotalFiles = async () => {
+    if (!token || !userId) {
+      setError("User not authenticated. Please login.");
+      return;
+    }
+
+    try {
+      const res = await axios.put(
+        `http://localhost:3000/directories/update-total-file/${userId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("Update total file success:", res.data.message);
+      fetchDirectory();
+    } catch (err) {
+      let errMsg = "";
+      if (err.response) {
+        errMsg = `${err.response.data.message || "Request failed"}`;
+      } else if (err.request) {
+        errMsg = "No response from server.";
+      } else {
+        errMsg = err.message;
+      }
+      setError(errMsg);
+      console.error("Error update total file:", errMsg);
+    }
+  };
 
   useEffect(() => {
     const fetchTheme = async () => {
@@ -579,93 +577,114 @@ function Chat() {
                           placeholder="Enter new chat topic title..."
                           required
                         />
-                        <button type="submit" className={styles.new_history_button}>
-                          <i className={`fa-solid fa-plus ${styles.new_history_icon}`}></i>
+                        <button
+                          type="submit"
+                          className={styles.new_history_button}
+                        >
+                          <i
+                            className={`fa-solid fa-plus ${styles.new_history_icon}`}
+                          ></i>
                         </button>
                       </form>
                     </div>
                     <ul className={styles.dropdown_list}>
-                    {chatHistoryList.map((his, idx) => (
-                      <li
-                        key={idx}
-                        className={styles.dropdown_item}
-                        onClick={async () => {
-                          if (editingId) return;
-                          setChatHistoryId(his.id);
-                          setChatTitle(his.title);
-                          setChatHistory([]);
-                          await fetchChatHistory();
-                          try {
-                            const res = await axios.get(`http://localhost:3000/ai/history/${his.id}`, {
-                              headers: { Authorization: `Bearer ${token}` },
-                            });
-                            const data = res.data.data;
-                            const chats = Array.isArray(data)
-                              ? data.map((chat) => ({ sender: chat.sender, text: chat.text }))
-                              : [];
-                            setChatHistory(chats);
-                          } catch {
-                            setError("Failed to load chat history for selected topic");
-                          }
-                        }}
-                      >
-                        {editingId === his.id ? (
-                          <>
-                            <div className={styles.rename_container}>
-                              <input
-                                className={styles.rename_input}
-                                value={editingTitle}
-                                onChange={(e) => setEditingTitle(e.target.value)}
-                                onClick={(e) => e.stopPropagation()}
-                              />
-                              <div className={styles.rename_button_group}>
-                                <button
-                                className={styles.rename_button}
-                                  onClick={async (e) => {
-                                    e.stopPropagation();
-                                    try {
-                                      await axios.put(
-                                        `http://localhost:3000/chat-history/${his.id}`,
-                                        { title: editingTitle, userId },
-                                        { headers: { Authorization: `Bearer ${token}` } }
-                                      );
-                                      const updatedList = [...chatHistoryList];
-                                      updatedList[idx].title = editingTitle;
-                                      setChatHistoryList(updatedList);
+                      {chatHistoryList.map((his, idx) => (
+                        <li
+                          key={idx}
+                          className={styles.dropdown_item}
+                          onClick={async () => {
+                            if (editingId) return;
+                            setChatHistoryId(his.id);
+                            setChatTitle(his.title);
+                            setChatHistory([]);
+                            await fetchChatHistory();
+                            try {
+                              const res = await axios.get(
+                                `http://localhost:3000/ai/history/${his.id}`,
+                                {
+                                  headers: { Authorization: `Bearer ${token}` },
+                                }
+                              );
+                              const data = res.data.data;
+                              const chats = Array.isArray(data)
+                                ? data.map((chat) => ({
+                                    sender: chat.sender,
+                                    text: chat.text,
+                                  }))
+                                : [];
+                              setChatHistory(chats);
+                            } catch {
+                              setError(
+                                "Failed to load chat history for selected topic"
+                              );
+                            }
+                          }}
+                        >
+                          {editingId === his.id ? (
+                            <>
+                              <div className={styles.rename_container}>
+                                <input
+                                  className={styles.rename_input}
+                                  value={editingTitle}
+                                  onChange={(e) =>
+                                    setEditingTitle(e.target.value)
+                                  }
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                                <div className={styles.rename_button_group}>
+                                  <button
+                                    className={styles.rename_button}
+                                    onClick={async (e) => {
+                                      e.stopPropagation();
+                                      try {
+                                        await axios.put(
+                                          `http://localhost:3000/chat-history/${his.id}`,
+                                          { title: editingTitle, userId },
+                                          {
+                                            headers: {
+                                              Authorization: `Bearer ${token}`,
+                                            },
+                                          }
+                                        );
+                                        const updatedList = [
+                                          ...chatHistoryList,
+                                        ];
+                                        updatedList[idx].title = editingTitle;
+                                        setChatHistoryList(updatedList);
+                                        setEditingId(null);
+                                      } catch {
+                                        setError("Failed to update title");
+                                      }
+                                    }}
+                                  >
+                                    <i className="fa-solid fa-floppy-disk"></i>
+                                  </button>
+                                  <button
+                                    className={styles.rename_button}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
                                       setEditingId(null);
-                                    } catch {
-                                      setError("Failed to update title");
-                                    }
-                                  }}
-                                >
-                                  <i className="fa-solid fa-floppy-disk"></i>
-                                </button>
-                                <button
-                                  className={styles.rename_button}
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setEditingId(null);
-                                  }}
-                                >
-                                  <i className="fa-solid fa-xmark"></i>
-                                </button>
+                                    }}
+                                  >
+                                    <i className="fa-solid fa-xmark"></i>
+                                  </button>
+                                </div>
                               </div>
-                            </div>
-                          </>
-                        ) : (
-                          <>
-                            {his.title}
-                            <button
-                              className={styles.rename_button}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setEditingId(his.id);
-                                setEditingTitle(his.title);
-                              }}
-                            >
-                              <i className="fa-solid fa-pen"></i>
-                            </button>
-                            <button
+                            </>
+                          ) : (
+                            <>
+                              {his.title}
+                              <button
+                                className={styles.rename_button}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setEditingId(his.id);
+                                  setEditingTitle(his.title);
+                                }}
+                              >
+                                <i className="fa-solid fa-pen"></i>
+                              </button>
+                              <button
                                 className={styles.rename_button}
                                 onClick={async () => {
                                   try {
@@ -677,20 +696,22 @@ function Chat() {
                                         },
                                       }
                                     );
-                                    const updatedList = chatHistoryList.filter((_, i) => i !== idx);
+                                    const updatedList = chatHistoryList.filter(
+                                      (_, i) => i !== idx
+                                    );
                                     setChatHistoryList(updatedList);
                                   } catch (err) {
                                     setError("Failed to delete history");
                                   }
                                 }}
                               >
-                              <i className="fa-solid fa-trash"></i>
-                            </button>
-                          </>
-                        )}
-                      </li>
-                    ))}
-                  </ul>    
+                                <i className="fa-solid fa-trash"></i>
+                              </button>
+                            </>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
                   </>
                 )}
               </div>
@@ -787,7 +808,7 @@ function Chat() {
                   : ""
               }
               required={!droppedFile}
-            />  
+            />
             <button
               type="submit"
               ref={bottomButton}

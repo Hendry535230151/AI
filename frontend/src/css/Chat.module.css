@@ -98,6 +98,7 @@ body::-webkit-scrollbar {
   border-radius: 10px;
   background-color: var(--secondary-color);
 }
+
 .dropdown_list {
   padding: 0 0 0 10px;
   list-style-type: none;
@@ -117,6 +118,43 @@ body::-webkit-scrollbar {
 .dropdown_item {
   width: 100%;
   margin: 10px 0;
+}
+
+.dropdown_items {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 5px 0;
+  padding: 10px;
+  font-size: 12px;
+  color: var(--text-color);
+  border: 2px solid #ffffff;
+  border-radius: 15px;
+}
+
+.dropdown_buttons button {
+  font-size: 11px;
+  margin: 2px;
+  padding: 4px 4px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background-color: var(--button-color, #4a4a4a);
+  color: var(--button-text-color, #ffffff);
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.dropdown_items input {
+  font-size: 12px;
+  padding: 6px 10px;
+  margin-right: 3px;
+  border: 1px solid var(--thin-color, #cccccc);
+  border-radius: 6px;
+  background-color: var(--background-color, #2b2b2b);
+  color: var(--text-color, #ffffff);
+  width: 50%;
+  outline: none;
+  transition: border 0.2s ease, background-color 0.2s ease;
 }
 
 .active {

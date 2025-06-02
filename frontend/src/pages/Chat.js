@@ -13,7 +13,6 @@ function Chat() {
   const [chatHistoryList, setChatHistoryList] = useState([]);
   const [editingId, setEditingId] = useState(null);
   const [editingTitle, setEditingTitle] = useState("");
-
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [chatTitle, setChatTitle] = useState("");
@@ -475,7 +474,7 @@ function Chat() {
                   {chatHistoryList.map((his, idx) => (
                     <li
                       key={idx}
-                      className={styles.dropdown_item}
+                      className={styles.dropdown_items}
                       onClick={async () => {
                         if (editingId) return;
                         setChatHistoryId(his.id);
@@ -503,6 +502,7 @@ function Chat() {
                             onChange={(e) => setEditingTitle(e.target.value)}
                             onClick={(e) => e.stopPropagation()}
                           />
+                          <div className={styles.dropdown_buttons}>
                           <button
                             onClick={async (e) => {
                               e.stopPropagation();
@@ -531,10 +531,12 @@ function Chat() {
                           >
                             Cancel
                           </button>
+                          </div>
                         </>
                       ) : (
                         <>
-                          {his.title}
+                        <span>{his.title}</span>
+                        <div className={styles.dropdown_buttons}>
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
@@ -564,6 +566,7 @@ function Chat() {
                             >
                               🗑️
                             </button>
+                            </div>
                         </>
                       )}
                     </li>

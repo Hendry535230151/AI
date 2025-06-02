@@ -63,6 +63,7 @@ body::-webkit-scrollbar {
 .sidebar_icon {
   font-size: 20px;
   font-weight: 100px;
+  color: var(--main-color);
 }
 
 .dropdown_group {
@@ -71,7 +72,6 @@ body::-webkit-scrollbar {
   height: 500px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
 }
 
 .dropdown_area {
@@ -111,12 +111,13 @@ body::-webkit-scrollbar {
 .dropdown_text,
 .dropdown_icon,
 .dropdown_item {
-  font-size: 12px;
+  font-size: 15px;
   color: var(--text-color);
 }
 
 .dropdown_item {
-  margin: 5px 0;
+  width: 100%;
+  margin: 10px 0;
 }
 
 .dropdown_items {
@@ -190,6 +191,11 @@ body::-webkit-scrollbar {
 .profile_name {
   margin: 0 0 0 10px;
   color: var(--thin-color);
+}
+
+.profile_icon {
+  color: var(--main-color);
+  font-size: 15px;
 }
 
 .main_area {
@@ -357,6 +363,7 @@ body::-webkit-scrollbar {
 }
 
 .query_icon {
+  color: var(--main-color);
   font-size: 18px;
 }
 
@@ -485,6 +492,11 @@ body::-webkit-scrollbar {
   background-color: var(--secondary-color);
 }
 
+.setting_group li:last-of-type {
+  background-color: #b10909;
+  color: #f5f5f5
+}
+
 .setting_active,
 .setting_active {
   color: var(--thin-color);
@@ -553,6 +565,10 @@ body::-webkit-scrollbar {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.change_request_icon {
+  color: var(--main-color);
 }
 
 .setting_title_type {
@@ -667,11 +683,38 @@ body::-webkit-scrollbar {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
-.container3 {
+.rename_container {
+  width: 100%;
+  height: 20px;
+  position: relative;
+}
+
+.rename_input {
+  width: 100%;
+  padding: 0 50px 0 0;
+  color: var(--text-color);
+  background-color: transparent;
+  border-bottom: 1px solid var(--bold-color);
+  border-radius: 5px;
+}
+
+.rename_button_group {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.rename_button {
+  margin: 0 5px;
+  background-color: transparent;
+  color: var(--bold-color);
+  cursor: pointer;
+}
+
+.new_history_container {
   width: 100%;
   max-width: 900px;
   margin: 10px auto;
-  padding: 15px;
   background-color: var(--secondary-color);
   border-radius: 10px;
   display: flex;
@@ -679,43 +722,33 @@ body::-webkit-scrollbar {
   gap: 10px;
 }
 
-.container3 form {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 10px;
+.new_history_form {
+  height: 25px;
+  position: relative;
 }
 
-.container3 input[type="text"] {
-  flex: 1;
-  padding: 10px 15px;
-  border-radius: 20px;
-  border: 1px solid var(--bold-color);
+.new_history_input {
+  width: 100%;
+  height: 100%;
+  padding: 0 0 0 10px;
+  border-radius: 5px;
+  border-bottom: 1px solid var(--bold-color);
   background-color: var(--main-color);
-  color: #f5f5f5;
-  font-size: 0.9rem;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text-color);
 }
 
-.container3 input[type="text"]::placeholder {
-  color: #cccccc;
-}
-
-.container3 button {
-  padding: 10px 20px;
-  background-color: #eaca91;
-  color: #131313;
-  border: none;
-  border-radius: 20px;
+.new_history_button {
+  width: 25px;
+  height: 100%;
+  background-color: var(--bold-color);
+  color: var(--text-color);
+  border-radius: 5px;
   cursor: pointer;
-  font-weight: bold;
-  transition: background-color 0.2s ease;
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 
-.container3 button:hover {
-  background-color: #d9b773;
-}
-
-i {
+.new_history_icon {
   color: var(--main-color);
 }

@@ -101,6 +101,22 @@ const directoryController = {
     }
   },
 
+  updateTotalFiles: async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+      await directoryService.updateTotalFiles(userId); 
+      res
+        .status(200)
+        .json({ success: true, message: "Total file already updated" });
+    } catch (err) {
+      res.status(err.statusCode || 500).json({
+        success: false,
+        message: err.message || "Failed to delete directory",
+      });
+    } 
+  },
+
   deleteDirectory: async (req, res) => {
     const { id } = req.params;
 

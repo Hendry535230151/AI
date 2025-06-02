@@ -32,6 +32,58 @@ function Chat() {
   const token = localStorage.getItem("token");
   const userId = fetchIdFromToken();
 
+  const fetchDirectory = async () => {
+    if (!token) {
+      setError("User not authenticated. Please login.");
+      return;
+    }
+    try {
+      const res = await axios.get(
+        `http://localhost:3000/directories/find-user-directory/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setDirectoryList(res.data.data);
+    } catch (err) {
+      setError("Failed to load directory");
+    }
+  };
+
+  const updateTotalFiles = async () => {
+    if (!token || !userId) {
+      setError("User not authenticated. Please login.");
+      return;
+    }
+
+    try {
+      const res = await axios.put(
+        `http://localhost:3000/directories/update-total-file/${userId}`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log("Update total file success:", res.data.message);
+      fetchDirectory();
+    } catch (err) {
+      let errMsg = "";
+      if (err.response) {
+        errMsg = `${err.response.data.message || "Request failed"}`;
+      } else if (err.request) {
+        errMsg = "No response from server.";
+      } else {
+        errMsg = err.message;
+      }
+      setError(errMsg);
+      console.error("Error update total file:", errMsg);
+    }
+  };
+
   useEffect(() => {
     const fetchTheme = async () => {
       if (!token) {
@@ -125,26 +177,6 @@ function Chat() {
     let dragCounter = 0;
     let dragLeaveTimeout;
 
-    const fetchDirectory = async () => {
-      if (!token) {
-        setError("User not authenticated. Please login.");
-        return;
-      }
-      try {
-        const res = await axios.get(
-          `http://localhost:3000/directories/find-user-directory/${userId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        setDirectoryList(res.data.data);
-      } catch (err) {
-        setError("Failed to load directory");
-      }
-    };
-
     const handleWindowDragOver = (e) => {
       e.preventDefault();
       dragCounter++;
@@ -227,6 +259,27 @@ function Chat() {
 
     setChatHistory((prev) => [...prev, { sender: "user", text: userMessage }]);
 
+    const updateFileCount = async () => {
+      if (!token) {
+        setError("User not authenticated. Please login.");
+        return;
+      }
+
+      try {
+        const res = await axios.put(
+          `http://localhost:3000/directories/update-total-file/${userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setDirectoryList(res.data.data);
+      } catch (err) {
+        setError("Failed to load directory");
+      }
+    };
+
     try {
       if (droppedFile) {
         const formData = new FormData();
@@ -244,6 +297,8 @@ function Chat() {
             },
           }
         );
+
+        await updateTotalFiles();
 
         setChatHistory((prev) => [
           ...prev,
@@ -277,7 +332,6 @@ function Chat() {
         ]);
       }
 
-      // setMessage("");
       setError("");
     } catch (err) {
       let errMsg = "";
@@ -314,22 +368,30 @@ function Chat() {
   };
 
   const directoryTree = useMemo(
-    () => buildDirectoryTree(directoryList),
+    () => (directoryList ? buildDirectoryTree(directoryList) : []),
     [directoryList]
   );
 
   const renderDirectoryTree = (nodes, level = 0) => {
     return (
-      <ul style={{ listStyleType: "none", paddingLeft: level === 0 ? 0 : 10 }}>
+      <ul
+        style={{
+          listStyleType: "none",
+          paddingLeft: level === 0 ? 0 : level * 10,
+        }}
+      >
         {nodes.map((node) => (
           <li
             key={node.id}
             className={styles.dropdown_item}
-            style={{ paddingLeft: level }}
+            style={{
+              paddingLeft: level * 10,
+              cursor: "pointer",
+            }}
           >
             <i className="fa-solid fa-folder"></i> {node.directory_name}{" "}
             <span style={{ color: "gray", fontSize: "0.9em" }}>
-              ({node.file_count ?? 0} files)
+              ({node.total_files ?? 0} files)
             </span>
             {node.children &&
               node.children.length > 0 &&
@@ -470,154 +532,188 @@ function Chat() {
                   ></i>
                 </button>
                 {!isClosedHistory && (
-                  <ul className={styles.dropdown_list}>
-                  {chatHistoryList.map((his, idx) => (
-                    <li
-                      key={idx}
-                      className={styles.dropdown_items}
-                      onClick={async () => {
-                        if (editingId) return;
-                        setChatHistoryId(his.id);
-                        setChatTitle(his.title);
-                        setChatHistory([]);
-                        await fetchChatHistory();
-                        try {
-                          const res = await axios.get(`http://localhost:3000/ai/history/${his.id}`, {
-                            headers: { Authorization: `Bearer ${token}` },
-                          });
-                          const data = res.data.data;
-                          const chats = Array.isArray(data)
-                            ? data.map((chat) => ({ sender: chat.sender, text: chat.text }))
-                            : [];
-                          setChatHistory(chats);
-                        } catch {
-                          setError("Failed to load chat history for selected topic");
-                        }
-                      }}
+                  <>
+                    <div
+                      className={`${styles.new_history_container} ${
+                        isClosedDirectory && isClosedHistory
+                          ? styles.dropdown_area
+                          : styles.close_dropdown
+                      }`}
                     >
-                      {editingId === his.id ? (
-                        <>
-                          <input
-                            value={editingTitle}
-                            onChange={(e) => setEditingTitle(e.target.value)}
-                            onClick={(e) => e.stopPropagation()}
-                          />
-                          <div className={styles.dropdown_buttons}>
-                          <button
-                            onClick={async (e) => {
-                              e.stopPropagation();
-                              try {
-                                await axios.put(
-                                  `http://localhost:3000/chat-history/${his.id}`,
-                                  { title: editingTitle, userId },
-                                  { headers: { Authorization: `Bearer ${token}` } }
-                                );
-                                const updatedList = [...chatHistoryList];
-                                updatedList[idx].title = editingTitle;
-                                setChatHistoryList(updatedList);
-                                setEditingId(null);
-                              } catch {
-                                setError("Failed to update title");
+                      <form
+                        className={styles.new_history_form}
+                        onSubmit={async (e) => {
+                          e.preventDefault();
+
+                          if (!chatTitle || !userId) return;
+
+                          try {
+                            const response = await axios.post(
+                              "http://localhost:3000/chat-history/",
+                              {
+                                title: chatTitle,
+                                userId: userId,
+                              },
+                              {
+                                headers: {
+                                  Authorization: `Bearer ${token}`,
+                                },
                               }
-                            }}
-                          >
-                            Simpan
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setEditingId(null);
-                            }}
-                          >
-                            Cancel
-                          </button>
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                        <span>{his.title}</span>
-                        <div className={styles.dropdown_buttons}>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setEditingId(his.id);
-                              setEditingTitle(his.title);
-                            }}
-                          >
-                            ✏️
-                          </button>
-                          <button
-                              onClick={async () => {
-                                try {
-                                  await axios.delete(
-                                    `http://localhost:3000/chat-history/${his.id}`,
-                                    {
-                                      headers: {
-                                        Authorization: `Bearer ${token}`,
-                                      },
-                                    }
-                                  );
-                                  const updatedList = chatHistoryList.filter((_, i) => i !== idx);
-                                  setChatHistoryList(updatedList);
-                                } catch (err) {
-                                  setError("Failed to delete history");
+                            );
+                            setChatHistoryId(response.data.data.id);
+                            setChatHistory([]);
+                            setChatTitle("");
+                            await fetchChatHistory();
+                          } catch (err) {
+                            console.error("Failed to create chat history", err);
+                          }
+                        }}
+                      >
+                        <input
+                          className={styles.new_history_input}
+                          type="text"
+                          value={chatTitle}
+                          onChange={(e) => setChatTitle(e.target.value)}
+                          placeholder="Enter new chat topic title..."
+                          required
+                        />
+                        <button
+                          type="submit"
+                          className={styles.new_history_button}
+                        >
+                          <i
+                            className={`fa-solid fa-plus ${styles.new_history_icon}`}
+                          ></i>
+                        </button>
+                      </form>
+                    </div>
+                    <ul className={styles.dropdown_list}>
+                      {chatHistoryList.map((his, idx) => (
+                        <li
+                          key={idx}
+                          className={styles.dropdown_item}
+                          onClick={async () => {
+                            if (editingId) return;
+                            setChatHistoryId(his.id);
+                            setChatTitle(his.title);
+                            setChatHistory([]);
+                            await fetchChatHistory();
+                            try {
+                              const res = await axios.get(
+                                `http://localhost:3000/ai/history/${his.id}`,
+                                {
+                                  headers: { Authorization: `Bearer ${token}` },
                                 }
-                              }}
-                            >
-                              🗑️
-                            </button>
-                            </div>
-                        </>
-                      )}
-                    </li>
-                  ))}
-                </ul>                
+                              );
+                              const data = res.data.data;
+                              const chats = Array.isArray(data)
+                                ? data.map((chat) => ({
+                                    sender: chat.sender,
+                                    text: chat.text,
+                                  }))
+                                : [];
+                              setChatHistory(chats);
+                            } catch {
+                              setError(
+                                "Failed to load chat history for selected topic"
+                              );
+                            }
+                          }}
+                        >
+                          {editingId === his.id ? (
+                            <>
+                              <div className={styles.rename_container}>
+                                <input
+                                  className={styles.rename_input}
+                                  value={editingTitle}
+                                  onChange={(e) =>
+                                    setEditingTitle(e.target.value)
+                                  }
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                                <div className={styles.rename_button_group}>
+                                  <button
+                                    className={styles.rename_button}
+                                    onClick={async (e) => {
+                                      e.stopPropagation();
+                                      try {
+                                        await axios.put(
+                                          `http://localhost:3000/chat-history/${his.id}`,
+                                          { title: editingTitle, userId },
+                                          {
+                                            headers: {
+                                              Authorization: `Bearer ${token}`,
+                                            },
+                                          }
+                                        );
+                                        const updatedList = [
+                                          ...chatHistoryList,
+                                        ];
+                                        updatedList[idx].title = editingTitle;
+                                        setChatHistoryList(updatedList);
+                                        setEditingId(null);
+                                      } catch {
+                                        setError("Failed to update title");
+                                      }
+                                    }}
+                                  >
+                                    <i className="fa-solid fa-floppy-disk"></i>
+                                  </button>
+                                  <button
+                                    className={styles.rename_button}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setEditingId(null);
+                                    }}
+                                  >
+                                    <i className="fa-solid fa-xmark"></i>
+                                  </button>
+                                </div>
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              {his.title}
+                              <button
+                                className={styles.rename_button}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setEditingId(his.id);
+                                  setEditingTitle(his.title);
+                                }}
+                              >
+                                <i className="fa-solid fa-pen"></i>
+                              </button>
+                              <button
+                                className={styles.rename_button}
+                                onClick={async () => {
+                                  try {
+                                    await axios.delete(
+                                      `http://localhost:3000/chat-history/${his.id}`,
+                                      {
+                                        headers: {
+                                          Authorization: `Bearer ${token}`,
+                                        },
+                                      }
+                                    );
+                                    const updatedList = chatHistoryList.filter(
+                                      (_, i) => i !== idx
+                                    );
+                                    setChatHistoryList(updatedList);
+                                  } catch (err) {
+                                    setError("Failed to delete history");
+                                  }
+                                }}
+                              >
+                                <i className="fa-solid fa-trash"></i>
+                              </button>
+                            </>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </>
                 )}
-              </div>
-              <div
-                className={`${styles.container3} ${
-                  isClosedDirectory && isClosedHistory
-                    ? styles.dropdown_area
-                    : styles.close_dropdown
-                }`}
-              >
-                <form
-                  onSubmit={async (e) => {
-                    e.preventDefault();
-
-                    if (!chatTitle || !userId) return;
-
-                    try {
-                      const response = await axios.post(
-                        "http://localhost:3000/chat-history/",
-                        {
-                          title: chatTitle,
-                          userId: userId,
-                        },
-                        {
-                          headers: {
-                            Authorization: `Bearer ${token}`,
-                          },
-                        }
-                      );
-                      setChatHistoryId(response.data.data.id);
-                      setChatHistory([]);
-                      setChatTitle("");
-                      await fetchChatHistory();
-                    } catch (err) {
-                      console.error("Failed to create chat history", err);
-                    }
-                  }}
-                >
-                  <input
-                    type="text"
-                    value={chatTitle}
-                    onChange={(e) => setChatTitle(e.target.value)}
-                    placeholder="Enter new chat topic title..."
-                    required
-                  />
-                  <button type="submit">Start New Chat</button>
-                </form>
               </div>
             </>
           )}
@@ -628,7 +724,7 @@ function Chat() {
             onClick={() => setIsOpenSetting(true)}
           >
             <div className={styles.profile_circle}>
-              <i className="fa-solid fa-user"></i>
+              <i className={`fa-solid fa-user ${styles.profile_icon}`}></i>
             </div>
             {isClosedSidebar ? (
               <></>
@@ -637,7 +733,6 @@ function Chat() {
             )}
           </button>
         </div>
-        {/* <LogoutButton /> */}
       </div>
       <div className={styles.main_area}>
         <header className={styles.header}>
@@ -689,8 +784,7 @@ function Chat() {
               onChange={handleInputChange}
               placeholder={
                 droppedFile
-                  ? // ? "Enter a description for the file..."
-                    "Type your message..."
+                  ? "Enter a description for the file..."
                   : "Type your message..."
               }
               className={styles.query_field}

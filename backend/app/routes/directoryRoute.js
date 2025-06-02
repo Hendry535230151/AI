@@ -10,6 +10,7 @@ router.get(
   directoryController.getDirectoryByUserId
 );
 router.post("/create", directoryController.createDirectory);
+router.put("/update-total-file/:userId", directoryController.updateTotalFiles);
 router.put("/rename-directory/:id", directoryController.updateDirectoryName);
 router.delete("/delete-directory/:id", directoryController.deleteDirectory);
 

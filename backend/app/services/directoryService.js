@@ -1,5 +1,5 @@
 const directoryModel = require("../models/Directory");
-const fileModel = require("../models/Files")
+const fileModel = require("../models/Files");
 const CustomError = require("../errors/CustomError");
 
 const directoryService = {
@@ -122,9 +122,15 @@ const directoryService = {
           400
         );
       } else if (!userId) {
-        throw new CustomError("User ID is required. Please provide valid data and try again.", 400);
+        throw new CustomError(
+          "User ID is required. Please provide valid data and try again.",
+          400
+        );
       } else if (!directoryName) {
-        throw new CustomError("Directory name is required. Please provide valid data and try again", 400);
+        throw new CustomError(
+          "Directory name is required. Please provide valid data and try again",
+          400
+        );
       }
 
       const checkDuplicate = await directoryModel.checkDuplicateDirectory(
@@ -171,8 +177,6 @@ const directoryService = {
       for (const dir of directories) {
         try {
           const files = await fileModel.getFilesByDirectoryId(dir.id);
-          console.log("Directory ID:", dir.id);
-          console.log("Files:", files);
 
           const count = files ? files.length : 0;
           await directoryModel.updateDirecotryFileCount(dir.id, count);

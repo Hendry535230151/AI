@@ -68,7 +68,7 @@ function Chat() {
           },
         }
       );
-      console.log("Update total file success:", res.data.message);
+      // console.log("Update total file success:", res.data.message);
       fetchDirectory();
     } catch (err) {
       let errMsg = "";
@@ -322,6 +322,8 @@ function Chat() {
             },
           }
         );
+
+        await updateTotalFiles();
 
         setChatHistory((prev) => [
           ...prev,

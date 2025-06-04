@@ -493,22 +493,6 @@ function Chat() {
                 </button>
                 {!isClosedDirectory && (
                   <ul className={styles.dropdown_list}>
-                    {/* {directoryList.length > 0 ? (
-                    directoryList.map((dir, idx) => (
-                      <li
-                        key={idx}
-                        className={styles.dropdown_item}
-                        style={{ paddingLeft: `${dir.level * 20}px` }}
-                      >
-                        <i className="fa-solid fa-folder"></i>{' '}
-                        {dir.directory_name}
-                      </li>
-                    ))
-                  ) : (
-                    <li className={styles.dropdown_item}>
-                      No directories found
-                    </li>
-                  )} */}
                     {directoryTree.length > 0 ? (
                       renderDirectoryTree(directoryTree)
                     ) : (
@@ -702,6 +686,11 @@ function Chat() {
                                       (_, i) => i !== idx
                                     );
                                     setChatHistoryList(updatedList);
+                                    if (chatHistoryId === his.id) {
+                                      setChatHistoryId(null);
+                                      setChatHistory([]);
+                                      setChatTitle("");
+                                    }
                                   } catch (err) {
                                     setError("Failed to delete history");
                                   }

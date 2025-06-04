@@ -203,6 +203,29 @@ const fileService = {
       throw err;
     }
   },
+
+  clearUserFile: async (userId) => {
+    try {
+      if (!userId) {
+        throw new CustomError(
+          "User ID is required. Please provide a valid ID and try again.",
+          400
+        )
+      }
+
+      const deleteUserFile = await fileModel.deleteFileByUserId(userId);
+      if (!deleteUserFile) {
+        throw new CustomError(
+          `Failed to delete all file with user ID: ${userId}. Please try again.`,
+          400
+        )
+      }
+
+      return deleteUserFile;
+    } catch (err) {
+      throw err;
+    }
+  }
 };
 
 module.exports = fileService;

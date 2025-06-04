@@ -265,8 +265,14 @@ function Home() {
           <div className={styles.footer_section}>
             <h3 className={styles.footer_title}>Contact Us</h3>
             <div className={styles.footer_description}>
-              <p>📞 08xxxxxxxxxx</p>
-              <p>📧 Someone@example.com</p>
+              <p>
+                <i className={`fa-solid fa-phone ${styles.footer_icon}`}></i>
+                08xxxxxxxxxx
+              </p>
+              <p>
+                <i className={`fa-solid fa-envelope ${styles.footer_icon}`}></i>
+                Someone@example.com
+              </p>
             </div>
           </div>
 

@@ -132,6 +132,23 @@ const directoryController = {
       });
     }
   },
+
+  clearUserDirectory: async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+      const A = await directoryService.clearUserDirectory(userId);
+      console.log(A)
+      res
+        .status(200)
+        .json({ success: true, message: "Success to clear all directory"});
+    } catch (err) {
+      res.status(err.statusCode || 500).json({
+        success: false,
+        message: err.message || "Failed to clear directory",
+      });
+    }
+  }
 };
 
 module.exports = directoryController;

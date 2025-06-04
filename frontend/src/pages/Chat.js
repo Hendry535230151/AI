@@ -881,60 +881,61 @@ function Chat() {
         <div className={styles.new_history_container}>
           <div className={styles.new_history_card}>
             <h1 className={styles.new_history_title}>Enter your chat title</h1>
-            <form
-              className={styles.new_history_form}
-              onSubmit={async (e) => {
-                e.preventDefault();
+              <form
+                className={styles.new_history_form}
+                onSubmit={async (e) => {
+                  e.preventDefault();
 
-                if (!chatTitle || !userId) return;
+                  if (!chatTitle || !userId) return;
 
-                try {
-                  const response = await axios.post(
-                    "http://localhost:3000/chat-history/",
-                    {
-                      title: chatTitle,
-                      userId: userId,
-                    },
-                    {
-                      headers: {
-                        Authorization: `Bearer ${token}`,
+                  try {
+                    const response = await axios.post(
+                      "http://localhost:3000/chat-history/",
+                      {
+                        title: chatTitle,
+                        userId: userId,
                       },
-                    }
-                  );
-                  setChatHistoryId(response.data.data.id);
-                  setChatHistory([]);
-                  setChatTitle("");
-                  await fetchChatHistory();
-                  setIsOpenNewSearch(false);
-                } catch (err) {
-                  console.error("Failed to create chat history", err);
-                }
-              }}
-            >
-              <input
-                className={styles.new_history_input}
-                type="text"
-                value={chatTitle}
-                onChange={(e) => setChatTitle(e.target.value)}
-                placeholder="Enter new chat topic title..."
-                required
-              />
-              <div className={styles.new_history_button_group}>
-                <button
-                  type="button"
-                  className={styles.new_history_button}
-                >
-                  Add
-                </button>
-                <button
-                  type="button"
-                  className={styles.new_history_button}
-                >
-                  Cancel
-                </button>
-                <button></button>
-              </div>
-            </form>
+                      {
+                        headers: {
+                          Authorization: `Bearer ${token}`,
+                        },
+                      }
+                    );
+                    setChatHistoryId(response.data.data.id);
+                    setChatHistory([]);
+                    setChatTitle("");
+                    await fetchChatHistory();
+                    setIsOpenNewSearch(false);
+                  } catch (err) {
+                    console.error("Failed to create chat history", err);
+                  }
+                }}
+              >
+                <input
+                  className={styles.new_history_input}
+                  type="text"
+                  value={chatTitle}
+                  onChange={(e) => setChatTitle(e.target.value)}
+                  placeholder="Enter new chat topic title..."
+                  required
+                />
+                <div className={styles.new_history_button_group}>
+                  <button
+                    type="submit"
+                    className={styles.new_history_button}
+                  >
+                    Add
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.new_history_button}
+                    onClick={() => setIsOpenNewSearch(false)} // misalnya untuk cancel
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+
             </div>
         </div>
             

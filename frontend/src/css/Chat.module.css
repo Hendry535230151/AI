@@ -773,7 +773,7 @@ body::-webkit-scrollbar {
   left: calc(100% - 17px);
 }
 
-.confirm_container {
+.confirm_container, .new_history_container {
   width: 100%;
   height: 100%;
   position: absolute;
@@ -783,7 +783,7 @@ body::-webkit-scrollbar {
   z-index: 3;
 }
 
-.confirm_card {
+.confirm_card, .new_history_card {
   width: 450px;
   height: 170px;
   padding: 30px;
@@ -797,7 +797,12 @@ body::-webkit-scrollbar {
   z-index: 5;
 }
 
-.confirm_title {
+.new_history_card {
+  height: 200px;
+}
+
+.confirm_title, .new_history_title {
+  margin: 0 0 3px 0;
   color: var(--text-color);
 }
 
@@ -805,13 +810,13 @@ body::-webkit-scrollbar {
   color: var(--thin-color);
 }
 
-.confirm_button_group {
+.confirm_button_group, .new_history_button_group {
   position: absolute;
   bottom: 30px;
   right: 30px;
 }
 
-.confirm_button {
+.confirm_button, .new_history_button {
   height: 40px;
   width: 80px;
   margin: 0 0 0 10px;
@@ -823,6 +828,12 @@ body::-webkit-scrollbar {
   background-color: #b10909;
   color: var(--text-color);
   outline: auto;
+}
+
+.new_history_button:first-of-type {
+  background-color: var(--main-color);
+  color: var(--text-color);
+  outline: 1px solid var(--bold-color);
 }
 
 .warning_text {
@@ -868,20 +879,28 @@ body::-webkit-scrollbar {
   cursor: pointer;
 }
 
-.new_history_container {
-  width: 100%;
-  max-width: 900px;
-  margin: 10px auto;
-  background-color: var(--secondary-color);
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
+  /* .new_history_container {
+    width: 100%;
+    height: 100%;
+    background-color: #1f1f1fb3;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 2;
+  }
+
+  .new_history_card {
+    width: 450px;
+    height: 175px;
+    background-color: var(--secondary-color);
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  } */
 
 .new_history_form {
-  height: 25px;
-  position: relative;
+  height: 40px;
 }
 
 .new_history_input {
@@ -892,20 +911,4 @@ body::-webkit-scrollbar {
   border-bottom: 1px solid var(--bold-color);
   background-color: var(--main-color);
   color: var(--text-color);
-}
-
-.new_history_button {
-  width: 25px;
-  height: 100%;
-  background-color: var(--bold-color);
-  color: var(--text-color);
-  border-radius: 5px;
-  cursor: pointer;
-  position: absolute;
-  top: 0;
-  right: 0;
-}
-
-.new_history_icon {
-  color: var(--main-color);
 }

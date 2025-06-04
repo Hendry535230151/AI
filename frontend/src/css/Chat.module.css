@@ -398,7 +398,7 @@ body::-webkit-scrollbar {
 }
 
 /* Setting area css */
-.setting_wrapper {
+.setting_wrapper, .search_wrapper {
   width: 100vw;
   height: 100vh;
   background-color: #1f1f1fb3;
@@ -408,7 +408,7 @@ body::-webkit-scrollbar {
   z-index: 2;
 }
 
-.setting_card {
+.setting_card, .search_card {
   width: 90%;
   max-width: 1100px;
   height: 600px;
@@ -421,9 +421,69 @@ body::-webkit-scrollbar {
   left: 50%;
   transform: translate(-50%, -50%);
   display: grid;
+  gap: 20px;
+}
+
+.setting_card { 
   grid-template-columns: 250px 1fr;
   grid-template-rows: 250px 1fr;
+}
+
+.search_card {
+  grid-template-rows: 40px 1fr;
+}
+
+.search_area {
+  display: grid;
+  grid-template-columns: 1fr 40px;
   gap: 20px;
+}
+
+.search_result_group {
+  grid-template-columns: repeat(2, 1fr);
+  display: flex;
+  gap: 20px;
+}
+
+.search_form {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.search_bar {
+  width: 100%;
+  height: 100%;
+  padding: 0 45px 0 15px;
+  background-color: var(--main-color);
+  border: 1px solid var(--thin-color);
+  border-radius: 10px;
+  color: var(--text-color);
+}
+
+.search_icon {
+  height: 40px;
+  width: 40px;
+  position: absolute;
+  right: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background-color: var(--bold-color);
+}
+
+.result_area {
+  flex: 1;
+  background-color: #131313;
+  border-radius: 10px;
+}
+
+.sub_text {
+  color: var(--text-color); 
+  padding: 20px;
+  border-radius: 10px 10px 0 0;
 }
 
 .setting_circle {

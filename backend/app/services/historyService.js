@@ -49,6 +49,23 @@ const historyService = {
     }
   },
 
+  getHistoryByTitle: async (searchQuery) => {
+    try {
+      if (!searchQuery) {
+        throw new CustomError('History ID is required. Please provide a valid ID and try again.', 400);
+      }
+
+      const searchResult = await historyModel.getHistoryByTitle(searchQuery);
+      if (!searchResult) {
+        throw new CustomError('No History found', 404);
+      }
+
+      return searchResult;
+    } catch (err) {
+      throw err;
+    }
+  },
+
   createHistory: async (userId, title) => {
     try {
       if (!userId) {

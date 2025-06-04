@@ -23,6 +23,7 @@ function Chat() {
   const [isClosedDirectory, setIsClosedDirectory] = useState(false);
   const [isClosedHistory, setIsClosedHistory] = useState(false);
   const [isOpenSetting, setIsOpenSetting] = useState(false);
+  const [isOpenSearch, setIsOpenSearch] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isTyping, setIsTyping] = useState(false);
   const [isActiveConfirmPanel, setActiveConfirmPanel] = useState(false);
@@ -526,7 +527,7 @@ function Chat() {
             <>
               <button className={styles.sidebar_button}>
                 <i
-                  className={`fa-solid fa-magnifying-glass ${styles.sidebar_icon}`}
+                  className={`fa-solid fa-magnifying-glass ${styles.sidebar_icon}`} onClick={() => setIsOpenSearch(true)}
                 ></i>
               </button>
               <button className={styles.sidebar_button}>
@@ -856,7 +857,6 @@ function Chat() {
             />
             <button
               type="submit"
-              // className={styles.query_button}
               disabled={!chatHistoryId}
               title={
                 !chatHistoryId
@@ -896,6 +896,36 @@ function Chat() {
           </div>
         )}
         <div ref={bottomRef} />
+        {/* Search area */}
+        {isOpenSearch && (
+          <div className={styles.search_wrapper}>
+            <div className={styles.search_card}>
+              <div className={styles.search_area}>
+                <form className={styles.search_form}>
+                  <input className={styles.search_bar} type="text" placeholder="Input what you waant to search ..."></input>
+                  <button type="button">
+                    <i
+                      className={`fa-solid fa-magnifying-glass ${styles.search_icon}`}
+                    ></i>
+                  </button>
+                </form>
+                <i
+                  className={`fa-solid fa-xmark ${styles.close_setting_icon}`}
+                  onClick={() => setIsOpenSearch(false)}
+                ></i>
+              </div>
+              <div className={styles.search_result_group}>
+                <div className={styles.result_area}>
+                  <h3 className={styles.sub_text}>Directory</h3>
+                </div>
+                <div className={styles.result_area}>
+                  <h3 className={styles.sub_text}>History</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Setting area */}
         {isActiveConfirmPanel && (
           <div className={styles.confirm_container}>

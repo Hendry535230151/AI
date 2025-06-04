@@ -471,19 +471,37 @@ body::-webkit-scrollbar {
   align-items: center;
   justify-content: center;
   border-radius: 10px;
+  color: var(--main-color);
   background-color: var(--bold-color);
 }
 
 .result_area {
   flex: 1;
-  background-color: #131313;
+  background-color: var(--main-color);
   border-radius: 10px;
+  padding: 20px;
 }
 
 .sub_text {
+  margin: 0 0 20px 0;
   color: var(--text-color); 
-  padding: 20px;
   border-radius: 10px 10px 0 0;
+  position: relative;
+}
+
+.sub_text::before {
+  content: '';
+  width: 120px;
+  height: 3px;
+  background-color: var(--text-color);
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+}
+
+.result_text {
+  color: var(--text-color);
+  margin: 3px 0;
 }
 
 .setting_circle {
@@ -769,7 +787,7 @@ body::-webkit-scrollbar {
   width: 450px;
   height: 170px;
   padding: 30px;
-  background-color: #242424;
+  background-color: var(--secondary-color);
   border-radius: 10px;
   border: 1px solid var(--thin-color);
   position: relative;
@@ -803,7 +821,7 @@ body::-webkit-scrollbar {
 
 .confirm_button:first-of-type {
   background-color: #b10909;
-  color: white;
+  color: var(--text-color);
   outline: auto;
 }
 
@@ -812,8 +830,8 @@ body::-webkit-scrollbar {
   max-width: 900px;
   margin: 10px auto;
   padding: 15px 20px;
-  background-color: #eaca91;
-  color: #131313;
+  background-color: var(--main-color);
+  color: var(--text-color);
   font-size: 0.9rem;
   font-weight: 600;
   text-align: center;

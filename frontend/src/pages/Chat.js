@@ -29,11 +29,44 @@ function Chat() {
   const [isActiveConfirmPanel, setActiveConfirmPanel] = useState(false);
   const [chatHistoryId, setChatHistoryId] = useState(null);
   const [clearDesition, setClearDesition] = useState(null);
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [searchDirectories, setSearchDirectories] = useState([]);
+  const [searchHistories, setSearchHistories] = useState([]);
   const queryFieldRef = useRef(null);
   const bottomRef = useRef(null);
   const bottomButton = useRef(null);
   const token = localStorage.getItem("token");
   const userId = fetchIdFromToken();
+
+  const handleSearch = async () => {
+    if (!searchKeyword.trim()) return;
+
+    try {
+      const [dirRes, historyRes] = await Promise.all([
+        axios.get(`/directories/name/${userId}`, {
+          params: {
+            searchQuery: searchKeyword,
+          },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }),
+        axios.get(`/chat-history/search/${userId}`, {
+          params: {
+            searchQuery: searchKeyword,
+          },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }),
+      ]);
+
+      setSearchDirectories(dirRes.data.data || []);
+      setSearchHistories(historyRes.data.data || []);
+    } catch (err) {
+      console.error("Search failed", err);
+    }
+  };
 
   const fetchDirectory = async () => {
     if (!token) {
@@ -901,12 +934,22 @@ function Chat() {
           <div className={styles.search_wrapper}>
             <div className={styles.search_card}>
               <div className={styles.search_area}>
-                <form className={styles.search_form}>
-                  <input className={styles.search_bar} type="text" placeholder="Input what you waant to search ..."></input>
+                <form
+                  className={styles.search_form}
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSearch();
+                  }}
+                >
+                  <input
+                    className={styles.search_bar}
+                    type="text"
+                    placeholder="Input what you want to search ..."
+                    value={searchKeyword}
+                    onChange={(e) => setSearchKeyword(e.target.value)}
+                  />
                   <button type="button">
-                    <i
-                      className={`fa-solid fa-magnifying-glass ${styles.search_icon}`}
-                    ></i>
+                    <i className={`fa-solid fa-magnifying-glass ${styles.search_icon}`}></i>
                   </button>
                 </form>
                 <i
@@ -917,9 +960,23 @@ function Chat() {
               <div className={styles.search_result_group}>
                 <div className={styles.result_area}>
                   <h3 className={styles.sub_text}>Directory</h3>
+                  {searchDirectories.length === 0 ? (
+                    <p className={styles.result_text}>No directory found</p>
+                  ) : (
+                    searchDirectories.map((dir) => (
+                      <div className={styles.result_text} key={dir.id}>{dir.directory_name}</div> // atau dir.directory_name
+                    ))
+                  )}
                 </div>
                 <div className={styles.result_area}>
                   <h3 className={styles.sub_text}>History</h3>
+                  {searchHistories.length === 0 ? (
+                    <p className={styles.result_text}>No history found</p>
+                  ) : (
+                    searchHistories.map((history) => (
+                      <div className={styles.result_text} key={history.id}>{history.title}</div>
+                    ))
+                  )}
                 </div>
               </div>
             </div>

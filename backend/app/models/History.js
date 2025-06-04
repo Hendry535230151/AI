@@ -33,10 +33,10 @@ const historyModel = {
     });
   },
 
-  getHistoryByTitle: (seachResult) => {
+  getHistoryByTitle: (searchQuery, userId) => {
     return new Promise((resolve, reject) => {
-      const query = 'SELECT * FROM chat_history WHERE chat_title LIKE ?'
-      db.query(query, [`%${seachResult}%`], (err, result) => {
+      const query = 'SELECT * FROM chat_histories WHERE title LIKE ? AND user_id = ?'
+      db.query(query, [`%${searchQuery}%`, userId], (err, result) => {
         if (err ){
           return  reject (err);
         }

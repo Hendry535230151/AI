@@ -49,13 +49,15 @@ const historyService = {
     }
   },
 
-  getHistoryByTitle: async (searchQuery) => {
+  getHistoryByTitle: async (searchQuery, userId) => {
     try {
       if (!searchQuery) {
         throw new CustomError('History ID is required. Please provide a valid ID and try again.', 400);
       }
 
-      const searchResult = await historyModel.getHistoryByTitle(searchQuery);
+      console.log(searchQuery, userId)
+
+      const searchResult = await historyModel.getHistoryByTitle(searchQuery, userId);
       if (!searchResult) {
         throw new CustomError('No History found', 404);
       }

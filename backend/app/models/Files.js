@@ -53,7 +53,6 @@ const fileModel = {
     return new Promise((resolve, reject) => {
       const query = "SELECT * FROM files WHERE directory_id = ?";
       db.query(query, [directoryId], (err, result) => {
-        console.log(result)
         if (err) {
           return reject(err);
         }

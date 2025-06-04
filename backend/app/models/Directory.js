@@ -158,6 +158,7 @@ const directoryModel = {
     return new Promise((resolve, reject) => {
       const query = 'DELETE FROM directories WHERE user_id = ?';
       db.query(query, [userId], (err, result) => {
+        console.log(result)
         if (err) {
           return reject(err);
         }

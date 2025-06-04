@@ -137,7 +137,8 @@ const directoryController = {
     const { userId } = req.params;
 
     try {
-      await directoryService.clearUserDirectory(userId);
+      const A = await directoryService.clearUserDirectory(userId);
+      console.log(A)
       res
         .status(200)
         .json({ success: true, message: "Success to clear all directory"});

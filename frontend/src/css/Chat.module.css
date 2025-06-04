@@ -462,9 +462,11 @@ body::-webkit-scrollbar {
 }
 
 .setting_container {
-  display: grid;
-  grid-template-rows: 150px 1fr;
   gap: 20px;
+}
+
+.setting_selection {
+  height: 100%;
 }
 
 .setting_selection,
@@ -476,6 +478,7 @@ body::-webkit-scrollbar {
 
 .setting_list {
   border-radius: 0 0 0 30px;
+  margin: 0 0 40px 0;
 }
 
 .setting_group,
@@ -512,7 +515,7 @@ body::-webkit-scrollbar {
 .setting_group li,
 .setting_item_list li {
   padding: 2.5px 0 2.5px 15px;
-  margin: 1px 0;
+  margin: 4px 0;
   border-radius: 5px;
   transition: 0.2s ease-in-out;
   cursor: pointer;
@@ -572,7 +575,7 @@ body::-webkit-scrollbar {
 }
 
 .setting_title_type {
-  margin: 0 0 3px 0;
+  margin: 0 0 10px 0;
   font-size: 18px;
   color: var(--bold-color);
 }
@@ -620,11 +623,35 @@ body::-webkit-scrollbar {
 }
 
 .setting_form_inline {
+  margin: 0 0 8px 0;
   display: flex;
-  align-items: center;
   flex-direction: row;
+  align-items: center;
   justify-content: space-between;
   color: var(--text-color);
+}
+
+.button_input_group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.clear_button {
+  padding: 0 3px;
+  height: 25px;
+  width: 85px;
+  background-color: #b10909;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.clear_text {
+  color: #f5f5f5;
+  font-size: 12px;
 }
 
 .checkbox_group {
@@ -666,6 +693,58 @@ body::-webkit-scrollbar {
 
 .checkbox:checked + .slider {
   left: calc(100% - 17px);
+}
+
+.confirm_container {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: #1f1f1fd6;
+  z-index: 3;
+}
+
+.confirm_card {
+  width: 450px;
+  height: 170px;
+  padding: 30px;
+  background-color: #242424;
+  border-radius: 10px;
+  border: 1px solid var(--thin-color);
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5;
+}
+
+.confirm_title {
+  color: var(--text-color);
+}
+
+.confirm_description {
+  color: var(--thin-color);
+}
+
+.confirm_button_group {
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
+}
+
+.confirm_button {
+  height: 40px;
+  width: 80px;
+  margin: 0 0 0 10px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.confirm_button:first-of-type {
+  background-color: #b10909;
+  color: white;
+  outline: auto;
 }
 
 .warning_text {

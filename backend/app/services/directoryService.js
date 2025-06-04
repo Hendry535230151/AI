@@ -220,7 +220,7 @@ const directoryService = {
     }
   },
 
-  deleteDirectoryByUserId: async (userId) => {
+  clearUserDirectory: async (userId) => {
     try {
       if (!userId) {
         throw new CustomError(

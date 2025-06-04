@@ -24,6 +24,7 @@ function Chat() {
   const [isClosedHistory, setIsClosedHistory] = useState(false);
   const [isOpenSetting, setIsOpenSetting] = useState(false);
   const [isOpenSearch, setIsOpenSearch] = useState(false);
+  const [isOpenSearch, setIsOpenSearch] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isTyping, setIsTyping] = useState(false);
   const [isActiveConfirmPanel, setActiveConfirmPanel] = useState(false);
@@ -559,7 +560,9 @@ function Chat() {
             <></>
           ) : (
             <>
-              <button className={styles.sidebar_button}>
+              <button className={styles.sidebar_button} onClick={() => {
+                setIsOpenSearch(true);
+              }}>
                 <i
                   className={`fa-solid fa-magnifying-glass ${styles.sidebar_icon}`} onClick={() => setIsOpenSearch(true)}
                 ></i>

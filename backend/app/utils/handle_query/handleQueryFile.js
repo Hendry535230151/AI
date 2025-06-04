@@ -24,24 +24,34 @@ const categorizeFile = (extension) => {
   return "others";
 };
 
-const handleQueryFile = async (message, userId) => {
+const handleQueryFile = async (message, userId, userName) => {
+  const modelFlash = genAI.getGenerativeModel({
+    model: "gemini-2.0-flash",
+  });
   const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
 
   try {
-    const intentCheck = await model.generateContent(
+    const intentCheck = await modelFlash.generateContent(
       `Instruction: Classify the user's intent from the following message. 
       Possible intents: 
       - list: if user wants to list all files, or get their files, or also get all file of a specific type but NOT from a specific directory
       - searchByName: if user is looking for a file by name or related to it by description, 
       - searchByDirectory: if user is looking to get all files from a specific directory
       - makeDir: if user wants to make a new directory or folder
-      - moveFile: if user want to move an existing file to an existing folder/directory or new directory 
+      - moveFile: if user want to move an existing file to an existing folder/directory or new directory
+      - deleteFile: if user want to delete a file
+      - confirmDeleteFile: if user's message is UserName/File as confirmation to delete file. but the username from message must be the exact same as "${userName}" from server
       - none: if the intent is unrelated to files.
+      Double check with the language as well, usually it's in english or indonesia
 
       Message: "${message}"
       Respond with only the intent label (list, searchByName, or none).`
     );
-    const intent = intentCheck.response.text().trim().toLowerCase();
+    let intent = intentCheck.response.text().trim().toLowerCase();
+
+    if (intent === "confirmdeletefile" && message.split("/")[0] !== userName) {
+      intent = "wrongconfirmation";
+    }
 
     const reply = await model.generateContent(
       `Instruction: Based on the following message, respond with a short, polite sentence 
@@ -53,13 +63,15 @@ const handleQueryFile = async (message, userId) => {
     const politeIntro = reply.response.text().trim();
 
     const extract = await model.generateContent(
-      `Instruction: Extract the most likely file name the user is referring to from the message below. Return only the file name (1–2 words max).\nMessage: "${message}"`
+      `Instruction: Extract the most likely file name the user is referring to from the message below. Return only the file name (1–2 words max).\nMessage: "${message}"
+      Double check with the language as well, usually it's in english or indonesia`
     );
     const fileName = extract.response.text().trim();
 
     const typeExtract = await model.generateContent(
       `Instruction: Based on the user's message, identify if they are asking for a specific file type category (e.g., images, pdf, documents, compressed, audio, video, powerpoint, spreadsheets). 
       Return only the category name if detected, or "all" if they want all files.
+      Double check with the language as well, usually it's in english or indonesia
 
       Message: "${message}"`
     );
@@ -68,6 +80,7 @@ const handleQueryFile = async (message, userId) => {
     const dirExtract = await model.generateContent(`
         Instruction: Extract the directory or folder name the user refers to in this message.
         If none is found, return "default".
+        Double check with the language as well, usually it's in english or indonesia
       
         Message: "${message}"
       `);
@@ -223,13 +236,83 @@ const handleQueryFile = async (message, userId) => {
         const result = await fileModel.moveFileToDirectory(file.id, dir.id);
         return await generateLocalizedMessage(message, result);
       }
+
+      case "deletefile": {
+        let files = await fileModel.getFilesByNameAndIdDirectory(
+          fileName,
+          userId
+        );
+        if (!files || files.length === 0) {
+          if (files.length === 0) {
+            const notFoundReplyGen = generateLocalizedMessage(
+              message,
+              `No files found with the name or similar to ${fileName}`
+            );
+            return notFoundReplyGen;
+          }
+        }
+
+        const groupedFiles = groupFilesByDirectory(files);
+        const fileList = generateFileListMarkdown(groupedFiles, port);
+
+        const deleteReply = await model.generateContent(
+          `Instruction: From the following message, you'll be asked to delete certain file from the user
+          As a confirmation to delete the file, you need to give them the confirmation method telling them to type
+          "UserName/FileName"
+          UserName: "${userName}"
+          FileName: "${fileList}", get the name of the fileName inside the bracket []
+          FileDirectory: "${fileList}", get the name of the directory from string with : at the end
+          Format the returning file: 
+          "FileDirectory: FileName (description)"
+          if the file is more than one, type the confirmation word ask the user to choose the filename by themselves 
+          You must respond with the output only (don't put FileDirectory: and Confirmation:)
+          `
+        );
+
+        const reply = deleteReply.response.text().trim();
+        const replyLocalized = await generateLocalizedMessage(message, reply);
+
+        return `${replyLocalized}`;
+      }
+
+      case "confirmdeletefile": {
+        const file = await fileModel.getFileByNameUserID(fileName, userId);
+        if (file === false) {
+          return await generateLocalizedMessage(
+            message,
+            `File "${fileName}" not found.`
+          );
+        }
+
+        const deletion = await fileModel.deleteFileById(file?.[0].id);
+
+        if (deletion === false) {
+          return await generateLocalizedMessage(
+            message,
+            `The deletion of "${fileName}" failed`
+          );
+        }
+
+        return await generateLocalizedMessage(
+          message,
+          `The deletion of "${fileName}" succeed`
+        );
+      }
+
+      case "wrongconfirmation": {
+        const reply =
+          "Wrong confirmation to delete the file, please double check again";
+        const replyLocalized = await generateLocalizedMessage(message, reply);
+        return `${replyLocalized}`;
+      }
+
       case "none":
       default:
         return null;
     }
   } catch (error) {
     console.error("Error in handleFileQuery:", error);
-    return "There was an error processing your file request.";
+    return "Server is busy, please try again in a few minutes";
   }
 };
 
@@ -238,7 +321,8 @@ async function generateLocalizedMessage(userMessage, serviceMessage) {
   const prompt = `
     Instruction: You are an assistant for a file management system. 
     Based on the user's message and the system message below, rewrite the system message in a polite, friendly tone, 
-    and in the same language as the user's message. Only said the revised message also not in quote.
+    and in the same language as the user's message. Usually the common language is English or Indonesia
+    Only said the revised message also not in quote.
 
     User Message: "${userMessage}"
     System Message: "${serviceMessage}"

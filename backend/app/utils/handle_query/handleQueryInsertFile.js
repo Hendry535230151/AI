@@ -4,32 +4,29 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 const handleQueryInsertFile = async (userId, fileName, description) => {
+  const modelFlash = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
   const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite" });
 
-  let directories = await directoryModel.getDirectoriesByUserId(userId);
+  let checkDuplicate = await fileModel.getFileByNameUserID(fileName, userId);
 
-  if (!directories || directories.length === 0) {
-    const defaultDir = await directoryModel.createDirectory(
-      userId,
-      "default",
-      null
-    );
-    const fallbackMessage = `No directory found. Created default directory and uploaded your ${fileName} file there.`;
+  if (checkDuplicate) {
+    const fallbackMessage = `File ${fileName} already exists!`;
     const localized = await generateLocalizedMessage(
       description,
       fallbackMessage
     );
 
     return {
-      action: "upload",
-      directoryId: defaultDir.insertId,
+      action: "noop",
       message: localized,
     };
   }
 
   const dirExtract = await model.generateContent(`
-    Instruction: Extract the directory name the user want to put the file in refers to in this message.
-    If none is found, return "default".
+    Instruction: Extract the directory name the user want to put the file in refers to in this message. 
+    Usually user won't specify if it's folder/directory but make sure if user wanted to put a file inside something, it must be the directory
+    If none is found, return "default". 
+    Double check with the language as well, usually it's in english or indonesia
 
     File Name : "${fileName}"
     Message: "${description}"
@@ -45,6 +42,7 @@ const handleQueryInsertFile = async (userId, fileName, description) => {
     called the file is based on this message, 
     If the message do not give any command, just some names, use it as the keyword as well
     If none is found just put the file name
+    Double check with the language as well, usually it's in english or indonesia
 
     Message: "${description}"
     FileName: "${fileName}"
@@ -77,7 +75,8 @@ async function generateLocalizedMessage(userMessage, serviceMessage) {
   const prompt = `
     Instruction: You are an assistant for a file management system. 
     Based on the user's message and the system message below, rewrite the system message in a polite, friendly tone, 
-    and in the same language as the user's message. Only said the revised message also not in quote.
+    and in the same language as the user's message. Usually the common language is English and Indonesia
+    Only said the revised message also not in quote.
 
     User Message: "${userMessage}"
     System Message: "${serviceMessage}"

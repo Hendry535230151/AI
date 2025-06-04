@@ -5,6 +5,7 @@ const CustomError = require("../errors/CustomError");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const fileModel = require("../models/Files");
+const userModel = require("../models/Users");
 const handleQueryGetFile = require("../utils/handle_query/handleQueryFile");
 const handleQueryInsertFile = require("../utils/handle_query/handleQueryInsertFile");
 const aiService = {
@@ -14,7 +15,16 @@ const aiService = {
     const chatHistoryId =
       providedHistoryId || (await historyModel.createHistory(userId));
 
-    const handledQuery = await handleQueryGetFile(message, userId);
+    const userName = await userModel.getUserById(userId);
+    const userNameCapital = userName.first_name
+      .concat(userName.last_name)
+      .toUpperCase();
+
+    const handledQuery = await handleQueryGetFile(
+      message,
+      userId,
+      userNameCapital
+    );
     if (handledQuery) {
       const userChat = await chatModel.insertChat(
         chatHistoryId,
@@ -22,6 +32,7 @@ const aiService = {
         "user",
         message
       );
+
       if (!userChat) {
         throw new CustomError("Error A", 500);
       }

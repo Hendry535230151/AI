@@ -11,5 +11,6 @@ router.get("/search/:id", fileController.getFileById);
 router.post("/create", upload.single("file"), fileController.createFile);
 router.put("/rename/:id", fileController.renameFile);
 router.delete("/delete/:id", fileController.deleteFileById);
+router.delete("/clear/:userId", fileController.clearUserFile);
 
 module.exports = router;

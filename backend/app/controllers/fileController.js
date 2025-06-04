@@ -1,5 +1,6 @@
 const directoryService = require("../services/directoryService");
 const fileService = require("../services/fileService");
+const historyService = require("../services/historyService");
 
 const fileController = {
   getAllFiles: async (req, res) => {
@@ -109,6 +110,22 @@ const fileController = {
       res.status(err.statusCode || 400).json({
         success: false,
         message: err.message || "Failed to delete file",
+      });
+    }
+  },
+
+  clearUserFile: async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+      await fileService.clearUserFile(userId);
+      res
+        .status(200)
+        .json({ success: true, message: "Success to clear all files"});
+    } catch (err) {
+      res.status(err.statusCode || 500).json({
+        success: false,
+        message: err.message || "Failed to clear directory",
       });
     }
   },

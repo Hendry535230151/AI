@@ -219,6 +219,29 @@ const directoryService = {
       throw err;
     }
   },
+
+  deleteDirectoryByUserId: async (userId) => {
+    try {
+      if (!userId) {
+        throw new CustomError(
+          "User ID is required. Please provide a valid ID and try again.",
+          400
+        )
+      }
+
+      const deleteUserDirectory = await directoryModel.deleteDirectoryByUserId(userId);
+      if (!deleteUserDirectory) {
+        throw new CustomError(
+          `Failed to delete all directory with user ID: ${userId}. Please try again.`,
+          400
+        )
+      }
+    
+      return deleteUserDirectory;
+    } catch (err) {
+      throw err;
+    }
+  }
 };
 
 module.exports = directoryService;

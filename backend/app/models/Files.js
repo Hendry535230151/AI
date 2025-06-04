@@ -266,6 +266,22 @@ const fileModel = {
       });
     });
   },
+
+  deleteFileByUserId: (userId) => {
+    return new Promise((resolve, reject) => {
+      const query = 'DELETE FROM files WHERE user_id = ?';
+      db.query(query, [userId], (err, result) => {
+        if (err) {
+          return reject(err);
+        }
+        if (!result || result.affectedRows === 0) {
+          resolve(false);
+        } else {
+          resolve(true);
+        }
+      })
+    })
+  }
 };
 
 module.exports = fileModel;

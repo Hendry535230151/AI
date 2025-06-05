@@ -124,11 +124,11 @@ const directoryModel = {
 
   updateDirecotryFileCount: (id, totalFiles) => {
     return new Promise((resolve, reject) => {
-      const query = 'UPDATE directories SET total_files = ? WHERE id = ?';
+      const query = "UPDATE directories SET total_files = ? WHERE id = ?";
       db.query(query, [totalFiles, id], (err, result) => {
         if (err) {
           return reject(err);
-        } 
+        }
         if (!result || result.affectedRows === 0) {
           resolve(false);
         } else {
@@ -156,9 +156,8 @@ const directoryModel = {
 
   deleteDirectoryByUserId: (userId) => {
     return new Promise((resolve, reject) => {
-      const query = 'DELETE FROM directories WHERE user_id = ?';
+      const query = "DELETE FROM directories WHERE user_id = ?";
       db.query(query, [userId], (err, result) => {
-        console.log(result)
         if (err) {
           return reject(err);
         }
@@ -167,9 +166,9 @@ const directoryModel = {
         } else {
           resolve(true);
         }
-      })
-    })
-  }
+      });
+    });
+  },
 };
 
 module.exports = directoryModel;

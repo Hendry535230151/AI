@@ -4,10 +4,6 @@ import styles from "./setting.module.css";
 const ChangeProfile = ({
 
 }) => {
-    const handleClick = () => {
-
-    };
-
     return (
         <>
             <div className={styles.setting_group_type}>

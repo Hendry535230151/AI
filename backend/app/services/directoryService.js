@@ -55,21 +55,21 @@ const directoryService = {
     }
   },
 
-  getDirectoryByName: async (directoryName) => {
+  getDirectoryByName: async (searchQuery, userId) => {
     try {
-      if (!directoryName) {
+      if (!searchQuery) {
         throw new CustomError(
-          "Directory name is required. Please provide a valid name and try again.",
+          "Search query is required. Please provide a valid name and try again.",
           400
         );
       }
 
       const findDirectory = await directoryModel.getDirectoryByName(
-        directoryName
+        searchQuery, userId
       );
       if (!findDirectory) {
         throw new CustomError(
-          `No directory found with the name: ${directoryName}. Please ensure the name is correctly spelled and try again.`,
+          `No directory found with the name: ${searchQuery}. Please ensure the name is correctly spelled and try again.`,
           404
         );
       }

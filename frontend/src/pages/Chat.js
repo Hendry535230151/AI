@@ -23,16 +23,52 @@ function Chat() {
   const [isClosedDirectory, setIsClosedDirectory] = useState(false);
   const [isClosedHistory, setIsClosedHistory] = useState(false);
   const [isOpenSetting, setIsOpenSetting] = useState(false);
+  const [isOpenSearch, setIsOpenSearch] = useState(false);
+  const [isOpenSearch, setIsOpenSearch] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isTyping, setIsTyping] = useState(false);
   const [isActiveConfirmPanel, setActiveConfirmPanel] = useState(false);
   const [chatHistoryId, setChatHistoryId] = useState(null);
   const [clearDesition, setClearDesition] = useState(null);
+  const [searchKeyword, setSearchKeyword] = useState("");
+  const [searchDirectories, setSearchDirectories] = useState([]);
+  const [searchHistories, setSearchHistories] = useState([]);
+  const [isOpenNewSeach, setIsOpenNewSearch] = useState(false);
   const queryFieldRef = useRef(null);
   const bottomRef = useRef(null);
   const bottomButton = useRef(null);
   const token = localStorage.getItem("token");
   const userId = fetchIdFromToken();
+
+  const handleSearch = async () => {
+    if (!searchKeyword.trim()) return;
+
+    try {
+      const [dirRes, historyRes] = await Promise.all([
+        axios.get(`/directories/name/${userId}`, {
+          params: {
+            searchQuery: searchKeyword,
+          },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }),
+        axios.get(`/chat-history/search/${userId}`, {
+          params: {
+            searchQuery: searchKeyword,
+          },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }),
+      ]);
+
+      setSearchDirectories(dirRes.data.data || []);
+      setSearchHistories(historyRes.data.data || []);
+    } catch (err) {
+      console.error("Search failed", err);
+    }
+  };
 
   const fetchDirectory = async () => {
     if (!token) {
@@ -524,14 +560,16 @@ function Chat() {
             <></>
           ) : (
             <>
-              <button className={styles.sidebar_button}>
+              <button className={styles.sidebar_button} onClick={() => {
+                setIsOpenSearch(true);
+              }}>
                 <i
-                  className={`fa-solid fa-magnifying-glass ${styles.sidebar_icon}`}
+                  className={`fa-solid fa-magnifying-glass ${styles.sidebar_icon}`} onClick={() => setIsOpenSearch(true)}
                 ></i>
               </button>
               <button className={styles.sidebar_button}>
                 <i
-                  className={`fa-solid fa-pen-to-square ${styles.sidebar_icon}`}
+                  className={`fa-solid fa-pen-to-square ${styles.sidebar_icon}`} onClick={() => setIsOpenNewSearch(true)}
                 ></i>
               </button>
             </>
@@ -584,60 +622,6 @@ function Chat() {
                 </button>
                 {!isClosedHistory && (
                   <>
-                    <div
-                      className={`${styles.new_history_container} ${
-                        isClosedDirectory && isClosedHistory
-                          ? styles.dropdown_area
-                          : styles.close_dropdown
-                      }`}
-                    >
-                      <form
-                        className={styles.new_history_form}
-                        onSubmit={async (e) => {
-                          e.preventDefault();
-
-                          if (!chatTitle || !userId) return;
-
-                          try {
-                            const response = await axios.post(
-                              "http://localhost:3000/chat-history/",
-                              {
-                                title: chatTitle,
-                                userId: userId,
-                              },
-                              {
-                                headers: {
-                                  Authorization: `Bearer ${token}`,
-                                },
-                              }
-                            );
-                            setChatHistoryId(response.data.data.id);
-                            setChatHistory([]);
-                            setChatTitle("");
-                            await fetchChatHistory();
-                          } catch (err) {
-                            console.error("Failed to create chat history", err);
-                          }
-                        }}
-                      >
-                        <input
-                          className={styles.new_history_input}
-                          type="text"
-                          value={chatTitle}
-                          onChange={(e) => setChatTitle(e.target.value)}
-                          placeholder="Enter new chat topic title..."
-                          required
-                        />
-                        <button
-                          type="submit"
-                          className={styles.new_history_button}
-                        >
-                          <i
-                            className={`fa-solid fa-plus ${styles.new_history_icon}`}
-                          ></i>
-                        </button>
-                      </form>
-                    </div>
                     <ul className={styles.dropdown_list}>
                       {chatHistoryList.map((his, idx) => (
                         <li
@@ -856,7 +840,6 @@ function Chat() {
             />
             <button
               type="submit"
-              // className={styles.query_button}
               disabled={!chatHistoryId}
               title={
                 !chatHistoryId
@@ -896,6 +879,124 @@ function Chat() {
           </div>
         )}
         <div ref={bottomRef} />
+        {/* New chat area */}
+        {isOpenNewSeach &&
+        <div className={styles.new_history_container}>
+          <div className={styles.new_history_card}>
+            <h1 className={styles.new_history_title}>Enter your chat title</h1>
+              <form
+                className={styles.new_history_form}
+                onSubmit={async (e) => {
+                  e.preventDefault();
+
+                  if (!chatTitle || !userId) return;
+
+                  try {
+                    const response = await axios.post(
+                      "http://localhost:3000/chat-history/",
+                      {
+                        title: chatTitle,
+                        userId: userId,
+                      },
+                      {
+                        headers: {
+                          Authorization: `Bearer ${token}`,
+                        },
+                      }
+                    );
+                    setChatHistoryId(response.data.data.id);
+                    setChatHistory([]);
+                    setChatTitle("");
+                    await fetchChatHistory();
+                    setIsOpenNewSearch(false);
+                  } catch (err) {
+                    console.error("Failed to create chat history", err);
+                  }
+                }}
+              >
+                <input
+                  className={styles.new_history_input}
+                  type="text"
+                  value={chatTitle}
+                  onChange={(e) => setChatTitle(e.target.value)}
+                  placeholder="Enter new chat topic title..."
+                  required
+                />
+                <div className={styles.new_history_button_group}>
+                  <button
+                    type="submit"
+                    className={styles.new_history_button}
+                  >
+                    Add
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.new_history_button}
+                    onClick={() => setIsOpenNewSearch(false)} // misalnya untuk cancel
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+
+            </div>
+        </div>
+            
+        }
+        {/* Search area */}
+        {isOpenSearch && (
+          <div className={styles.search_wrapper}>
+            <div className={styles.search_card}>
+              <div className={styles.search_area}>
+                <form
+                  className={styles.search_form}
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSearch();
+                  }}
+                >
+                  <input
+                    className={styles.search_bar}
+                    type="text"
+                    placeholder="Input what you want to search ..."
+                    value={searchKeyword}
+                    onChange={(e) => setSearchKeyword(e.target.value)}
+                  />
+                  <button type="button">
+                    <i className={`fa-solid fa-magnifying-glass ${styles.search_icon}`}></i>
+                  </button>
+                </form>
+                <i
+                  className={`fa-solid fa-xmark ${styles.close_setting_icon}`}
+                  onClick={() => setIsOpenSearch(false)}
+                ></i>
+              </div>
+              <div className={styles.search_result_group}>
+                <div className={styles.result_area}>
+                  <h3 className={styles.sub_text}>Directory</h3>
+                  {searchDirectories.length === 0 ? (
+                    <p className={styles.result_text}>No directory found</p>
+                  ) : (
+                    searchDirectories.map((dir) => (
+                      <div className={styles.result_text} key={dir.id}>{dir.directory_name}</div> // atau dir.directory_name
+                    ))
+                  )}
+                </div>
+                <div className={styles.result_area}>
+                  <h3 className={styles.sub_text}>History</h3>
+                  {searchHistories.length === 0 ? (
+                    <p className={styles.result_text}>No history found</p>
+                  ) : (
+                    searchHistories.map((history) => (
+                      <div className={styles.result_text} key={history.id}>{history.title}</div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Setting area */}
         {isActiveConfirmPanel && (
           <div className={styles.confirm_container}>

@@ -30,6 +30,18 @@ const historyController = {
     }
   },
 
+  getHistoryByTitle: async (req, res) => {
+    const { userId } = req.params;
+    const { searchQuery } = req.query;
+
+    try {
+      const history = await historyService.getHistoryByTitle(searchQuery, userId);
+      res.status(200).json({ success: true, data: history });
+    } catch (err) {
+      res.status(err.statusCode || 400).json({ success: false, message: err.message });
+    }
+  },
+
   createHistory: async (req, res) => {
     const { userId, title } = req.body;
     try {

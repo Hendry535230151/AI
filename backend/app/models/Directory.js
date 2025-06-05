@@ -50,11 +50,11 @@ const directoryModel = {
     });
   },
 
-  getDirectoryByName: (directoryName, userId) => {
+  getDirectoryByName: (searchQuery, userId) => {
     return new Promise((resolve, reject) => {
       const query =
         "SELECT * FROM directories WHERE directory_name LIKE ? AND user_id = ?";
-      db.query(query, [`%${directoryName}%`, userId], (err, result) => {
+      db.query(query, [`%${searchQuery}%`, userId], (err, result) => {
         if (err) {
           return reject(err);
         }

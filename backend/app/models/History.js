@@ -33,6 +33,22 @@ const historyModel = {
     });
   },
 
+  getHistoryByTitle: (searchQuery, userId) => {
+    return new Promise((resolve, reject) => {
+      const query = 'SELECT * FROM chat_histories WHERE title LIKE ? AND user_id = ?'
+      db.query(query, [`%${searchQuery}%`, userId], (err, result) => {
+        if (err ){
+          return  reject (err);
+        }
+        if (!result || result.length === 0) {
+          resolve(false);
+        } else {
+          resolve(result);
+        }
+      })
+    })
+  },
+
   getHistoryByUserId: (userId) => {
     return new Promise((resolve, reject) => {
       const query = 'SELECT * FROM chat_histories WHERE user_id = ?';

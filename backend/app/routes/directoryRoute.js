@@ -2,8 +2,8 @@ const express = require("express");
 const router = express.Router();
 const directoryController = require("../controllers/directoryController");
 
+router.get("/name/:userId", directoryController.getDirectoryByName);
 router.get("/", directoryController.getAllDirectories);
-router.get("/name", directoryController.getDirectoryByName);
 router.get("/find-directory/:id", directoryController.getDirectoryById);
 router.get(
   "/find-user-directory/:userId",

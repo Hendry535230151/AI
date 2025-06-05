@@ -15,7 +15,7 @@ const directoryController = {
 
   getDirectoryById: async (req, res) => {
     const { id } = req.params;
-
+  
     try {
       const directory = await directoryService.getDirectoryById(id);
       res.status(200).json({ success: true, data: directory });
@@ -41,11 +41,12 @@ const directoryController = {
   },
 
   getDirectoryByName: async (req, res) => {
-    const { directoriesName } = req.query;
+    const { searchQuery } = req.query;
+    const { userId } = req.params;
 
     try {
       const directory = await directoryService.getDirectoryByName(
-        directoriesName
+        searchQuery, userId
       );
       res.status(200).json({ success: true, data: directory });
     } catch (err) {

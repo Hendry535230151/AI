@@ -1,16 +1,20 @@
 import styles from "../css/Home.module.css";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
+  const navigate = useNavigate();
   return (
     <div className={styles.container}>
       <div className={styles.hero}>
         <div className={styles.circle_rotate}>
-          <p className={styles.hero_icon}>ICON</p>
-          <p className={styles.hero_text}>Your File Buddy</p>
+          <img
+            className={styles.hero_image}
+            src="Logo_AInizer_Light-removebg-preview.png"
+          ></img>
         </div>
         <div className={styles.navbar_container}>
           <div className={styles.left_navbar}>
-            <span className={styles.navbar_item}>LOGO</span>
+            <span className={styles.navbar_item}></span>
           </div>
           <div className={styles.right_navbar}>
             <a href="/login" className={styles.navbar_item}>
@@ -138,9 +142,16 @@ function Home() {
                 collaborate with other members, and bring your ideas to life.
                 Let’s continue this journey together.
               </p>
-              <button className={styles.collab_button}>Login</button>
+              <button
+                onClick={() => navigate("/login")}
+                className={styles.collab_button}
+              >
+                Login
+              </button>
             </div>
-            <div className={styles.collab_image}></div>
+            <div className={styles.collab_image}>
+              <img src="icon1.png"></img>
+            </div>
           </div>
           <div className={styles.collab_group}>
             <div className={styles.collab_text}>
@@ -152,9 +163,16 @@ function Home() {
                 where ideas grow and collaborations happen. Take the first step
                 towards your next great project.
               </p>
-              <button className={styles.collab_button}>Register</button>
+              <button
+                onClick={() => navigate("/register")}
+                className={styles.collab_button}
+              >
+                Register
+              </button>
             </div>
-            <div className={styles.collab_image}></div>
+            <div className={styles.collab_image}>
+              <img src="icon2.png"></img>
+            </div>
           </div>
         </div>
       </div>
@@ -289,6 +307,9 @@ function Home() {
           </button>
         </div>
       </div>*/}
+      <div className={styles.big_word_container}>
+        <h1 className={styles.big_word}>Join With Us Now</h1>
+      </div>
       <footer className={styles.footer_container}>
         <div className={styles.footer_content}>
           <div className={styles.footer_section}>

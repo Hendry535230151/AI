@@ -275,10 +275,10 @@ body::-webkit-scrollbar {
 }
 
 .error_icon {
-    grid-row: span 2;
-    font-size: 30px;
-    margin: 0 20px 0 0;
-    color: #b10909;
+  grid-row: span 2;
+  font-size: 30px;
+  margin: 0 20px 0 0;
+  color: #b10909;
 }
 
 .markdown_container {
@@ -398,7 +398,8 @@ body::-webkit-scrollbar {
 }
 
 /* Setting area css */
-.setting_wrapper, .search_wrapper {
+.setting_wrapper,
+.search_wrapper {
   width: 100vw;
   height: 100vh;
   background-color: #1f1f1fb3;
@@ -408,7 +409,8 @@ body::-webkit-scrollbar {
   z-index: 2;
 }
 
-.setting_card, .search_card {
+.setting_card,
+.search_card {
   width: 90%;
   max-width: 1100px;
   height: 600px;
@@ -424,7 +426,7 @@ body::-webkit-scrollbar {
   gap: 20px;
 }
 
-.setting_card { 
+.setting_card {
   grid-template-columns: 250px 1fr;
   grid-template-rows: 250px 1fr;
 }
@@ -484,13 +486,13 @@ body::-webkit-scrollbar {
 
 .sub_text {
   margin: 0 0 20px 0;
-  color: var(--text-color); 
+  color: var(--text-color);
   border-radius: 10px 10px 0 0;
   position: relative;
 }
 
 .sub_text::before {
-  content: '';
+  content: "";
   width: 120px;
   height: 3px;
   background-color: var(--text-color);
@@ -575,7 +577,7 @@ body::-webkit-scrollbar {
 
 .setting_group li:last-of-type {
   background-color: #b10909;
-  color: #f5f5f5
+  color: #f5f5f5;
 }
 
 .setting_active,
@@ -773,7 +775,8 @@ body::-webkit-scrollbar {
   left: calc(100% - 17px);
 }
 
-.confirm_container, .new_history_container {
+.confirm_container,
+.new_history_container {
   width: 100%;
   height: 100%;
   position: absolute;
@@ -783,7 +786,8 @@ body::-webkit-scrollbar {
   z-index: 3;
 }
 
-.confirm_card, .new_history_card {
+.confirm_card,
+.new_history_card {
   width: 450px;
   height: 170px;
   padding: 30px;
@@ -801,7 +805,8 @@ body::-webkit-scrollbar {
   height: 200px;
 }
 
-.confirm_title, .new_history_title {
+.confirm_title,
+.new_history_title {
   margin: 0 0 3px 0;
   color: var(--text-color);
 }
@@ -810,13 +815,15 @@ body::-webkit-scrollbar {
   color: var(--thin-color);
 }
 
-.confirm_button_group, .new_history_button_group {
+.confirm_button_group,
+.new_history_button_group {
   position: absolute;
   bottom: 30px;
   right: 30px;
 }
 
-.confirm_button, .new_history_button {
+.confirm_button,
+.new_history_button {
   height: 40px;
   width: 80px;
   margin: 0 0 0 10px;
@@ -879,7 +886,7 @@ body::-webkit-scrollbar {
   cursor: pointer;
 }
 
-  /* .new_history_container {
+/* .new_history_container {
     width: 100%;
     height: 100%;
     background-color: #1f1f1fb3;
@@ -914,7 +921,7 @@ body::-webkit-scrollbar {
 }
 
 /* Search part */
-.search_wrapper {
+/* .search_wrapper {
   width: 100vw;
   height: 100vh;
   background-color: #1f1f1fb3;
@@ -1003,4 +1010,4 @@ body::-webkit-scrollbar {
   position: relative;
   text-decoration: underline;
   display: block;
-}
+} */

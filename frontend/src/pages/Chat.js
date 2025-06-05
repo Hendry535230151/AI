@@ -1070,7 +1070,7 @@ function Chat() {
                         activeSetting === "basic" ? styles.setting_active : ""
                       }
                     >
-                      Basic setting
+                      Basic Setting
                     </li>
                     <li
                       onClick={() => setActiveSetting("theme")}
@@ -1078,7 +1078,7 @@ function Chat() {
                         activeSetting === "theme" ? styles.setting_active : ""
                       }
                     >
-                      Theme setting
+                      Theme Setting
                     </li>
                     <li
                       onClick={() => setActiveSetting("clear")}
@@ -1086,9 +1086,9 @@ function Chat() {
                         activeSetting === "clear" ? styles.setting_active : ""
                       }
                     >
-                      Language setting
+                      Clear Setting
                     </li>
-                    <li
+                    {/* <li
                       onClick={() => setActiveSetting("collaboration")}
                       className={
                         activeSetting === "collaboration"
@@ -1097,7 +1097,7 @@ function Chat() {
                       }
                     >
                       Collaboration setting
-                    </li>
+                    </li> */}
                     <li onClick={handleLogout}>Logout</li>
                   </ul>
                 </div>
@@ -1175,7 +1175,7 @@ function Chat() {
                 )}
                 {activeSetting === "theme" && (
                   <div className={styles.setting_group_type}>
-                    <h4 className={styles.setting_title_type}>Change Name</h4>
+                    <h4 className={styles.setting_title_type}>Change Theme</h4>
                     <div className={styles.setting_types}>
                       <form className={styles.setting_form_inline}>
                         <label
@@ -1204,7 +1204,7 @@ function Chat() {
                 )}
                 {activeSetting === "clear" && (
                   <div className={styles.setting_group_type}>
-                    <h4 className={styles.setting_title_type}>Change Name</h4>
+                    <h4 className={styles.setting_title_type}>Clear Stuffs</h4>
                     <div className={styles.setting_types}>
                       <form className={styles.setting_form}>
                         <div className={styles.setting_form_inline}>

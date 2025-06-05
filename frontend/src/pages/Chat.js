@@ -24,7 +24,6 @@ function Chat() {
   const [isClosedHistory, setIsClosedHistory] = useState(false);
   const [isOpenSetting, setIsOpenSetting] = useState(false);
   const [isOpenSearch, setIsOpenSearch] = useState(false);
-  const [isOpenSearch, setIsOpenSearch] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
   const [isTyping, setIsTyping] = useState(false);
   const [isActiveConfirmPanel, setActiveConfirmPanel] = useState(false);
@@ -561,16 +560,21 @@ function Chat() {
             <></>
           ) : (
             <>
-              <button className={styles.sidebar_button} onClick={() => {
-                setIsOpenSearch(true);
-              }}>
+              <button
+                className={styles.sidebar_button}
+                onClick={() => {
+                  setIsOpenSearch(true);
+                }}
+              >
                 <i
-                  className={`fa-solid fa-magnifying-glass ${styles.sidebar_icon}`} onClick={() => setIsOpenSearch(true)}
+                  className={`fa-solid fa-magnifying-glass ${styles.sidebar_icon}`}
+                  onClick={() => setIsOpenSearch(true)}
                 ></i>
               </button>
               <button className={styles.sidebar_button}>
                 <i
-                  className={`fa-solid fa-pen-to-square ${styles.sidebar_icon}`} onClick={() => setIsOpenNewSearch(true)}
+                  className={`fa-solid fa-pen-to-square ${styles.sidebar_icon}`}
+                  onClick={() => setIsOpenNewSearch(true)}
                 ></i>
               </button>
             </>
@@ -881,10 +885,12 @@ function Chat() {
         )}
         <div ref={bottomRef} />
         {/* New chat area */}
-        {isOpenNewSeach &&
-        <div className={styles.new_history_container}>
-          <div className={styles.new_history_card}>
-            <h1 className={styles.new_history_title}>Enter your chat title</h1>
+        {isOpenNewSeach && (
+          <div className={styles.new_history_container}>
+            <div className={styles.new_history_card}>
+              <h1 className={styles.new_history_title}>
+                Enter your chat title
+              </h1>
               <form
                 className={styles.new_history_form}
                 onSubmit={async (e) => {
@@ -924,10 +930,7 @@ function Chat() {
                   required
                 />
                 <div className={styles.new_history_button_group}>
-                  <button
-                    type="submit"
-                    className={styles.new_history_button}
-                  >
+                  <button type="submit" className={styles.new_history_button}>
                     Add
                   </button>
                   <button
@@ -939,11 +942,9 @@ function Chat() {
                   </button>
                 </div>
               </form>
-
             </div>
-        </div>
-            
-        }
+          </div>
+        )}
         {/* Search area */}
         {isOpenSearch && (
           <div className={styles.search_wrapper}>
@@ -964,7 +965,9 @@ function Chat() {
                     onChange={(e) => setSearchKeyword(e.target.value)}
                   />
                   <button type="button">
-                    <i className={`fa-solid fa-magnifying-glass ${styles.search_icon}`}></i>
+                    <i
+                      className={`fa-solid fa-magnifying-glass ${styles.search_icon}`}
+                    ></i>
                   </button>
                 </form>
                 <i
@@ -979,7 +982,9 @@ function Chat() {
                     <p className={styles.result_text}>No directory found</p>
                   ) : (
                     searchDirectories.map((dir) => (
-                      <div className={styles.result_text} key={dir.id}>{dir.directory_name}</div> // atau dir.directory_name
+                      <div className={styles.result_text} key={dir.id}>
+                        {dir.directory_name}
+                      </div> // atau dir.directory_name
                     ))
                   )}
                 </div>
@@ -989,7 +994,9 @@ function Chat() {
                     <p className={styles.result_text}>No history found</p>
                   ) : (
                     searchHistories.map((history) => (
-                      <div className={styles.result_text} key={history.id}>{history.title}</div>
+                      <div className={styles.result_text} key={history.id}>
+                        {history.title}
+                      </div>
                     ))
                   )}
                 </div>

@@ -621,39 +621,6 @@ body::-webkit-scrollbar {
   flex-direction: column;
 }
 
-.setting_input_container {
-  position: relative;
-  width: 100%;
-  max-width: 400px;
-}
-
-.setting_input {
-  padding: 0 10px;
-  height: 30px;
-  width: 100%;
-  background-color: var(--main-color);
-  border-radius: 5px;
-  border: 1px solid var(--thin-color);
-  color: var(--text-color);
-}
-
-.change_request_group {
-  width: 30px;
-  height: 100%;
-  border-radius: 0 5px 5px 0;
-  position: absolute;
-  right: 0;
-  top: 0;
-  background-color: var(--bold-color);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.change_request_icon {
-  color: var(--main-color);
-}
-
 .setting_title_type {
   margin: 0 0 10px 0;
   font-size: 18px;

@@ -148,11 +148,12 @@ function Chat() {
           Authorization: `Bearer ${token}`,
         },
       });
+
+      await updateTotalFiles();
     } catch (err) {
       setError("Failed to clear directory");
     }
   };
-
 
   const updateTotalFiles = async () => {
     if (!token || !userId) {
@@ -1002,31 +1003,33 @@ function Chat() {
           <div className={styles.confirm_container}>
             <div className={styles.confirm_card}>
               <h1 className={styles.confirm_title}>
-                {clearDesition === 'history'
-                  ? 'Clear History'
-                  : clearDesition === 'directory'
-                  ? 'Clear Directory'
-                  : 'Clear File'}
+                {clearDesition === "history"
+                  ? "Clear History"
+                  : clearDesition === "directory"
+                  ? "Clear Directory"
+                  : "Clear File"}
               </h1>
               <p className={styles.confirm_description}>
-                {clearDesition === 'history'
-                  ? 'Are you sure you want to clear all of your chat history?'
-                  : clearDesition === 'directory'
-                  ? 'Are you sure you want to clear all of your saved directories?'
-                  : 'Are you sure you want to clear all of your files?'}
+                {clearDesition === "history"
+                  ? "Are you sure you want to clear all of your chat history?"
+                  : clearDesition === "directory"
+                  ? "Are you sure you want to clear all of your saved directories?"
+                  : "Are you sure you want to clear all of your files?"}
               </p>
               <div className={styles.confirm_button_group}>
                 <button
                   className={styles.confirm_button}
                   onClick={async () => {
-                    if (clearDesition === 'history') {
+                    if (clearDesition === "history") {
                       await clearHistoryByUserId();
-                    } else if (clearDesition === 'directory') {
+                    } else if (clearDesition === "directory") {
+                      await clearFileByUserId();
                       await clearDirectoryByUserId();
-                    } else if (clearDesition === 'file') {
+                    } else if (clearDesition === "file") {
                       await clearFileByUserId();
                     }
                     setActiveConfirmPanel(false);
+                    window.location.reload();
                   }}
                 >
                   Yes
@@ -1073,9 +1076,7 @@ function Chat() {
                     <li
                       onClick={() => setActiveSetting("clear")}
                       className={
-                        activeSetting === "clear"
-                          ? styles.setting_active
-                          : ""
+                        activeSetting === "clear" ? styles.setting_active : ""
                       }
                     >
                       Language setting
@@ -1170,7 +1171,7 @@ function Chat() {
                     <h4 className={styles.setting_title_type}>Change Name</h4>
                     <div className={styles.setting_types}>
                       <form className={styles.setting_form_inline}>
-                        <label 
+                        <label
                           htmlFor="themeChange"
                           className={styles.setting_description_type}
                         >
@@ -1212,11 +1213,13 @@ function Chat() {
                               className={styles.clear_button}
                               onClick={(e) => {
                                 e.preventDefault();
-                                setClearDesition('history');
+                                setClearDesition("history");
                                 setActiveConfirmPanel(true);
                               }}
                             >
-                              <span className={styles.clear_text}>clear history</span>
+                              <span className={styles.clear_text}>
+                                clear history
+                              </span>
                             </button>
                           </div>
                         </div>
@@ -1234,11 +1237,13 @@ function Chat() {
                               className={styles.clear_button}
                               onClick={(e) => {
                                 e.preventDefault();
-                                setClearDesition('directory');
+                                setClearDesition("directory");
                                 setActiveConfirmPanel(true);
                               }}
                             >
-                              <span className={styles.clear_text}>clear directory</span>
+                              <span className={styles.clear_text}>
+                                clear directory
+                              </span>
                             </button>
                           </div>
                         </div>
@@ -1256,11 +1261,13 @@ function Chat() {
                               className={styles.clear_button}
                               onClick={(e) => {
                                 e.preventDefault();
-                                setClearDesition('file');
+                                setClearDesition("file");
                                 setActiveConfirmPanel(true);
                               }}
                             >
-                              <span className={styles.clear_text}>clear file</span>
+                              <span className={styles.clear_text}>
+                                clear file
+                              </span>
                             </button>
                           </div>
                         </div>
@@ -1275,7 +1282,6 @@ function Chat() {
               ></i>
             </div>
           </div>
-
         ) : (
           <></>
         )}

@@ -23,7 +23,7 @@ const handleQueryInsertFile = async (userId, fileName, description) => {
   }
 
   const dirExtract = await model.generateContent(`
-    Instruction: Extract the directory name the user want to put the file in refers to in this message. 
+    Instruction: Extract the name of directory the user want to put the file in refers to in this message. 
     Usually user won't specify if it's folder/directory but make sure if user wanted to put a file inside something, it must be the directory
     If none is found, return "default". 
     Double check with the language as well, usually it's in english or indonesia

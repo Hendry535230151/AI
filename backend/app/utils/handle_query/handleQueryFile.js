@@ -78,14 +78,16 @@ const handleQueryFile = async (message, userId, userName) => {
     const requestedCategory = typeExtract.response.text().trim().toLowerCase();
 
     const dirExtract = await model.generateContent(`
-        Instruction: Extract the directory or folder name the user refers to in this message.
+        Instruction: Extract the name of directory or folder name the user refers to in this message.
         If none is found, return "default".
         Double check with the language as well, usually it's in english or indonesia
       
         Message: "${message}"
       `);
 
-    const directoryName = dirExtract.response.text().trim() || "default";
+    let directoryNameTemp = dirExtract.response.text().trim() || "default";
+    const directoryName = directoryNameTemp.replace("", "");
+
     const targetDir = await directoryModel.getDirectoryByName(
       directoryName,
       userId

@@ -1,0 +1,377 @@
+.setting_wrapper,
+.search_wrapper {
+  width: 100vw;
+  height: 100vh;
+  background-color: #1f1f1fb3;
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+}
+
+.setting_card,
+.search_card {
+  width: 90%;
+  max-width: 1100px;
+  height: 600px;
+  padding: 50px;
+  border-radius: 30px;
+  border: 3px solid var(--thin-color);
+  background-color: var(--secondary-color);
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  gap: 20px;
+}
+
+.setting_card {
+  grid-template-columns: 250px 1fr;
+  grid-template-rows: 250px 1fr;
+}
+
+.search_card {
+  grid-template-rows: 40px 1fr;
+}
+
+.search_area {
+  display: grid;
+  grid-template-columns: 1fr 40px;
+  gap: 20px;
+}
+
+.search_result_group {
+  grid-template-columns: repeat(2, 1fr);
+  display: flex;
+  gap: 20px;
+}
+
+.search_form {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.search_bar {
+  width: 100%;
+  height: 100%;
+  padding: 0 45px 0 15px;
+  background-color: var(--main-color);
+  border: 1px solid var(--thin-color);
+  border-radius: 10px;
+  color: var(--text-color);
+}
+
+.search_icon {
+  height: 40px;
+  width: 40px;
+  position: absolute;
+  right: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  color: var(--main-color);
+  background-color: var(--bold-color);
+}
+
+.result_area {
+  flex: 1;
+  background-color: var(--main-color);
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.sub_text {
+  margin: 0 0 20px 0;
+  color: var(--text-color);
+  border-radius: 10px 10px 0 0;
+  position: relative;
+}
+
+.sub_text::before {
+  content: "";
+  width: 120px;
+  height: 3px;
+  background-color: var(--text-color);
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+}
+
+.result_text {
+  color: var(--text-color);
+  margin: 3px 0;
+}
+
+.setting_circle {
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  border: 3px solid var(--thin-color);
+  background-color: var(--main-color);
+}
+
+.big_profile {
+  height: 100%;
+  font-size: 7rem;
+  color: var(--thin-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.setting_profile {
+  padding: 50px;
+  font-size: 25px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  position: relative;
+}
+
+.setting_title {
+  margin: 0 0 10px 0;
+  color: var(--thin-color);
+}
+
+.setting_description {
+  color: var(--text-color);
+  font-size: 15px;
+}
+
+.setting_container {
+  gap: 20px;
+}
+
+.setting_selection {
+  height: 100%;
+}
+
+.setting_selection,
+.setting_list {
+  padding: 15px;
+  background-color: var(--setting-container);
+  overflow-y: auto;
+}
+
+.setting_list {
+  border-radius: 0 0 0 30px;
+  margin: 0 0 40px 0;
+}
+
+.setting_group,
+.setting_item_list {
+  list-style-type: none;
+  color: var(--text-color);
+}
+
+.setting_group li:hover,
+.setting_item_list li:hover,
+.setting_active,
+.setting_active {
+  color: var(--bold-color);
+  background-color: var(--secondary-color);
+}
+
+.setting_group li:last-of-type {
+  background-color: #b10909;
+  color: #f5f5f5;
+}
+
+.setting_active,
+.setting_active {
+  color: var(--thin-color);
+}
+
+.setting_active::before,
+.setting_active::before {
+  content: ">";
+  margin: 0 10px 0 0;
+  display: inline-block;
+}
+
+.setting_group li,
+.setting_item_list li {
+  padding: 2.5px 0 2.5px 15px;
+  margin: 4px 0;
+  border-radius: 5px;
+  transition: 0.2s ease-in-out;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.setting_content {
+  padding: 15px;
+  background-color: var(--setting-container);
+  border-radius: 0 0 30px 0;
+  overflow-y: auto;
+}
+
+.setting_group_type {
+  display: flex;
+  flex-direction: column;
+  margin: 0 0 10px 0;
+}
+
+.setting_form {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.setting_title_type {
+  margin: 0 0 10px 0;
+  font-size: 18px;
+  color: var(--bold-color);
+}
+
+.setting_description_type {
+  color: var(--text-color);
+  margin: 0 0 5px 0;
+}
+
+.close_setting_icon {
+  height: 40px;
+  width: 40px;
+  border: 1px solid var(--thin-color);
+  border-radius: 50%;
+  color: var(--thin-color);
+  position: absolute;
+  top: 50px;
+  right: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.setting_textarea {
+  width: 100%;
+  height: 80px;
+  padding: 10px;
+  border: 1px solid var(--thin-color);
+  border-radius: 5px;
+  background-color: var(--main-color);
+  resize: none;
+  color: var(--text-color);
+}
+
+.description_button {
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  background-color: var(--bold-color);
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+}
+
+.setting_form_inline {
+  margin: 0 0 8px 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--text-color);
+}
+
+.button_input_group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.clear_button {
+  padding: 0 3px;
+  height: 25px;
+  width: 85px;
+  background-color: #b10909;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.clear_text {
+  color: #f5f5f5;
+  font-size: 12px;
+}
+
+.checkbox_group {
+  position: relative;
+  display: inline-block;
+  width: 35px;
+  height: 20px;
+  background-color: var(--bold-color);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.checkbox {
+  opacity: 0;
+  width: 35px;
+  height: 20px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+.slider {
+  position: absolute;
+  top: 50%;
+  left: 2px;
+  width: 15px;
+  height: 15px;
+  background-color: var(--main-color);
+  border-radius: 50%;
+  transform: translateY(-50%);
+  transition: left 0.3s ease;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+}
+
+.checkbox:checked + .slider {
+  left: calc(100% - 17px);
+}
+
+
+.setting_input_container {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+}
+
+.setting_input {
+  padding: 0 10px;
+  height: 30px;
+  width: 100%;
+  background-color: var(--main-color);
+  border-radius: 5px;
+  border: 1px solid var(--thin-color);
+  color: var(--text-color);
+}
+
+.change_request_group {
+  width: 30px;
+  height: 100%;
+  border-radius: 0 5px 5px 0;
+  position: absolute;
+  right: 0;
+  top: 0;
+  background-color: var(--bold-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.change_request_icon {
+  color: var(--main-color);
+}

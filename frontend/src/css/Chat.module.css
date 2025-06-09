@@ -256,6 +256,10 @@ body::-webkit-scrollbar {
   white-space: pre-wrap;
 }
 
+.ai_message a {
+  color: var(--thin-color);
+}
+
 .user_message {
   align-self: flex-end;
   background-color: var(--bold-color);

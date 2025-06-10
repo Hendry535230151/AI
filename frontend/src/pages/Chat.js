@@ -34,11 +34,86 @@ function Chat() {
   const [searchDirectories, setSearchDirectories] = useState([]);
   const [searchHistories, setSearchHistories] = useState([]);
   const [isOpenNewSeach, setIsOpenNewSearch] = useState(false);
+  const [user, setUser] = useState(null);
   const queryFieldRef = useRef(null);
   const bottomRef = useRef(null);
   const bottomButton = useRef(null);
   const token = localStorage.getItem("token");
   const userId = fetchIdFromToken();
+
+  const fetchTitle = async (his) => {
+    if (editingId) return;
+    setChatHistoryId(his.id);
+    setChatTitle(his.title);
+    setChatHistory([]);
+    await fetchChatHistory();
+    try {
+      const res = await axios.get(
+        `http://localhost:3000/ai/history/${his.id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      const data = res.data.data;
+      const chats = Array.isArray(data)
+        ? data.map((chat) => ({
+            sender: chat.sender,
+            text: chat.text,
+          }))
+        : [];
+      setChatHistory(chats);
+    } catch {
+      setError(
+        "Failed to load chat history for selected topic"
+      );
+    }
+  };
+
+  const updateTitle = async (id, idx) => {
+    try {
+      await axios.put(
+        `http://localhost:3000/chat-history/${id}`,
+        { title: editingTitle, userId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const updatedList = [
+        ...chatHistoryList,
+      ];
+      updatedList[idx].title = editingTitle;
+      setChatHistoryList(updatedList);
+      setEditingId(null);
+    } catch {
+      setError("Failed to update title");
+    }
+  };
+
+  const deleteTitle = async (id, idx) => {
+    try {
+      await axios.delete(
+        `http://localhost:3000/chat-history/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const updatedList = chatHistoryList.filter(
+        (_, i) => i !== idx
+      );
+      setChatHistoryList(updatedList);
+      if (chatHistoryId === id) {
+        setChatHistoryId(null);
+        setChatHistory([]);
+        setChatTitle("");
+      }
+    } catch (err) {
+      setError("Failed to delete history");
+    }
+  };
 
   const handleSearch = async () => {
     if (!searchKeyword.trim()) return;
@@ -185,6 +260,23 @@ function Chat() {
       console.error("Error update total file:", errMsg);
     }
   };
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const token = localStorage.getItem('token'); 
+        const res = await axios.get(`http://localhost:3000/users/find-user/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setUser(res.data.data);
+      } catch (err) {
+        console.error('Error fetching user:', err);
+      }
+    };
+
+    fetchUser();
+  }, []);
 
   useEffect(() => {
     const fetchTheme = async () => {
@@ -629,37 +721,14 @@ function Chat() {
                 {!isClosedHistory && (
                   <>
                     <ul className={styles.dropdown_list}>
-                      {chatHistoryList.map((his, idx) => (
+                      {chatHistoryList.length === 0 ? (
+                      <li className={styles.dropdown_item}>No title found</li>
+                    ) : (
+                      chatHistoryList.map((his, idx) => (
                         <li
                           key={idx}
                           className={styles.dropdown_item}
-                          onClick={async () => {
-                            if (editingId) return;
-                            setChatHistoryId(his.id);
-                            setChatTitle(his.title);
-                            setChatHistory([]);
-                            await fetchChatHistory();
-                            try {
-                              const res = await axios.get(
-                                `http://localhost:3000/ai/history/${his.id}`,
-                                {
-                                  headers: { Authorization: `Bearer ${token}` },
-                                }
-                              );
-                              const data = res.data.data;
-                              const chats = Array.isArray(data)
-                                ? data.map((chat) => ({
-                                    sender: chat.sender,
-                                    text: chat.text,
-                                  }))
-                                : [];
-                              setChatHistory(chats);
-                            } catch {
-                              setError(
-                                "Failed to load chat history for selected topic"
-                              );
-                            }
-                          }}
+                          onClick={() => fetchTitle(his)}
                         >
                           {editingId === his.id ? (
                             <>
@@ -667,9 +736,7 @@ function Chat() {
                                 <input
                                   className={styles.rename_input}
                                   value={editingTitle}
-                                  onChange={(e) =>
-                                    setEditingTitle(e.target.value)
-                                  }
+                                  onChange={(e) => setEditingTitle(e.target.value)}
                                   onClick={(e) => e.stopPropagation()}
                                 />
                                 <div className={styles.rename_button_group}>
@@ -677,25 +744,7 @@ function Chat() {
                                     className={styles.rename_button}
                                     onClick={async (e) => {
                                       e.stopPropagation();
-                                      try {
-                                        await axios.put(
-                                          `http://localhost:3000/chat-history/${his.id}`,
-                                          { title: editingTitle, userId },
-                                          {
-                                            headers: {
-                                              Authorization: `Bearer ${token}`,
-                                            },
-                                          }
-                                        );
-                                        const updatedList = [
-                                          ...chatHistoryList,
-                                        ];
-                                        updatedList[idx].title = editingTitle;
-                                        setChatHistoryList(updatedList);
-                                        setEditingId(null);
-                                      } catch {
-                                        setError("Failed to update title");
-                                      }
+                                      updateTitle(his.id, idx)
                                     }}
                                   >
                                     <i className="fa-solid fa-floppy-disk"></i>
@@ -727,28 +776,9 @@ function Chat() {
                               </button>
                               <button
                                 className={styles.rename_button}
-                                onClick={async () => {
-                                  try {
-                                    await axios.delete(
-                                      `http://localhost:3000/chat-history/${his.id}`,
-                                      {
-                                        headers: {
-                                          Authorization: `Bearer ${token}`,
-                                        },
-                                      }
-                                    );
-                                    const updatedList = chatHistoryList.filter(
-                                      (_, i) => i !== idx
-                                    );
-                                    setChatHistoryList(updatedList);
-                                    if (chatHistoryId === his.id) {
-                                      setChatHistoryId(null);
-                                      setChatHistory([]);
-                                      setChatTitle("");
-                                    }
-                                  } catch (err) {
-                                    setError("Failed to delete history");
-                                  }
+                                onClick={(e) => { 
+                                  e.stopPropagation();
+                                  deleteTitle(his.id, idx)
                                 }}
                               >
                                 <i className="fa-solid fa-trash"></i>
@@ -756,7 +786,8 @@ function Chat() {
                             </>
                           )}
                         </li>
-                      ))}
+                        ))
+                      )}
                     </ul>
                   </>
                 )}
@@ -775,7 +806,7 @@ function Chat() {
             {isClosedSidebar ? (
               <></>
             ) : (
-              <p className={styles.profile_name}>User</p>
+              <p className={styles.profile_name}>{user ? user.first_name : 'Loading...'}</p>
             )}
           </button>
         </div>
@@ -1062,6 +1093,7 @@ function Chat() {
             setActiveSetting={setActiveSetting}
             isActiveSetting={isActiveSetting}
             handleLogout={handleLogout}
+            user = {user}
           />
         ) : (
           <></>

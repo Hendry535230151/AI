@@ -12,7 +12,8 @@ const ProfileDescription = ({
     updateTheme,
     setActiveSetting,
     isActiveSetting,
-    handleLogout
+    handleLogout,
+    user
 }) => {
     return (
         <div className={styles.setting_wrapper}>
@@ -21,7 +22,9 @@ const ProfileDescription = ({
                     <i className={`fa-solid fa-user ${styles.big_profile}`}></i>
                 </div>
                 <div className={styles.setting_profile}>
-                    <h1 className={styles.setting_title}>Hello, Human</h1>
+                    <h1 className={styles.setting_title}>
+                    Hello, {user?.first_name || "Human"}
+                    </h1>
                     <p className={styles.setting_description}>lorem</p>
                 </div>
                 <div className={styles.setting_container}>

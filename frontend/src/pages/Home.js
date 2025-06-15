@@ -120,10 +120,11 @@ function Home() {
         </div>
       </div>
       <h1 className={styles.video_text}>How To Use</h1>
-      <video controls className={styles.video_container}>
-        <source src="video-saya.mp4" type="video/mp4" />
-        Your browser does not support the video tag.
-      </video>
+      <iframe
+        className={styles.video_container}
+        src="https://www.youtube.com/embed/go2F5eKexec"
+        title="AInizer Video"
+      ></iframe>
       <div className={styles.collab_container}>
         <h1 className={styles.collab_title}>Join Our Team</h1>
         <p className={`${styles.collab_description} ${styles.center}`}>

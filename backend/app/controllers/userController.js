@@ -98,20 +98,7 @@ const userController = {
     }
   },
 
-  updateDescription: async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { description } = req.body;
-
-      const updatedUser = await userService.updateDescription(id, description);
-      return res.status(200).json({ success: true, data: updatedUser });
-    } catch (err) {
-      return res.status(err.statusCode || 500).json({
-        success: false,
-        message: err.message || "Internal server error",
-      });
-    }
-  },
+  
 };
 
 module.exports = userController;

@@ -9,5 +9,4 @@ router.get("/find-user/:id", userController.getUserById);
 router.put("/theme/:id", userController.setTheme);
 router.delete("/delete-user/:id", userController.deleteUserById);
 router.put("/:userId/name", userController.updateName);
-router.put("/:userId/description", userController.updateDescription);
 module.exports = router;

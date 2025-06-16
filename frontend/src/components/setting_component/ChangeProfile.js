@@ -4,16 +4,16 @@ import styles from "./setting.module.css";
 
 const ChangeProfile = ({ userId }) => {
   const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
 
   const handleNameChange = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.put(`http://localhost:3000/users/${userId}/name`,  { firstName: name });
       alert("Name updated!");
+      window.location.reload()
     } catch (error) {
       console.error("Error updating name:", error);
-      alert("Failed to update name.");
+      alert("Failed to update name."); 
     }
   };
 

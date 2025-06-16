@@ -78,7 +78,7 @@ body::-webkit-scrollbar {
 
 .dropdown_area {
   flex: 1;
-  min-height: 0;
+  min-height: 50px;
   margin: 10px 0;
   background-color: var(--secondary-color);
   display: flex;

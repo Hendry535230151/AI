@@ -168,34 +168,6 @@ const userService = {
       throw err;
     }
   },
-
-  updateDescription: async (userId, description) => {
-    try {
-      if (!userId) {
-        throw new CustomError(
-          "User ID is required. Please provide a valid ID and try again",
-          400
-        );
-      } else if (!description) {
-        throw new CustomError(
-          "First name is required. Please provide a valid first name and try again",
-          400
-        );
-      }
-
-      const changeDesc = await userModel.updateDescription(userId, description);
-      if (!changeDesc) {
-        throw new CustomError(
-          `Failed to change user first name. The user may not exist. Please verify the ID and try again.`,
-          400
-        );
-      }
-
-      return changeDesc;
-    } catch (err) {
-      throw err;
-    }
-  },
 };
 
 module.exports = userService;

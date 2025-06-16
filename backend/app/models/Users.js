@@ -145,22 +145,6 @@ const userModel = {
       });
     });
   },
-
-  updateDescription: (userId, description) => {
-    return new Promise((resolve, reject) => {
-      const query = "UPDATE users SET descipriton = ? WHERE id = ?";
-      db.query(query, [description, userId], (err, result) => {
-        if (err) {
-          return reject(err);
-        }
-        if (!result || result.affectedRows === 0) {
-          resolve(false);
-        } else {
-          resolve(result);
-        }
-      });
-    });
-  },
 };
 
 module.exports = userModel;

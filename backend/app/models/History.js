@@ -1,17 +1,17 @@
-const db = require('../config/db');
+const db = require("../config/db");
 
 const historyModel = {
   getHistories: () => {
     return new Promise((resolve, reject) => {
-      const query = 'SELECT * FROM chat_histories';
+      const query = "SELECT * FROM chat_histories";
       db.query(query, (err, result) => {
         if (err) {
-            return reject(err);
+          return reject(err);
         }
         if (!result || result.length === 0) {
-            resolve(false);
+          resolve(false);
         } else {
-            resolve(result);
+          resolve(result);
         }
       });
     });
@@ -19,15 +19,15 @@ const historyModel = {
 
   getHistoryById: (Id) => {
     return new Promise((resolve, reject) => {
-      const query = 'SELECT * FROM chat_histories WHERE id = ?';
+      const query = "SELECT * FROM chat_histories WHERE id = ?";
       db.query(query, [Id], (err, result) => {
         if (err) {
-            return reject(err);
+          return reject(err);
         }
         if (!result || result.length === 0) {
-            resolve(false);
+          resolve(false);
         } else {
-            resolve(result[0]);
+          resolve(result[0]);
         }
       });
     });
@@ -35,23 +35,24 @@ const historyModel = {
 
   getHistoryByTitle: (searchQuery, userId) => {
     return new Promise((resolve, reject) => {
-      const query = 'SELECT * FROM chat_histories WHERE title LIKE ? AND user_id = ?'
+      const query =
+        "SELECT * FROM chat_histories WHERE title LIKE ? AND user_id = ?";
       db.query(query, [`%${searchQuery}%`, userId], (err, result) => {
-        if (err ){
-          return  reject (err);
+        if (err) {
+          return reject(err);
         }
         if (!result || result.length === 0) {
           resolve(false);
         } else {
           resolve(result);
         }
-      })
-    })
+      });
+    });
   },
 
   getHistoryByUserId: (userId) => {
     return new Promise((resolve, reject) => {
-      const query = 'SELECT * FROM chat_histories WHERE user_id = ?';
+      const query = "SELECT * FROM chat_histories WHERE user_id = ?";
       db.query(query, [userId], (err, result) => {
         if (err) {
           return reject(err);
@@ -84,7 +85,7 @@ const historyModel = {
 
   createHistory: (userId, title) => {
     return new Promise((resolve, reject) => {
-      const query = 'INSERT INTO chat_histories (user_id, title) VALUES (?, ?)';
+      const query = "INSERT INTO chat_histories (user_id, title) VALUES (?, ?)";
       db.query(query, [userId, title], (err, result) => {
         if (err) {
           return reject(err);
@@ -101,7 +102,7 @@ const historyModel = {
   updateHistoryById: (id, userId, title) => {
     return new Promise((resolve, reject) => {
       const query =
-        "UPDATE chat_histories SET title = ? WHERE id = ? AND user_id = ?"
+        "UPDATE chat_histories SET title = ? WHERE id = ? AND user_id = ?";
       db.query(query, [title, id, userId], (err, result) => {
         if (err) {
           return reject(err);
@@ -117,15 +118,15 @@ const historyModel = {
 
   deleteHistoryById: (id) => {
     return new Promise((resolve, reject) => {
-      const query = 'DELETE FROM chat_histories WHERE id = ?';
+      const query = "DELETE FROM chat_histories WHERE id = ?";
       db.query(query, [id], (err, result) => {
         if (err) {
-            return reject(err);
+          return reject(err);
         }
         if (!result || result.affectedRows === 0) {
-            resolve(false);
+          resolve(false);
         } else {
-            resolve(true);
+          resolve(true);
         }
       });
     });
@@ -133,15 +134,15 @@ const historyModel = {
 
   deleteHistoryByUserId: (userId) => {
     return new Promise((resolve, reject) => {
-      const query = 'DELETE FROM chat_histories WHERE user_id = ?';
+      const query = "DELETE FROM chat_histories WHERE user_id = ?";
       db.query(query, [userId], (err, result) => {
         if (err) {
-            return reject(err);
+          return reject(err);
         }
         if (!result || result.affectedRows === 0) {
-            resolve(false);
+          resolve(false);
         } else {
-            resolve(true);
+          resolve(true);
         }
       });
     });
